@@ -1,0 +1,27 @@
+function string.upperPlus( s )
+    str = tostring( s )
+
+    local reps = {
+        ["а"] = "А", ["б"] = "Б", ["в"] = "В", ["г"] = "Г", ["д"] = "Д", 
+        ["е"] = "Е", ["ё"] = "Ё", ["ж"] = "Ж", ["з"] = "З", ["и"] = "И", 
+        ["й"] = "Й", ["к"] = "К", ["л"] = "Л", ["м"] = "М", ["н"] = "Н", 
+        ["о"] = "О", ["п"] = "П", ["р"] = "Р", ["с"] = "С", ["т"] = "Т", 
+        ["у"] = "У", ["ф"] = "Ф", ["х"] = "Х", ["ц"] = "Ц", ["ч"] = "Ч", 
+        ["ш"] = "Ш", ["щ"] = "Щ", ["ъ"] = "Ъ", ["ы"] = "Ы", ["ь"] = "Ь", 
+        ["э"] = "Э", ["ю"] = "Ю", ["я"] = "Я"
+    }
+
+    str = string.upper( str )
+
+    for k, v in pairs( reps ) do
+    	str = string.gsub( str, k, v )
+    end
+
+    return str
+end
+
+function FormattedMoney( amount )
+    amount = tostring( amount )
+
+    return amount:reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "").."$"
+end

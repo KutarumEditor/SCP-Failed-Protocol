@@ -1,0 +1,226 @@
+SWEP.Base = "fp_swep_base"
+
+SWEP.ViewModel = "models/hunter/blocks/cube025x025x025.mdl"
+SWEP.ShouldDrawVM = true
+SWEP.WorldModel = "models/hunter/blocks/cube025x025x025.mdl"
+SWEP.ShouldDrawWM = false
+
+SWEP.AutoSwitchTo = true
+SWEP.Weight = 999
+
+SWEP.Droppable = false
+
+SWEP.ReachDistance = 100
+
+SWEP.CantBeCarried = {
+	["player"] = true,
+	["cv_pickup_point_table"] = true,
+	["func_lod"] = true,
+	["func_brush"] = true,
+	["func_detail"] = true,
+	["func_breakable"] = true,
+	["func_breakable_surf"] = true,
+	["func_rot_button"] = true,
+	["func_button"] = true,
+	["func_door"] = true,
+	["func_door_rotating"] = true,
+	["prop_door_rotating"] = true,
+	["prop_dynamic"] = true,
+	["cv_blood"] = true,
+	["cv_armor"] = true,
+	["cv_delivery_point"] = true,
+	["cv_deliverer_locker"] = true,
+	["cv_fading_bag"] = true,
+}
+
+function SWEP:SetupDataTables()
+	self:NetworkVar( "Bool", 0, "IsCarrying" )
+end
+
+function SWEP:Initialize()
+	self:InitLang()
+
+	self:DrawShadow( false )
+
+	self:SetHoldType( self.HoldType )
+end
+
+function SWEP:PrimaryAttack()
+	if not IsFirstTimePredicted() then return end
+	local owner = self.Owner
+
+	self:SetCarrying()
+	local tr = owner:GetEyeTraceNoCursor()
+
+	if IsValid( tr.Entity ) and self:CanPickup( tr.Entity ) then
+		local Dist = ( owner:GetShootPos() - tr.HitPos ):Length()
+
+		if Dist < self.ReachDistance then
+			sound.Play( "Flesh.ImpactSoft", owner:GetShootPos(), 65, math.random( 90, 110 ) )
+
+			self:SetCarrying( tr.Entity, tr.PhysicsBone, tr.HitPos, Dist )
+
+			tr.Entity.Touched = true
+		end
+	end
+end
+
+function SWEP:SecondaryAttack()
+	if not IsFirstTimePredicted() then return end
+	local ply = self.Owner
+
+	local tr = ply:GetEyeTraceNoCursor()
+
+	local ent = tr.Entity
+	if IsValid( ent ) then
+		ply:ChatPrint( tostring( ent:GetPos() ) )
+		ply:ChatPrint( tostring( ent:GetAngles() ) )
+
+		ply:ChatPrint( ent:MapCreationID(), ent:GetClass() )
+
+		--ent:Remove()
+	else
+		if not SERVER then return end
+
+		ply:ChatPrint( "Vector( "..tr.HitPos.x..", "..tr.HitPos.y..", "..tr.HitPos.z.." )," )
+	end
+end
+
+function SWEP:GetCarrying()
+	return self.CarryEnt
+end
+
+function SWEP:SetCarrying( ent, bone, pos, dist )	
+	if IsValid( ent ) then
+		self.CarryEnt = ent
+		self.CarryBone = bone
+		self.CarryDist = dist
+
+		ent.IsBeingDragged = true
+
+		if not ( ent:GetClass() == "prop_ragdoll" ) then
+			self.CarryPos = ent:WorldToLocal( pos )
+		else
+			self.CarryPos = nil
+		end
+	else
+		if IsValid( self.CarryEnt ) then
+			self.CarryEnt.IsBeingDragged = false
+		end
+
+		self.CarryEnt = nil
+		self.CarryBone = nil
+		self.CarryPos = nil
+		self.CarryDist = nil
+	end
+end
+
+function SWEP:CanPickup( ent )
+	if ent:IsNPC() then return false end
+	if ent:IsWorld() then return false end
+	if self.CantBeCarried[ent:GetClass()] then return false end
+	local class = ent:GetClass()
+	if CLIENT then return true end
+	if ent:IsPlayerHolding() then return false end
+	if IsValid( ent:GetPhysicsObject() ) and ent:GetPhysicsObject():IsMotionEnabled() then return true end
+
+	return false
+end
+
+function SWEP:ApplyForce()
+	if not SERVER then return end
+
+	local target = self.Owner:GetAimVector() * self.CarryDist + self.Owner:GetShootPos() + Vector( 0, 0, 5 )
+	local phys = self.CarryEnt:GetPhysicsObjectNum( self.CarryBone )
+
+	if IsValid(phys) then
+		local TargetPos = phys:GetPos()
+
+		if self.CarryPos then
+			TargetPos = self.CarryEnt:LocalToWorld(self.CarryPos)
+		end
+
+		local vec = target - TargetPos
+		local len, mul = vec:Length(), self.CarryEnt:GetPhysicsObject():GetMass()
+
+		local StandingEnt = self.Owner:GetGroundEntity()
+		local StandingOn = IsValid( StandingEnt ) and ( ( StandingEnt == self.CarryEnt ) or ( StandingEnt:IsConstrained() and table.HasValue( constraint.GetAllConstrainedEntities( StandingEnt ), self.CarryEnt ) ) )
+		local PlyIn = ( self.CarryEnt == self.Owner:GetVehicle() )
+		if len > self.ReachDistance or StandingOn or PlyIn then
+			self:SetCarrying()
+
+			return
+		end
+
+		if self.CarryEnt:GetClass() == "prop_ragdoll" then
+			mul = mul * 10
+		end
+
+		vec:Normalize()
+		local plyVel = self.Owner:GetVelocity()
+		local avec, velo = vec * len^1.5, phys:GetVelocity() - (plyVel * 2)
+		local Force = ( avec - velo / 2 ) * mul
+		local ForceNormal = Force:GetNormalized()
+		local ForceMagnitude = Force:Length()
+		ForceMagnitude = math.Clamp( ForceMagnitude, 0, 2000 )
+		Force = ForceNormal * ForceMagnitude
+
+		local CounterDir, CounterAmt = velo:GetNormalized(), velo:Length()
+
+		if self.CarryPos then
+			phys:ApplyForceOffset( Force, self.CarryEnt:LocalToWorld( self.CarryPos ) )
+		else
+			phys:ApplyForceCenter( Force )
+		end
+
+		phys:ApplyForceCenter( Vector( 0, 0, mul ) )
+		phys:AddAngleVelocity( -phys:GetAngleVelocity() / 10 )
+	end
+end
+
+function SWEP:Think()
+	local owner = self:GetOwner()
+
+	if IsValid( owner ) and owner:KeyDown( IN_ATTACK ) then
+		if IsValid( self.CarryEnt ) then
+			self:ApplyForce()
+		end
+	elseif self.CarryEnt then
+		self:SetCarrying()
+	end
+
+	local holdType = "normal"
+
+	if IsValid( self.CarryEnt ) or self.CarryEnt then
+		holdType = "pistol"
+	else
+		holdType = "normal"
+	end
+
+	if SERVER then
+		self:SetHoldType( holdType )
+	end
+end
+
+local hand_default_mat = Material( "crimeville/misc/hand_default.png", "smooth" )
+local hand_grab_mat = Material( "crimeville/misc/hand_grab.png", "smooth" )
+
+function SWEP:DrawHUD()
+	local ply = LocalPlayer()
+	local tr = ply:GetEyeTraceNoCursor()
+
+	if ( IsValid( tr.Entity ) and self.CantBeCarried[tr.Entity:GetClass()] != true ) or IsEntity( self:GetCarrying() ) then
+		local Dist = ( ply:GetShootPos() - tr.HitPos ):Length()
+
+		if Dist < self.ReachDistance or IsEntity( self:GetCarrying() ) then
+			if IsEntity( self:GetCarrying() ) then
+				surface.SetMaterial( hand_grab_mat )
+			else
+				surface.SetMaterial( hand_default_mat )
+			end
+
+			surface.SetDrawColor( color_white )
+			surface.DrawTexturedRect( ScrW()/2 - ScreenScale( 5 ), ScrH()/2 - ScreenScale( 5 ), ScreenScale( 10 ), ScreenScale( 10 ) )
+		end
+	end
+end
