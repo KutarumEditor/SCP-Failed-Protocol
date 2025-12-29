@@ -26,4 +26,17 @@ SCPS = {
 		slowwalkspeed = 85,
 		jumppower = 175,
 	},
+	["SCP096"] = {
+		model = "models/washton/scp096/scp096unity.mdl",
+		swep = "fp_scp_swep_096",
+		maxhp = 2500,
+		hp = 2500,
+		scale_damage = false,
+		scary = true,
+		has_stamina = false,
+		walkspeed = 120,
+		crouchspeed = 0.5,
+		slowwalkspeed = 85,
+		jumppower = 125,
+	},
 }

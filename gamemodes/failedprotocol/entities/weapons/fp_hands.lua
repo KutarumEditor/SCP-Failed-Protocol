@@ -73,10 +73,16 @@ function SWEP:SecondaryAttack()
 
 	local ent = tr.Entity
 	if IsValid( ent ) then
-		ply:ChatPrint( tostring( ent:GetPos() ) )
-		ply:ChatPrint( tostring( ent:GetAngles() ) )
+		ply:ChatPrint( tostring( ent:GetPos() ).." "..tostring( ent:GetAngles() ) )
 
 		ply:ChatPrint( ent:MapCreationID(), ent:GetClass() )
+
+		if ent:GetClass() == "prop_dynamic" then
+			ply:ChatPrint( ent:GetModel() )
+		end
+
+		print( "eflags: ", ply:GetEFlags() )
+		print( "flags: ", ply:GetFlags() )
 
 		--ent:Remove()
 	else

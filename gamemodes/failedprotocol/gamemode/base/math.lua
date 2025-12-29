@@ -54,3 +54,9 @@ function ProjectPointOnPlane( point, planeNormal, planePoint )
 
     return projectedPoint
 end
+
+local VECTOR = FindMetaTable( "Vector" )
+
+function VECTOR:Copy()
+    return Vector( self.x, self.y, self.z )
+end

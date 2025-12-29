@@ -35,9 +35,9 @@ REGISTERED_ARMOR = {
 		model = "models/kutarum/scpfp/helmets/security_helmet_light.mdl",
 		durability = 50,
 		resistance = {
-			[HITGROUP_HEAD] = .25,
+			[HITGROUP_HEAD] = .15,
 		},
-		class = 1,
+		class = 2,
 	},
 	["security_heavy_helmet"] = {
 		type = "helmet",
@@ -45,7 +45,7 @@ REGISTERED_ARMOR = {
 		model = "models/kutarum/scpfp/helmets/security_helmet_heavy.mdl",
 		durability = 75,
 		resistance = {
-			[HITGROUP_HEAD] = .25,
+			[HITGROUP_HEAD] = .3,
 		},
 		class = 2,
 	},

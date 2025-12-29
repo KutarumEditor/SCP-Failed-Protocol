@@ -10,6 +10,11 @@ local sndDurTbl = {
 	["scpfp/gocsniper/scp.wav"] = 1.45,
 }
 
+local senderColor = {
+	gocsniper = Color( 97, 132, 149 ),
+	gruspy = Color( 158, 145, 99 ),
+}
+
 local function castPhraseInternal( sound, sender, text )
 	surface.PlaySound( sound )
 
@@ -38,6 +43,7 @@ function PHRASES.PopUp( s, t, d )
 	local sn = s.."_name"
 	table.insert( PHRASES.CUR, {
 		sender = LANG.Get( "PHRASES", sn ),
+		color = senderColor[s] or color_white,
 		text = utf8.force( LANG.Get( "PHRASES", s, t ) ),
 		curtext = "",
 		nextletter = 0,
@@ -47,6 +53,8 @@ function PHRASES.PopUp( s, t, d )
 end
 
 hook.Add( "HUDPaint", "PhrasesDisplay", function()
+	if #PHRASES.CUR == 0 then return end
+
 	for k, v in ipairs( PHRASES.CUR ) do
 		if k > 3 then continue end
 
@@ -57,8 +65,8 @@ hook.Add( "HUDPaint", "PhrasesDisplay", function()
 			v.curtext = utf8.sub( v.text, 1, utf8.len( v.curtext ) + 1 )
 		end
 
-		draw.SimpleTextOutlined( v.sender.." : "..v.curtext, "HUDNormal", ScrW() / 4, ScrH()*3/4 - ( k - 1 ) * ScreenScale( 12 ), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1, color_black )
-	
+		draw.MultiColorText( "HUDNormal", ScrW() / 4, ScrH()*3/4 - ( k - 1 ) * ScreenScale( 12 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1, color_black, v.color, v.sender, color_white, " : "..v.curtext )
+
 		if CurTime() >= v.endtime then
 			table.remove( PHRASES.CUR, k )
 		end

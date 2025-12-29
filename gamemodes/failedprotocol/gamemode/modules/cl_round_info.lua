@@ -118,6 +118,8 @@ end )
 net.Receive( "FPInfoPopup", function()
 	info_tbl = net.ReadTable( true )
 
+	PrintTable( info_tbl )
+
 	for i, v in ipairs( info_tbl ) do
 		txt_tbl = info_tbl[i].text
 
@@ -125,13 +127,14 @@ net.Receive( "FPInfoPopup", function()
 
 		for _, t in ipairs( txt_tbl ) do
 			if istable( t ) then
-				local text = lang
+				local text = {}
 
 				for _, sub in ipairs( t ) do
-					text = text[sub]
+					text[#text + 1] = tostring( sub )
 				end
 
-				info_tbl[i].text = info_tbl[i].text .. text
+				PrintTable( text )
+				info_tbl[i].text = info_tbl[i].text .. LANG.Get( unpack( text ) )
 			else
 				info_tbl[i].text = info_tbl[i].text .. t
 			end

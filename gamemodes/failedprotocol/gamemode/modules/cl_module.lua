@@ -13,6 +13,7 @@ local math = math
 local net = net
 local Angle = Angle
 local Vector = Vector
+local KMASKS = KMASKS
 local lply
 local lrag
 
@@ -176,32 +177,12 @@ function GM:HUDPaint()
 		surface.SetDrawColor( clr )
 	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, h - ind*2, h - ind*2 )
 
-		render.SetStencilEnable( true )
-
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
-
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, h - ind*2, h - ind*2 )
-
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	    surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
-
-	    draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2, ( w - ind*2 ) * hCoef, bar_height, bar.clr )
-
-	    render.SetStencilEnable( false )
+	    KMASKS.Start()
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2, ( w - ind*2 ) * hCoef, bar_height, bar.clr )
+		KMASKS.Source()
+		    surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
+			surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, h - ind*2, h - ind*2 )
+		KMASKS.End()
 
 		surface.SetDrawColor( 255, 255, 255, 255 * total_alpha_mult )
 		surface.SetMaterial( bar.icon )
@@ -209,34 +190,13 @@ function GM:HUDPaint()
 		-- Main bar
 		draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind, ( w - ind*2 ), h - ind*2, clr )
 
-		render.SetStencilEnable( true )
-
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
-
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-	    draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind, ( w - ind*2 ), h - ind*2, clr )
-
-	    render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	    surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
-
-	    draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2, ( w - ind*2  - ScreenScale( 4 ) ) * hCoef, bar_height, bar.clr )
-	    draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 1 ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2 - ScreenScale( 1 ), ScreenScale( 1 ), bar_height + ScreenScale( 2 ), color_white )
-	    draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ) + ( w - ind*2  - ScreenScale( 4 ) ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2 - ScreenScale( 1 ), ScreenScale( 1 ), bar_height + ScreenScale( 2 ), color_white )
-
-	    render.SetStencilEnable( false )
+		KMASKS.Start()
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2, ( w - ind*2  - ScreenScale( 4 ) ) * hCoef, bar_height, bar.clr )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 1 ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2 - ScreenScale( 1 ), ScreenScale( 1 ), bar_height + ScreenScale( 2 ), color_white )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ) + ( w - ind*2  - ScreenScale( 4 ) ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2 - ScreenScale( 1 ), ScreenScale( 1 ), bar_height + ScreenScale( 2 ), color_white )
+	    KMASKS.Source()
+		    draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind, ( w - ind*2 ), h - ind*2, clr )
+	    KMASKS.End()
 
 	    draw.SimpleTextOutlined( text, "HUDSmall", ( 8 + randShake + ind ) + ( w - ind*2 )/2 + h, startY - ( 8 + randShake ) + h/2, Color( 255, 255, 255, 255 * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
 
@@ -251,39 +211,20 @@ function GM:HUDPaint()
 	surface.SetDrawColor( clr )
     surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
 
-	render.SetStencilEnable( true )
+    KMASKS.Start()
+		surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
 
-    render.ClearStencil()
-    
-    render.SetStencilTestMask( 255 )
-    render.SetStencilWriteMask( 255 )
+	    surface.SetFont( "HUDNormal" )
+	    local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
 
-    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
+	    surface.SetDrawColor( color_white )
+	    surface.DrawRect( 8 + randShake + ind + ( w - ind*2 + h ) - ScreenScale( 2 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
+	    surface.DrawRect( 8 + randShake + ind + ScreenScale( 1 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
 
-    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-    render.SetStencilReferenceValue( 9 )
-    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-	surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
-
-	render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-    surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
-
-    surface.SetFont( "HUDNormal" )
-    local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
-
-    surface.SetDrawColor( color_white )
-    surface.DrawRect( 8 + randShake + ind + ( w - ind*2 + h ) - ScreenScale( 2 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
-    surface.DrawRect( 8 + randShake + ind + ScreenScale( 1 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
-
-    draw.SimpleTextOutlined( LANG.Get( "CLASSES", lply:GetFPClass() ), "HUDNormal", ( 8 + randShake + ind ) + ( w - ind*2 + h )/2, startY - ( 8 + randShake ) - h/2 + ind + (h - ind*2)/2, Color( team_clr.r, team_clr.g, team_clr.b, team_clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
-
-    render.SetStencilEnable( false )
+	    draw.SimpleTextOutlined( LANG.Get( "CLASSES", lply:GetFPClass() ), "HUDNormal", ( 8 + randShake + ind ) + ( w - ind*2 + h )/2, startY - ( 8 + randShake ) - h/2 + ind + (h - ind*2)/2, Color( team_clr.r, team_clr.g, team_clr.b, team_clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
+	KMASKS.Source()
+	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
+	KMASKS.End()
 
     startY = startY - h*2
 
@@ -296,39 +237,20 @@ function GM:HUDPaint()
 		surface.SetDrawColor( bg_clr )
 	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
 
-		render.SetStencilEnable( true )
+	    KMASKS.Start()
+			surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
 
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
+		    surface.SetFont( "HUDNormal" )
+		    local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
 
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
+		    surface.SetDrawColor( color_white )
+		    surface.DrawRect( 8 + randShake + ind + ( w - ind*2 + h ) - ScreenScale( 2 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
+		    surface.DrawRect( 8 + randShake + ind + ScreenScale( 1 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
 
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
-
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	    surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
-
-	    surface.SetFont( "HUDNormal" )
-	    local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
-
-	    surface.SetDrawColor( color_white )
-	    surface.DrawRect( 8 + randShake + ind + ( w - ind*2 + h ) - ScreenScale( 2 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
-	    surface.DrawRect( 8 + randShake + ind + ScreenScale( 1 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
-
-	    draw.SimpleTextOutlined( lply:FPName().." "..lply:FPSurname(), "HUDNormal", ( 8 + randShake + ind ) + ( w - ind*2 + h )/2, startY - ( 8 + randShake ) - h/2 + ind + (h - ind*2)/2, Color( clr.r, clr.g, clr.b, clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
-
-	    render.SetStencilEnable( false )
+		    draw.SimpleTextOutlined( lply:FPName().." "..lply:FPSurname(), "HUDNormal", ( 8 + randShake + ind ) + ( w - ind*2 + h )/2, startY - ( 8 + randShake ) - h/2 + ind + (h - ind*2)/2, Color( clr.r, clr.g, clr.b, clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
+		KMASKS.Source()
+		    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
+		KMASKS.End()
 	end
 
 	--Spectate Info
@@ -532,15 +454,18 @@ net.ReceivePing( "HideHUD", function( data )
 end )
 
 net.ReceivePing( "ClearCSData", function()
-    PRIVATE_MESSAGES = {}
-
     for i, ply in ipairs( player.GetAll() ) do
     	ply.known = false
+    	ply.grulocated = false
     end
 end )
 
 net.ReceivePing( "OnSpawnCS", function()
     hook.Run( "OnSpawn" )
+end )
+
+net.ReceivePing( "StartRoundAmbient", function()
+	AMBIENT.Start()
 end )
 
 hook.Add( "OnSpawn", "FPFlashWindow", function()

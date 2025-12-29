@@ -27,6 +27,7 @@ SETTINGS.fp_disable_support = "Отключить спавн за поддерж
 SETTINGS.fp_disable_scp = "Отключить спавн за SCP"
 SETTINGS.fp_inventory_button = "Открыть инвентарь"
 SETTINGS.fp_settings_button = "Открыть настройки"
+SETTINGS.fp_scp_upgrades_button = "Открыть улучшения SCP"
 
 local KEYCARDS = {}
 lang.KEYCARDS = KEYCARDS
@@ -67,6 +68,7 @@ CLASSES.gruspy = "Шпион ГРУ"
 CLASSES.guard_pacificator = "Усмиритель СБ"
 CLASSES.guard = "Сотрудник СБ"
 CLASSES.guard_storm = "Штурмовик СБ"
+CLASSES.cispy = "Шпион ПХ"
 
 CLASSES.ntfsoldier = "Солдат Э-11"
 
@@ -102,6 +104,7 @@ DESC.gruspy = "Описание йоу"
 DESC.guard_pacificator = "Описание йоу"
 DESC.guard = "Описание йоу"
 DESC.guard_storm = "Описание йоу"
+DESC.cispy = "Описание йоу"
 
 DESC.ntfsoldier = "Описание йоу"
 

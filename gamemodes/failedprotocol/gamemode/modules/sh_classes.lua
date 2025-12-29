@@ -141,8 +141,8 @@ CLASSES = {
 		spawngroup = "security",
 		team = TEAM_SD,
 		model = "models/kutarum/scpfp/playermodels/security.mdl",
-		weps = { "tfa_ins2_wpn_berettam9" },
-		ammo = { ["pistol"] = 75 },
+		weps = { "fp_melee_baton" },
+		ammo = {},
 		helmet = "security_cap",
 		vest = "security_light_vest",
 		maxhp = 100,
@@ -154,13 +154,24 @@ CLASSES = {
 		slowwalkspeed = 85,
 		runspeed = 225,
 		jumppower = 175,
-		callback = function( ply )
-			local wep = ply:GetWeapon( "tfa_ins2_wpn_berettam9" )
-
-			wep:SetClip1( wep:GetMaxClip1() )
-
-			ply:GiveKeycard( "jr_sec" )
-		end,
+	},
+	["cispy"] = {
+		spawngroup = "security",
+		team = TEAM_CI,
+		model = "models/kutarum/scpfp/playermodels/security.mdl",
+		weps = { "fp_melee_baton" },
+		ammo = {},
+		helmet = "security_cap",
+		vest = "security_light_vest",
+		maxhp = 100,
+		hp = 100,
+		maxstamina = 100,
+		stamina = 100,
+		walkspeed = 125,
+		crouchspeed = 0.5,
+		slowwalkspeed = 85,
+		runspeed = 225,
+		jumppower = 175,
 	},
 	["guard"] = {
 		spawngroup = "security",
@@ -250,6 +261,7 @@ CLASSES = {
 		jumppower = 175,
 		callback = function( ply )
 			ABILITIES.Setup( ply, "grucheck" )
+			ABILITIES.Setup( ply, "grulocate" )
 
 			ply:GiveKeycard( "res" )
 

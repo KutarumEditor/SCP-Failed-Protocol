@@ -40,10 +40,12 @@ ABILITIES = {
 				local tr = util.TraceLine( {
 					start = ply:GetShootPos(),
 					endpos = ply:GetShootPos() + ply:GetAimVector() * 100,
-					filter = function( ent ) return ent:IsPlayer() and ent != ply end
+					filter = function( ent )
+						return ent:IsPlayer() and ent:Alive() and ent != ply
+					end
 				} )
 
-				return tr.Entity != NULL
+				return tr.Entity:IsValid()
 			end,
 			callback = function( ply )
 				local tr = util.TraceLine( {
@@ -55,6 +57,7 @@ ABILITIES = {
 				local ent = tr.Entity
 				if ent.amnesicrussian then
 					ABILITIES.Remove( ply, "grucheck" )
+					ABILITIES.Remove( ply, "grulocate" )
 
 					net.Ping( "FoundRussian", tostring( ent:UserID() ), ply )
 
@@ -64,7 +67,21 @@ ABILITIES = {
 					ent:RevealRussian( ply )
 				else
 					ply:FPServerMessage( Color( 255, 125, 125 ), "$MISC.gruwrongtarget" )
+
+					net.Ping( "RemoveForGRULocator", tostring( ent:UserID() ), ply )
 				end
+			end
+		},
+		["grulocate"] = {
+			icon = check_mat,
+			color = Color( 215, 175, 0 ),
+			cooldown = 20,
+			button = KEY_N,
+			check = function( ply )
+				return true
+			end,
+			callback = function( ply )
+				net.Ping( "RussianLocator", nil, ply )
 			end
 		}
 	}

@@ -134,9 +134,11 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 		dmginfo:ScaleDamage( hitGroupDamage[hitgroup] or 1 )
 
-		if hitgroup == HITGROUP_HEAD and ( #armortbl == 0 or not defendedAtLeastBySomeShit or bulletClass > armorClass ) then
+		if hitgroup == HITGROUP_HEAD and ( !defendedAtLeastBySomeShit or bulletClass > armorClass ) then
 			dmginfo:ScaleDamage( 3 )
 		end
+
+		dmginfo:SetDamage( math.ceil( dmginfo:GetDamage() ) )
 
 		net.Start( "FPArmor" )
 			net.WritePlayer( ply )

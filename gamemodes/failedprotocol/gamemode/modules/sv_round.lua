@@ -46,6 +46,8 @@ REGISTERED_ROUND_TYPES = {
 			ClearPersonas()
 			SetupPlayers( "default" )
 
+			net.Ping( "StartRoundAmbient", "" )
+
 			net.Ping( "ClearCSData", "" )
 		end,
 		endcheck = function()
@@ -99,6 +101,7 @@ end
 
 function RestartRound()
 	-- Make random round system here
+
 
 	RoundStart( "default" )
 end

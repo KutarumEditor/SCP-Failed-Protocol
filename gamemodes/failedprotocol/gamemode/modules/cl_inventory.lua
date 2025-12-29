@@ -1,3 +1,17 @@
+local vgui = vgui
+local draw = draw
+local KMASKS = KMASKS
+local Vector = Vector
+local Angle = Angle
+local net = net
+local Material = Material
+local render = render
+local hook = hook
+local ScrW = ScrW
+local ScrH = ScrH
+local math = math
+local surface = surface
+
 LocalInv = LocalInv or {
     ITEMS = {},
 }
@@ -128,31 +142,12 @@ function CreateInventoryUI()
 
         local eased = math.ease.OutCirc( self:GetAlpha()/245 )
 
-        render.SetStencilEnable( true )
-
-        render.ClearStencil()
-        
-        render.SetStencilTestMask( 255 )
-        render.SetStencilWriteMask( 255 )
-
-        render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-        render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-        render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-        render.SetStencilReferenceValue( 9 )
-        render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-        draw.RoundedBox( 0, 0 + ( w/2 ) * ( 1 - eased ), 0, w * eased, h, Color( 5, 5, 5, 240 ) )
-
-        render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-        render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-        draw.RoundedBox( 0, 0, 0, w, h, Color( 5, 5, 5, 240 ) )
-        surface.SetDrawColor( 25, 25, 25, 55 )
-
-        render.SetStencilEnable( false )
+        KMASKS.Start()
+            draw.RoundedBox( 0, 0, 0, w, h, Color( 5, 5, 5, 240 ) )
+            surface.SetDrawColor( 25, 25, 25, 55 )
+        KMASKS.Source()
+            draw.RoundedBox( 0, 0 + ( w/2 ) * ( 1 - eased ), 0, w * eased, h, Color( 5, 5, 5, 240 ) )
+        KMASKS.End()
 
         surface.SetDrawColor( color_white )
         surface.DrawLine( mdlPad + mdlW + btPad*2 + btW, mdlPad, mdlPad + mdlW + btPad*2 + btW, sizeH - mdlPad )
@@ -369,44 +364,25 @@ function CreateInventoryUI()
 
                 info_alpha = math.Clamp( info_alpha + .01, 0, 1 )
 
-                render.SetStencilEnable( true )
+                KMASKS.Start()
+                    draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
 
-                render.ClearStencil()
-                
-                render.SetStencilTestMask( 255 )
-                render.SetStencilWriteMask( 255 )
+                    draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
-                render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-                render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
+                    for k, v in pairs( REGISTERED_ARMOR[LocalPlayer().FPArmor.helmet.name].resistance ) do
+                        if k == 0 or k == 10 then continue end
 
-                render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
+                        surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/"..k..".png" , "smooth" ) )
+                        surface.SetDrawColor( HSVToColor( v*120, 1, 1 ) )
+                        surface.DrawTexturedRect( x, y + nameH*1.5, w, ( w / 356 )*470 )
+                    end
 
-                render.SetStencilReferenceValue( 9 )
-                render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-                draw.RoundedBox( 0, x, y, w, h * eased, color_black )
-
-                render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-                render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-                draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
-
-                draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-
-                for k, v in pairs( REGISTERED_ARMOR[LocalPlayer().FPArmor.helmet.name].resistance ) do
-                    if k == 0 or k == 10 then continue end
-
-                    surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/"..k..".png" , "smooth" ) )
-                    surface.SetDrawColor( HSVToColor( v*120, 1, 1 ) )
+                    surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/frame.png" , "smooth" ) )
+                    surface.SetDrawColor( color_white )
                     surface.DrawTexturedRect( x, y + nameH*1.5, w, ( w / 356 )*470 )
-                end
-
-                surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/frame.png" , "smooth" ) )
-                surface.SetDrawColor( color_white )
-                surface.DrawTexturedRect( x, y + nameH*1.5, w, ( w / 356 )*470 )
-
-                render.SetStencilEnable( false )
+                KMASKS.Source()
+                    draw.RoundedBox( 0, x, y, w, h * eased, color_black )
+                KMASKS.End()
 
                 surface.SetDrawColor( color_white )
                 surface.DrawLine( x, y, x + w, y )
@@ -433,44 +409,25 @@ function CreateInventoryUI()
 
                 info_alpha = math.Clamp( info_alpha + .01, 0, 1 )
 
-                render.SetStencilEnable( true )
+                KMASKS.Start()
+                    draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
 
-                render.ClearStencil()
-                
-                render.SetStencilTestMask( 255 )
-                render.SetStencilWriteMask( 255 )
+                    draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
-                render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-                render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
+                    for k, v in pairs( REGISTERED_ARMOR[LocalPlayer().FPArmor.vest.name].resistance ) do
+                        if k == 0 or k == 10 then continue end
 
-                render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
+                        surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/"..k..".png" , "smooth" ) )
+                        surface.SetDrawColor( HSVToColor( v*120, 1, 1 ) )
+                        surface.DrawTexturedRect( x, y + nameH*1.5, w, ( w / 356 )*470 )
+                    end
 
-                render.SetStencilReferenceValue( 9 )
-                render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-                draw.RoundedBox( 0, x, y, w, h * eased, color_black )
-
-                render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-                render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-                draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
-
-                draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-
-                for k, v in pairs( REGISTERED_ARMOR[LocalPlayer().FPArmor.vest.name].resistance ) do
-                    if k == 0 or k == 10 then continue end
-
-                    surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/"..k..".png" , "smooth" ) )
-                    surface.SetDrawColor( HSVToColor( v*120, 1, 1 ) )
+                    surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/frame.png" , "smooth" ) )
+                    surface.SetDrawColor( color_white )
                     surface.DrawTexturedRect( x, y + nameH*1.5, w, ( w / 356 )*470 )
-                end
-
-                surface.SetMaterial( Material( "failedprotocol/inventory/silhouette/frame.png" , "smooth" ) )
-                surface.SetDrawColor( color_white )
-                surface.DrawTexturedRect( x, y + nameH*1.5, w, ( w / 356 )*470 )
-
-                render.SetStencilEnable( false )
+                KMASKS.Source()
+                    draw.RoundedBox( 0, x, y, w, h * eased, color_black )
+                KMASKS.End()
 
                 surface.SetDrawColor( color_white )
                 surface.DrawLine( x, y, x + w, y )
@@ -511,38 +468,19 @@ function CreateInventoryUI()
 
                 info_alpha = math.Clamp( info_alpha + .01, 0, 1 )
 
-                render.SetStencilEnable( true )
+                KMASKS.Start()
+                    draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
 
-                render.ClearStencil()
-                
-                render.SetStencilTestMask( 255 )
-                render.SetStencilWriteMask( 255 )
+                    draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
-                render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-                render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-                render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-                render.SetStencilReferenceValue( 9 )
-                render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-                draw.RoundedBox( 0, x, y, w, h * eased, color_black )
-
-                render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-                render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-                draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
-
-                draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-
-                local desc_y = y + descH*2
-                for k, v in pairs( desc_lines ) do
-                    draw.SimpleText( v, "ItemInfoSmall", x + w/2, desc_y + descH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-                    desc_y = desc_y + descH
-                end
-
-                render.SetStencilEnable( false )
+                    local desc_y = y + descH*2
+                    for k, v in pairs( desc_lines ) do
+                        draw.SimpleText( v, "ItemInfoSmall", x + w/2, desc_y + descH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                        desc_y = desc_y + descH
+                    end
+                KMASKS.Source()
+                    draw.RoundedBox( 0, x, y, w, h * eased, color_black )
+                KMASKS.End()
 
                 surface.SetDrawColor( color_white )
                 surface.DrawLine( x, y, x + w, y )
@@ -653,38 +591,19 @@ function CreateInventoryUI()
 
             info_alpha = math.Clamp( info_alpha + .01, 0, 1 )
 
-            render.SetStencilEnable( true )
+            KMASKS.Start()
+                draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
 
-            render.ClearStencil()
-            
-            render.SetStencilTestMask( 255 )
-            render.SetStencilWriteMask( 255 )
+                draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
-            render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-            render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-            render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-            render.SetStencilReferenceValue( 9 )
-            render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-            draw.RoundedBox( 0, x, y, w, h * eased, color_black )
-
-            render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-            render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-            draw.RoundedBox( 0, x, y, w, h, Color( 25, 25, 25, 240 * info_alpha ) )
-
-            draw.SimpleText( name, "ItemInfoNormal", x + w/2, y + nameH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-
-            local desc_y = y + descH*2
-            for k, v in pairs( desc_lines ) do
-                draw.SimpleText( v, "ItemInfoSmall", x + w/2, desc_y + descH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-                desc_y = desc_y + descH
-            end
-
-            render.SetStencilEnable( false )
+                local desc_y = y + descH*2
+                for k, v in pairs( desc_lines ) do
+                    draw.SimpleText( v, "ItemInfoSmall", x + w/2, desc_y + descH/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                    desc_y = desc_y + descH
+                end
+            KMASKS.Source()
+                draw.RoundedBox( 0, x, y, w, h * eased, color_black )
+            KMASKS.End()
 
             surface.SetDrawColor( color_white )
             surface.DrawLine( x, y, x + w, y )

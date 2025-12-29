@@ -19,6 +19,7 @@ function CL_SETTINGS.Get( name )
 		["int"] = GetConVar( name ):GetInt(),
 		["float"] = GetConVar( name ):GetFloat(),
 		["bind"] = GetConVar( name ):GetInt(),
+		["list"] = GetConVar( name ):GetString(),
 	}
 
 	return tbl[CL_SETTINGS.REG[CL_SETTINGS.GetByName( name )].type]
@@ -47,6 +48,10 @@ CL_SETTINGS.Register( "fp_settings_button", "95", "bind" )
 
 CL_SETTINGS.Register( "fp_inventory_button", "27", "bind" )
 
+CL_SETTINGS.Register( "fp_scp_upgrades_button", "12", "bind" )
+
+CL_SETTINGS.Register( "fp_language", "english", "list" )
+
 function CL_SETTINGS.Set( name, val )
 	local tbl = {
 		["string"] = function()
@@ -63,6 +68,9 @@ function CL_SETTINGS.Set( name, val )
 		end,
 		["bind"] = function()
 			GetConVar( name ):SetInt( val )
+		end,
+		["list"] = function()
+			GetConVar( name ):SetString( val )
 		end,
 	}
 
@@ -182,7 +190,28 @@ local convertTypes = {
 		bl:SetColor( Color( 255, 255, 255 ) )
 		bl:SetFont( "HUDNormal" )
 		bl:SetText( LANG.Get( "SETTINGS", tbl.name ) )
-	end
+	end,
+	["list"] = function( scrl, tbl )
+		local lp = scrl:Add( "DPanel" )
+		lp:SetSize( ScreenScale( 24 ), ScreenScale( 12 ) )
+		lp:Dock( TOP )
+		lp:DockMargin( 0, 0, 0, 5 )
+		lp:InvalidateParent( true )
+
+		local cb = vgui.Create( "DComboBox", lp )
+		cb:SetSize( ScreenScale( 12 ), ScreenScale( 12 ) )
+		cb:Dock( TOP )
+		cb:DockMargin( 0, 0, 0, 5 )
+		cb:SetValue( CL_SETTINGS.Get( tbl.name ) )
+
+		for i, v in ipairs( LANG.GetAllLangs() ) do
+			cb:AddChoice( v )
+		end
+
+		cb.OnSelect = function( self, index, value )
+			CL_SETTINGS.Set( tbl.name, value )
+		end
+	end,
 }
 
 function OpenSettings()

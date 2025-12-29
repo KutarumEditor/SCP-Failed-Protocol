@@ -98,7 +98,7 @@ function GM:FPFootstepParams( ply, st, vel, crouch )
 		return 100
 	end
 
-	local units = 50
+	local units = 45
 	local len = vel:Length()
 
 	if len > 125 then
@@ -176,11 +176,13 @@ function PLAYER:PlayStepSound()
 	if self:Crouching() or self:IsWalking() then
 		add_snd_vol = add_snd_vol * .5
 	else
-		self:EmitSound( snd, 65, 100, 1, CHAN_BODY )
+		--self:EmitSound( snd, 30, 100, 1, CHAN_AUTO )
+		EmitSound( snd, self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 60, 0, 100 )
 	end
 
 	timer.Simple( 0, function()
-		self:EmitSound( add_snd, 65, 100, add_snd_vol, CHAN_BODY )
+		--self:EmitSound( add_snd, 30, 100, add_snd_vol, CHAN_AUTO )
+		EmitSound( add_snd, self:GetPos(), self:EntIndex(), CHAN_AUTO, add_snd_vol, 60, 0, 100 )
 	end )
 
 	if !no_update then

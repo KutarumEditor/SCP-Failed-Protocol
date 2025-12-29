@@ -17,8 +17,8 @@ function GM:HandlePlayerArmorReduction( ply, dmginfo )
 end
 
 function GM:PlayerDeathSound( ply )
-	if FPTeams.HasInfo( ply:FPTeam(), FPTeams.INFO_HUMAN ) then
-		ply:EmitSound( "crimeville/humans/death_screams/death"..FPRandom( 1, 38 )..".mp3" )
+	if FPTeams.HasInfo( ply:FPTeam(), FPTeams.INFO_HUMAN ) and ply:LastHitGroup() != HITGROUP_HEAD then
+		ply:EmitSound( "scpfp/humans/new_death/"..FPRandom( 1, 25 )..".wav" )
 	end
 
 	return true

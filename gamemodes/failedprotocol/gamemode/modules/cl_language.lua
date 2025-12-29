@@ -2,7 +2,7 @@ LANG = {
 	REG = {}
 }
 
-CUR_LANG = CUR_LANG or "english"
+CUR_LANG = CUR_LANG or GetConVar( "fp_language" ) or "english"
 
 function GetAllLanguages()
 	return file.Find( LANGUAGES_PATH.."/*.lua", "LUA" )
@@ -52,10 +52,6 @@ end
 
 includeLanguages()
 
-concommand.Add( "fp_language", function( ply, cmd, args, argStr )
-	LANG.Load( args[1] )
-end, function( cmd, args )
-	local langs = LANG.GetAllLangs()
-
-	return AutoComplete( cmd, args, langs )
-end )
+cvars.AddChangeCallback( "fp_language", function( convar_name, value_old, value_new )
+    LANG.Load( value_new )
+end)

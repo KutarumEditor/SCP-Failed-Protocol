@@ -27,6 +27,7 @@ SETTINGS.fp_disable_support = "Disable spawning as support"
 SETTINGS.fp_disable_scp = "Disable spawning as SCP"
 SETTINGS.fp_inventory_button = "Open inventory"
 SETTINGS.fp_settings_button = "Open settings"
+SETTINGS.fp_scp_upgrades_button = "Open SCP upgrades"
 
 local KEYCARDS = {}
 lang.KEYCARDS = KEYCARDS

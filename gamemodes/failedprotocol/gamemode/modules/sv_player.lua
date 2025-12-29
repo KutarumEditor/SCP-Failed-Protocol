@@ -290,7 +290,6 @@ function PLAYER:Setup( class, spawn_override, instant )
 	self:SetupHands()
 
 	self:StripWeapons()
-	self:StripAmmo()
 
 	self:SetInvSlots( class_tab.inv_slots or 8 )
 
@@ -299,6 +298,8 @@ function PLAYER:Setup( class, spawn_override, instant )
 	for _, v in pairs( class_tab.weps ) do
 		self:Give( v )
 	end
+
+	self:StripAmmo()
 
 	for k, v in pairs( class_tab.ammo ) do
 		self:GiveAmmo( v, k, true )
@@ -369,10 +370,11 @@ function PLAYER:SetupSCP( class, instant )
 	self:SetupHands()
 
 	self:StripWeapons()
-	self:StripAmmo()
 
 	self:Give( class_tab.swep )
 	self:SelectWeapon( class_tab.swep )
+
+	self:StripAmmo()
 
 	timer.Simple( .01, function()
 		net.Ping( "SyncInvServerside", "", self )
