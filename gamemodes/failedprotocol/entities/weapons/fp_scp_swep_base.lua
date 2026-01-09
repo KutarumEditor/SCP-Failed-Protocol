@@ -8,6 +8,8 @@ SWEP.ShouldDrawWM = false
 SWEP.SwayScale = 2
 SWEP.BobScale = 2
 
+SWEP.Droppable = false
+
 SWEP.AutoSwitchTo = true
 SWEP.Weight = 1
 

@@ -167,6 +167,80 @@ function PickUpCheck( ply, item )
 	return #tbl < ply:GetInvSlots() and not ply:HasWeapon( item:GetClass() )
 end
 
+local nameToFunc = {
+	["lcz_spot_light"] = function( ent )
+		ent:Fire( "TurnOff" )
+	end,
+	["lcz_main_light"] = function( ent )
+		ent:Fire( "TurnOff" )
+	end,
+	["lcz_secondary_light"] = function( ent )
+		ent:Fire( "TurnOn" )
+	end,
+	["display_light"] = function( ent )
+		ent:Fire( "TurnOn" )
+	end,
+	["breach_screen"] = function( ent )
+		ent:SetSkin( 1 )
+	end,
+	["lcz_spot_light_mdl"] = function( ent )
+		ent:SetSkin( 0 )
+	end,
+	["lcz_secondary_light_mdl"] = function( ent )
+		ent:SetSkin( 1 )
+	end,
+	--[[["lcz_flour_light_mdl"] = function( ent )
+		ent:SetSkin( 1 )
+	end,]]
+}
+
+local nameToFuncBackup = {
+	["lcz_spot_light"] = function( ent )
+		ent:Fire( "TurnOn" )
+	end,
+	["lcz_main_light"] = function( ent )
+		ent:Fire( "TurnOn" )
+	end,
+	["lcz_secondary_light"] = function( ent )
+		ent:Fire( "TurnOff" )
+	end,
+	["display_light"] = function( ent )
+		ent:Fire( "TurnOff" )
+	end,
+	["breach_screen"] = function( ent )
+		ent:SetSkin( 0 )
+	end,
+	["lcz_spot_light_mdl"] = function( ent )
+		ent:SetSkin( 1 )
+	end,
+	["lcz_secondary_light_mdl"] = function( ent )
+		ent:SetSkin( 0 )
+	end,
+	--[[["lcz_flour_light_mdl"] = function( ent )
+		ent:SetSkin( 0 )
+	end,]]
+}
+
+function FacilityBreach()
+	for i, ent in ipairs( ents.GetAll() ) do
+		if ent:IsValid() then
+			if nameToFunc[ent:GetName()] != nil then
+				nameToFunc[ent:GetName()]( ent )
+			end
+		end
+	end
+end
+
+function FixFacilityBreach()
+	for i, ent in ipairs( ents.GetAll() ) do
+		if ent:IsValid() then
+			if nameToFuncBackup[ent:GetName()] != nil then
+				nameToFuncBackup[ent:GetName()]( ent )
+			end
+		end
+	end
+end
+
 concommand.Add( "bot_full", function( ply, cmd, args, argStr )
 	local t = 1
 	repeat

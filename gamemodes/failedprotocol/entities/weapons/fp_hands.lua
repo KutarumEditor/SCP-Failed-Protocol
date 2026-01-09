@@ -22,6 +22,7 @@ SWEP.CantBeCarried = {
 	["func_breakable_surf"] = true,
 	["func_rot_button"] = true,
 	["func_button"] = true,
+	["class C_BaseToggle"] = true, --clientside button
 	["func_door"] = true,
 	["func_door_rotating"] = true,
 	["prop_door_rotating"] = true,
@@ -83,6 +84,7 @@ function SWEP:SecondaryAttack()
 
 		print( "eflags: ", ply:GetEFlags() )
 		print( "flags: ", ply:GetFlags() )
+		print( ent:GetClass() )
 
 		--ent:Remove()
 	else
@@ -124,11 +126,13 @@ end
 function SWEP:CanPickup( ent )
 	if ent:IsNPC() then return false end
 	if ent:IsWorld() then return false end
-	if self.CantBeCarried[ent:GetClass()] then return false end
 	local class = ent:GetClass()
+	if self.CantBeCarried[class] != nil then return false end
 	if CLIENT then return true end
 	if ent:IsPlayerHolding() then return false end
 	if IsValid( ent:GetPhysicsObject() ) and ent:GetPhysicsObject():IsMotionEnabled() then return true end
+
+	print( "can be picked up: "..ent:GetClass() )
 
 	return false
 end

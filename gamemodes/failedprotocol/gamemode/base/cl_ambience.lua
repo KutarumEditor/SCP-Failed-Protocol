@@ -2,10 +2,14 @@ AMBIENT = AMBIENT or {
 	CHANNEL = nil,
 	SOUND = nil,
 	TIME = nil,
+	BAN = 0,
 	VOLUME = .5
 }
 
+PrintTable( AMBIENT )
+
 function AMBIENT.Restart( name )
+	local name = name or "sound/scpfp/ambience/"..FPRandom( 1, 8 )..".mp3"
 	AMBIENT.SOUND = name
 	AMBIENT.TIME = AMBIENT.TIME or 0
 	sound.PlayFile( name, "", function( station, errCode, errStr )
@@ -32,6 +36,16 @@ function AMBIENT.Start()
 	end
 end
 
+function AMBIENT.Stop()
+	if AMBIENT.CHANNEL != nil then
+		AMBIENT.CHANNEL:Stop()
+	end
+end
+
+function AMBIENT.Ban( time )
+	AMBIENT.BAN = time
+end
+
 local ambThinkDelay = 0
 hook.Add( "Think", "FPAmbience", function()
 	if ambThinkDelay <= CurTime() then
@@ -41,7 +55,15 @@ hook.Add( "Think", "FPAmbience", function()
 				AMBIENT.SOUND = nil
 			end
 
-			AMBIENT.Restart( AMBIENT.SOUND != nil and AMBIENT.SOUND or "sound/scpfp/ambience/"..FPRandom( 1, 8 )..".mp3" )
+			if AMBIENT.SOUND != nil then
+				AMBIENT.Restart( AMBIENT.SOUND )
+			else
+				if AMBIENT.BAN == 0 then
+					AMBIENT.Restart( "sound/scpfp/ambience/"..FPRandom( 1, 8 )..".mp3" )
+				else
+					AMBIENT.BAN = math.max( 0, AMBIENT.BAN - FrameTime() * 2 )
+				end
+			end
 
 			ambThinkDelay = CurTime() + FrameTime() * 2
 		elseif AMBIENT.CHANNEL:IsValid() and AMBIENT.CHANNEL:GetState() != 0 then

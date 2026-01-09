@@ -46,8 +46,6 @@ REGISTERED_ROUND_TYPES = {
 			ClearPersonas()
 			SetupPlayers( "default" )
 
-			net.Ping( "StartRoundAmbient", "" )
-
 			net.Ping( "ClearCSData", "" )
 		end,
 		endcheck = function()
@@ -334,6 +332,7 @@ function SetupPlayers( type )
 						pl:Setup( selected_class, istable( unique_spawns[selected_class] ) and table.remove( unique_spawns[selected_class], FPRandom( 1, #unique_spawns[selected_class] ) ) or isvector( unique_spawns[selected_class] ) and unique_spawns[selected_class] or table.remove( available_spawns, FPRandom( 1, #available_spawns ) ), false )
 						pl:PopupStartInfo()
 						pl:ScreenFade( SCREENFADE.IN, color_black, 2, 3 )
+						net.Ping( "StartRoundAmbient", "", pl )
 					end
 				end )
 			end

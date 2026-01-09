@@ -65,13 +65,14 @@ function SWEP:Think()
 
 		if self:GetRageBan() == 0 then
 			for _, ply in player.Iterator() do
-				if owner:TestVisibility( ply, nil, true, 36 ) and not FPTeams.IsAlly( TEAM_SCP, ply:FPTeam() ) then
+				if owner:TestVisibility( ply, nil, true, 36 ) and not FPTeams.IsAlly( TEAM_SCP, ply:FPTeam() ) and ply != owner then
 					self:AddVictim( ply )
 				end
 			end
 		end
 
-		--print( "Charge: "..self:GetCharge(), "Rage: "..self:GetRage(), self:GetRageBan() )
+		print( "Charge: "..self:GetCharge(), "Rage: "..self:GetRage(), self:GetRageBan() )
+		PrintTable( self.Victims )
 	end
 end
 

@@ -93,6 +93,22 @@ function inspectPanel( target )
 	end
 end
 
+local drawTable = {
+	--[[{
+		mat = Material( "failedprotocol/020_horror_face.png" ),
+		clr = color_white,
+		time = 3,
+		x = ScrW() / 2,
+		y = ScrH() / 2,
+		w = 256,
+		h = 256
+	}]]
+}
+
+function DrawSprite( data )
+	table.insert( drawTable, data )
+end
+
 local hud_hidden = false
 local hud_hide_alpha = 1
 
@@ -131,6 +147,18 @@ function GM:HUDPaint()
 		surface.SetDrawColor( 0, 0, 0, 240 )
 		surface.SetMaterial( vignette_mat )
 		surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
+	end
+
+	for i, elem in ipairs( drawTable ) do
+		surface.SetDrawColor( elem.clr )
+		surface.SetMaterial( elem.mat )
+		surface.DrawTexturedRect( elem.x, elem.y, elem.w, elem.h )
+
+		elem.time = elem.time - FrameTime()
+
+		if elem.time <= 0 then
+			drawTable[i] = nil
+		end
 	end
 
 	if hud_hidden then
@@ -465,7 +493,8 @@ net.ReceivePing( "OnSpawnCS", function()
 end )
 
 net.ReceivePing( "StartRoundAmbient", function()
-	AMBIENT.Start()
+	AMBIENT.Restart( "sound/scpfp/ambience/blue_feather.mp3" )
+	AMBIENT.TIME = 0
 end )
 
 hook.Add( "OnSpawn", "FPFlashWindow", function()
