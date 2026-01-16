@@ -52,6 +52,8 @@ end
 
 includeLanguages()
 
+cvars.RemoveChangeCallback( "fp_language", "loading_lang" )
+
 cvars.AddChangeCallback( "fp_language", function( convar_name, value_old, value_new )
     LANG.Load( value_new )
-end)
+end, "loading_lang" )

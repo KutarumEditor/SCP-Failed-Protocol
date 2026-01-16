@@ -70,7 +70,7 @@ CLASSES.guard = "Сотрудник СБ"
 CLASSES.guard_storm = "Штурмовик СБ"
 CLASSES.cispy = "Шпион ПХ"
 
-CLASSES.ntfsoldier = "Солдат Э-11"
+CLASSES.ntfsoldier = "Солдат Эпсилон-11"
 
 CLASSES.gocsoldier = "Солдат ГОК"
 
@@ -187,12 +187,17 @@ local ENT = {}
 lang.ENT = ENT
 
 ENT.prop_ragdoll = "Тело"
+ENT.fp_box = "Коробка"
 
 local ACTIONS = {}
 lang.ACTIONS = ACTIONS
 
 ACTIONS.prop_ragdoll = {
 	check = "Осмотреть",
+}
+
+ACTIONS.fp_box = {
+	open = "Открыть",
 }
 
 local PHRASES = {}

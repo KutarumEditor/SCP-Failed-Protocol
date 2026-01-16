@@ -59,6 +59,10 @@ end
 
 if CLIENT then
 
+local render = render
+local surface = surface
+local Color = Color
+
 local FPCurTask = nil
 local FPTaskColor = color_white
 local FPTaskStartTime = 0

@@ -69,7 +69,7 @@ CLASSES.guard_pacificator = "SD Pacificator"
 CLASSES.guard = "SD Officer"
 CLASSES.guard_storm = "SD Stormtrooper"
 
-CLASSES.ntfsoldier = "E-11 Soldier"
+CLASSES.ntfsoldier = "Epsilon-11 Soldier"
 
 CLASSES.gocsoldier = "GOC Soldier"
 

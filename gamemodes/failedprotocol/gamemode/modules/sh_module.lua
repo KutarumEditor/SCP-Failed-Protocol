@@ -83,7 +83,7 @@ local ammoPenetration = {
 	[7] = 1, --buckshot
 	[5] = 3, --smg1
 	[1] = 3, --ar2
-	[5] = 4, --357
+	[5] = 3, --357
 	[13] = 4, --SniperRound
 	[14] = 4, --SniperPenetratedRound
 }

@@ -10,6 +10,7 @@ end
 function GM:PlayerSpawn( ply )
 	if !ply.InitialSpawn then
 		ply.InitialSpawn = true
+		ply.depressedUse = true
 
 		ply:KillSilent()
 		ply:SetupSpectator()
@@ -20,7 +21,7 @@ function GM:PlayerSpawn( ply )
 	ply:AddEFlags( EFL_NO_DAMAGE_FORCES )
 
 	ply:SetCustomCollisionCheck( true )
-	ply:SetCollisionGroup( COLLISION_GROUP_PLAYER )
+	ply:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
 end
 
 function GM:GetFallDamage(ply, speed)
@@ -111,7 +112,7 @@ function PLAYER:CreatePlayerRagdoll()
 
 	local velocity = self:GetVelocity() * .25
 	if ( body and IsValid( body ) ) then
-		for i = 1, body:GetPhysicsObjectCount() do
+		for i = 0, body:GetPhysicsObjectCount() - 1 do
 			local physicsObject = body:GetPhysicsObjectNum( i )
 			local boneIndex = body:TranslatePhysBoneToBone( i )
 			local position, angle = self:GetBonePosition( boneIndex )
@@ -241,7 +242,7 @@ function PLAYER:Cleanup()
 	self:Freeze( false )
 	self:SetNoDraw( false )
 	self:SetCustomCollisionCheck( true )
-	self:SetCollisionGroup( COLLISION_GROUP_PLAYER )
+	self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
 	self:SetSolid( SOLID_BBOX )
 	self:SetCanZoom( false )
 	self:Extinguish()

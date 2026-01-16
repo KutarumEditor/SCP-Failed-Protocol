@@ -132,7 +132,7 @@ function GM:HUDPaint()
 			clr = Color( 95, 95, 95 ),
 			curvalue = math.max( lply:GetStamina(), 0 ),
 			maxvalue = lply:GetMaxStamina(),
-			show = function() return lply:FPTeam() != TEAM_SPEC end,
+			show = function() return lply:FPTeam() != TEAM_SPEC and ( lply:FPTeam() != TEAM_SCP or SCPS[lply:GetFPClass()].has_stamina == true ) end,
 		},
 		[3] = {	--Armor
 			icon = armor_mat,
@@ -257,7 +257,7 @@ function GM:HUDPaint()
     startY = startY - h*2
 
     --Name bar
-    if lply:FPTeam() != TEAM_SPEC then
+    if lply:FPTeam() != TEAM_SPEC and lply:FPTeam() != TEAM_SCP then
 		local clr = Color( 75, 75, 75 )
 		local bg_clr = Color( 5, 5, 5 )
 		bg_clr.a = 225 * total_alpha_mult
@@ -481,6 +481,15 @@ net.ReceivePing( "HideHUD", function( data )
 	HideHUD( tobool( tbl[1] ), tobool( tbl[2] ) )
 end )
 
+function OnDeath()
+	AMBIENT.TIME = 0
+	AMBIENT.Restart( "sound/scpfp/ambience/death.mp3" )
+end
+
+net.ReceivePing( "ClientDeath", function()
+	OnDeath()
+end )
+
 net.ReceivePing( "ClearCSData", function()
     for i, ply in ipairs( player.GetAll() ) do
     	ply.known = false
@@ -493,10 +502,17 @@ net.ReceivePing( "OnSpawnCS", function()
 end )
 
 net.ReceivePing( "StartRoundAmbient", function()
-	AMBIENT.Restart( "sound/scpfp/ambience/blue_feather.mp3" )
-	AMBIENT.TIME = 0
+	RoundStartCutscene()
 end )
 
 hook.Add( "OnSpawn", "FPFlashWindow", function()
 	system.FlashWindow()
+end )
+
+concommand.Add( "remove_clientside_models", function()
+	for i, v in ipairs( ents.GetAll() ) do
+		if v:GetClass() == "C_BaseFlex" then
+			v:Remove()
+		end
+	end
 end )

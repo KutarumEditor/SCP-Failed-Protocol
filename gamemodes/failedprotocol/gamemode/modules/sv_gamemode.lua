@@ -3,10 +3,14 @@ local buttonEnts = {
 	["func_rot_button"] = true
 }
 
+local ACCESS = ACCESS or {}
+
 function GM:PlayerUse( ply, ent )
+	ply.useRealBan = ply.useRealBan or 0
+
 	if istable( ENTITY_ACTIONS_OVERRIDE[ent:GetClass()] ) then return false end
 
-	if ent:IsWeapon() and ply:EyePos():Distance( ent:GetPos() ) < 100 and ply:GetEyeTrace().Entity == ent and PickUpCheck( ply, ent ) then
+	if ent:IsWeapon() and ply:EyePos():Distance( ply:GetEyeTrace().HitPos ) < 100 and ply:GetEyeTrace().Entity == ent and PickUpCheck( ply, ent ) then
 		ply:TimedTask( "weapon_equip", 1, Color( 200, 155, 0 ),
 	    function()
 	        return IsValid( ent ) and IsValid( ply ) and
@@ -16,22 +20,51 @@ function GM:PlayerUse( ply, ent )
 	    end )
 	end
 
+	if ent:GetClass() == "prop_ragdoll" and ply:EyePos():Distance( ply:GetEyeTrace().HitPos ) < 100 and ply:GetEyeTrace().Entity == ent then
+		ply:TimedTask( "body_check", 1, Color( 180, 175, 0 ),
+	    function()
+	        return IsValid( ent ) and IsValid( ply ) and
+	            ply:EyePos():Distance( ply:GetEyeTrace().HitPos ) < 100 and ply:GetEyeTrace().Entity == ent
+	    end, function()
+	        ply:CheckBody( ent )
+	    end )
+	end
+
 	local ent_id = ent:EntIndex()
-	if buttonEnts[ent:GetClass()] and ACCESS.BUTTON_CACHE[ent_id] != nil then
-		local kc = ply:GetActiveWeapon()
-		if kc:GetClass() != "fp_keycard" then return false end
-
-		if kc:GetState() == KEYCARD_USED then
-			return ACCESS.CheckKeycardAccess( ent_id, kc:GetKeycard() )
-		else
-			kc:UseKeycard( ent )
-
+	if buttonEnts[ent:GetClass()] then
+		if ply.useRealBan > CurTime() or not ply.depressedUse then
+			ply.useRealBan = CurTime() + FrameTime() * 2
 			return false
+		end
+
+		ply.depressedUse = false
+		ply.useRealBan = CurTime() + FrameTime() * 3
+
+		if ACCESS.BUTTON_CACHE[ent_id] != nil then
+			local kc = ply:GetActiveWeapon()
+			if kc:GetClass() != "fp_keycard" then
+				ent:EmitSound( "scpfp/doors/denied.wav", 55, 100, 1, CHAN_ITEM )
+				return false
+			end
+
+			if kc:GetState() == KEYCARD_USED then
+				return ACCESS.CheckKeycardAccess( ent_id, kc:GetKeycard() )
+			else
+				kc:UseKeycard( ent )
+
+				return false
+			end
 		end
 	end
 
 	return true
 end
+
+hook.Add( "KeyRelease", "UseExample", function( ply, key )
+    if key == IN_USE then
+        ply.depressedUse = true
+    end
+end )
 
 local dmgCallback = {
 	[DMG_BULLET] = function( ent, dmginfo )

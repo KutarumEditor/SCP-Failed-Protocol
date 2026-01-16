@@ -56,18 +56,20 @@ function SWEP:UseKeycard( ent )
 		vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( ACT_VM_PRIMARYATTACK ) )
 		vm:SetPlaybackRate( 1 )
 
-		self:SetState( KEYCARD_USED )
-
 		TIMERS.Create( ply:SteamID64().."KeycardUse", vm:SequenceDuration( vm:GetSequence() ) / 2.5, function()
 			local wep = ply:GetActiveWeapon()
 			if IsValid( ply ) and IsValid( wep ) and wep == self then
+				wep:SetState( KEYCARD_USED )
+
 				if ACCESS.CheckKeycardAccess( ent:EntIndex(), wep:GetKeycard() ) then
 					ent:Input( "Use", ply, ply )
 
-					ent:EmitSound( "scpfp/doors/granted.wav", 65, 100, 1, CHAN_ITEM )
+					ent:EmitSound( "scpfp/doors/granted.wav", 55, 100, 1, CHAN_ITEM )
 				else
-					ent:EmitSound( "scpfp/doors/denied.wav", 65, 100, 1, CHAN_ITEM )
+					ent:EmitSound( "scpfp/doors/denied.wav", 55, 100, 1, CHAN_ITEM )
 				end
+
+				wep:SetState( KEYCARD_CALM )
 			end
 		end )
 	end

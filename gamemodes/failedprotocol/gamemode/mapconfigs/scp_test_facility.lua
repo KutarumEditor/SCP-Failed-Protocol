@@ -1,5 +1,6 @@
 SCP008_SPAWN = Vector( -632.02856445313, 1032.1557617188, -14335.96875 )
 SCP035_SPAWN = Vector( -1337.2078857422, 1030.3117675781, -14335.96875 )
+SCP096_SPAWN = Vector( -2533.7426757813, 1026.1203613281, -14335.96875 )
 
 SPEC_SPAWN = {
 	Vector( -2533.7426757813, 1026.1203613281, -14335.96875 )
@@ -115,9 +116,60 @@ CI_SPAWN = {
 	Vector( -40.409236907959, 1041.4787597656, -14335.96875 ),
 }
 
+EXITS = {
+	{
+		name = "main",
+		bounds = {
+			Vector( -3001.7761230469, -977.89007568359, -14335.96875 ),
+			Vector( -2761.484375, -749.12036132813, -14176.03125 )
+		},
+		check = function( ply )
+			return true
+		end,
+		callback = function( ply )
+			print( ply )
+			print( ply:Nick() .. " escaped through the main exit!" )
+		end
+	},
+}
+
 ACCESS_OVERRIDE = {
 	{
 		pos = Vector( -176, 928, -14284 ),
-		access = ACCESS_SCP2
+		access = "SCP2",
 	},
 }
+
+MENU_LOGO_POS = { Vector( -3630.96875, -766.821411, -14284.262695 ), Angle( 0, 90, 90 ) }
+
+MENU_CAM_PATH = {
+	{
+		time = 4,
+		pos = Vector( -3163.246094, -767.608521, -14273.102539 ),
+		ang = Angle( -90, -180, 0 ),
+		fov = 60,
+		ease = math.ease.InOutSine
+	},
+	{
+		time = 4,
+		pos = Vector( -3418.789551, -766.821411, -14284.262695 ),
+		ang = Angle( 0, 180, 0 ),
+		fov = 90,
+		ease = nil
+	},
+}
+
+local panelMdls = {
+	["models/elan/scpsl/doors/panels/touch_panel.mdl"] = true,
+	["models/elan/scpsl/doors/panels/keycard_panel.mdl"] = true,
+}
+
+for i, v in ipairs( ents.GetAll() ) do
+	if v:GetClass() != "prop_dynamic" then continue end
+
+	if panelMdls[v:GetModel()] == nil then return end
+
+	--[[v.Draw = function( ... )
+		-- body
+	end]]
+end

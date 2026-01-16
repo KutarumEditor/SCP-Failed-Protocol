@@ -41,6 +41,7 @@ local kill_overrides = {
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	ply:ScreenFade( SCREENFADE.IN, color_white, .25, 0 )
+	ply:ScreenFade( SCREENFADE.OUT, color_black, 4, 1.1 )
 	local wep = ply:GetActiveWeapon()
 
 	if wep.Droppable then
@@ -54,6 +55,7 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	timer.Simple( 5, function()
 		if IsValid( ply ) and !ply:Alive() and ply:FPTeam() != TEAM_SPEC then
 			ply:SetupSpectator()
+			ply:ScreenFade( SCREENFADE.IN, color_black, 5, 0 )
 		end
 	end )
 
@@ -85,12 +87,14 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 		end
 	end
 
-	ply:SetDSP( FPRandom( 35, 37 ), false )
+	ply:SetDSP( FPRandom( 32, 34 ), false )
 
 	ply:AddDeaths( 1 )
 
 	ply:SetFPName( "John" )
 	ply:SetFPSurname( "Doe" )
+
+	net.Ping( "ClientDeath", nil, ply )
 
 	if ( attacker:IsValid() && attacker:IsPlayer() ) then
 		local mult = FPTeams.GetReward( ply:FPTeam() )
@@ -120,7 +124,7 @@ function GM:PlayerDeathThink( ply )
 end
 
 function GM:PostPlayerDeath( ply )
-	--RoundEndCheck()
+	RoundEndCheck()
 end
 
 function GM:PlayerCanPickupWeapon( ply, wep ) -- OBSOLETE, cuz of other pickup system

@@ -159,35 +159,16 @@ function GM:HUDDrawTargetID()
 
 	surface.DrawLine( ent_sprite_pos.x, ent_sprite_pos.y, Lerp( id_lerp, ent_sprite_pos.x, end_x ), Lerp( id_lerp, ent_sprite_pos.y, end_y ) )
 
-	render.SetStencilEnable( true )
+	KMASKS.Start()
+        draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) - w/2, Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, w, h, LerpColor( .95, Color( clr.r, clr.g, clr.b, 200 * id_alpha ), Color( 0, 0, 0, 215 * id_alpha ) ) )
+		surface.SetDrawColor( Color( clr.r, clr.g, clr.b, 5 * id_alpha ) )
+		draw.SimpleText( id_target, font, Lerp( id_lerp, ent_sprite_pos.x, end_x ), Lerp( id_lerp, ent_sprite_pos.y, end_y ), Color( clr.r, clr.g, clr.b, 255 * id_alpha ), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
 
-    render.ClearStencil()
-    
-    render.SetStencilTestMask( 255 )
-    render.SetStencilWriteMask( 255 )
-
-    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-    render.SetStencilReferenceValue( 9 )
-    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-	draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) - w/2, Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, w, h, LerpColor( .95, Color( clr.r, clr.g, clr.b, 200 * id_alpha ), Color( 0, 0, 0, 215 * id_alpha ) ) )
-	
-	render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-	render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) - w/2, Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, w, h, LerpColor( .95, Color( clr.r, clr.g, clr.b, 200 * id_alpha ), Color( 0, 0, 0, 215 * id_alpha ) ) )
-	surface.SetDrawColor( Color( clr.r, clr.g, clr.b, 5 * id_alpha ) )
-	draw.SimpleText( id_target, font, Lerp( id_lerp, ent_sprite_pos.x, end_x ), Lerp( id_lerp, ent_sprite_pos.y, end_y ), Color( clr.r, clr.g, clr.b, 255 * id_alpha ), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
-
-	draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) - w/2, Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, ScreenScale( 1 ), h, Color( clr.r, clr.g, clr.b, 255 * id_alpha ) )
-	draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) + w/2 - ScreenScale( 1 ), Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, ScreenScale( 1 ), h, Color( clr.r, clr.g, clr.b, 255 * id_alpha ) )
-
-	render.SetStencilEnable( false )
+		draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) - w/2, Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, ScreenScale( 1 ), h, Color( clr.r, clr.g, clr.b, 255 * id_alpha ) )
+		draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) + w/2 - ScreenScale( 1 ), Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, ScreenScale( 1 ), h, Color( clr.r, clr.g, clr.b, 255 * id_alpha ) )
+    KMASKS.Source()
+        draw.RoundedBox( 0, Lerp( id_lerp, ent_sprite_pos.x, end_x ) - w/2, Lerp( id_lerp, ent_sprite_pos.y, end_y ) - h, w, h, LerpColor( .95, Color( clr.r, clr.g, clr.b, 200 * id_alpha ), Color( 0, 0, 0, 215 * id_alpha ) ) )
+    KMASKS.End()
 
 	draw.FramedBox( Lerp( id_lerp, ent_sprite_pos.x, end_x )-4, Lerp( id_lerp, ent_sprite_pos.y, end_y )-4, 8, 8, 1, 1, Color( clr.r, clr.g, clr.b, 255 * id_alpha ) )
 	draw.FramedBox( Lerp( id_lerp, ent_sprite_pos.x, end_x )-4, Lerp( id_lerp, ent_sprite_pos.y, end_y )-4-h, 8, 8, 1, 1, Color( clr.r, clr.g, clr.b, 255 * id_alpha ) )

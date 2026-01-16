@@ -23,7 +23,7 @@ REGISTERED_ROUND_TYPES = {
 	["numb"] = {
 		chance = 0,
 		callback = function()
-			for _, ply in ipairs( player.GetAll() ) do
+			for _, ply in player.Iterator() do
 				ply:SetupSpectator( true )
 			end
 		end,
@@ -39,6 +39,8 @@ REGISTERED_ROUND_TYPES = {
 		},
 		max_supports = 5,
 		callback = function()
+			SetupExits()
+
 			SpawnDefaultItems()
 
 			SetupFirstSupportTimer()
@@ -49,7 +51,7 @@ REGISTERED_ROUND_TYPES = {
 			net.Ping( "ClearCSData", "" )
 		end,
 		endcheck = function()
-			return BasicRoundFinishCheck()
+			return RoundFinishCheck()
 		end,
 	},
 }
@@ -83,7 +85,9 @@ function RoundStart( type )
 
 		FreezeRound()
 
-		ACCESS.RecomputeButtons()
+		timer.Simple( 0, function()
+			ACCESS.RecomputeButtons()
+		end )
 
 		REGISTERED_ROUND_TYPES[type].callback()
 
@@ -105,20 +109,30 @@ function RestartRound()
 end
 
 function FinishRound()
+	local alivePlys = {}
+
+	for _, ply in player.Iterator() do
+		if ply:Alive() then
+			table.insert( alivePlys, ply )
+		end
+	end
+
+	SelectEnding( alivePlys )
+
 	if TIMERS.Exists( "TimerSupport" ) then
 		TIMERS.Destroy( "TimerSupport" )
 	end
 
 	ROUND.aftermath = true
 
-	for _, ply in ipairs( player.GetAll() ) do
+	for _, ply in player.Iterator() do
 		--ply:PopupEndInfo()
 	end
 
 	RoundDataSync()
 
 	TIMERS.Create( "RoundEnd", 20, function()
-		for _, ply in ipairs( player.GetAll() ) do
+		for _, ply in player.Iterator() do
 			ply:ScreenFade( SCREENFADE.OUT, color_black, 10, .1)
 		end
 
@@ -150,10 +164,10 @@ function RoundEndCheck()
 	end
 end
 
-function BasicRoundFinishCheck()
+function RoundFinishCheck()
 	local alivePlys = {}
 
-	for _, ply in ipairs( player.GetAll() ) do
+	for _, ply in player.Iterator() do
 		if ply:Alive() then
 			table.insert( alivePlys, ply )
 		end

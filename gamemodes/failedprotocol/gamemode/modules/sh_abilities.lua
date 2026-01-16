@@ -201,46 +201,27 @@ hook.Add( "HUDPaint", "HUDAbilities", function()
 			draw.SimpleTextOutlined( uses, "HUDSmall", start_pos + size/2, ScrH() - gap*4/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
 		end
 
-		render.SetStencilEnable( true )
+		KMASKS.Start()
+            local clr = ABILITIES.REG[name].color
+			local lerpclr = LerpColor( .9, clr, Color( 15, 15, 15 ) )
+			lerpclr.a = 225
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, lerpclr )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size * ratio, Color( 5, 5, 5, 175 ) )
 
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
+			local lerpclr = LerpColor( ratio, clr, Color( 45, 45, 45 ) )
+			surface.SetDrawColor( lerpclr )
+			surface.SetMaterial( ABILITIES.REG[name].icon )
+			surface.DrawTexturedRect( start_pos + ScreenScale( 1 ), ScrH() - size - gap + ScreenScale( 1 ), size - ScreenScale( 2 ), size - ScreenScale( 2 ) )
 
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
+			draw.SimpleTextOutlined( string.upper( input.GetKeyName( ABILITIES.REG[name].button ) ), "HUDMedium", start_pos + size/2, ScrH() - size/2 - gap, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
 
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, color_white )
-		
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-		local clr = ABILITIES.REG[name].color
-		local lerpclr = LerpColor( .9, clr, Color( 15, 15, 15 ) )
-		lerpclr.a = 225
-		draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, lerpclr )
-		draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size * ratio, Color( 5, 5, 5, 175 ) )
-
-		local lerpclr = LerpColor( ratio, clr, Color( 45, 45, 45 ) )
-		surface.SetDrawColor( lerpclr )
-		surface.SetMaterial( ABILITIES.REG[name].icon )
-		surface.DrawTexturedRect( start_pos + ScreenScale( 1 ), ScrH() - size - gap + ScreenScale( 1 ), size - ScreenScale( 2 ), size - ScreenScale( 2 ) )
-
-		draw.SimpleTextOutlined( string.upper( input.GetKeyName( ABILITIES.REG[name].button ) ), "HUDMedium", start_pos + size/2, ScrH() - size/2 - gap, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
-
-		draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
-		draw.RoundedBox( 0, start_pos + size - ScreenScale( 5 ), ScrH() - ScreenScale( 1 ) - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
-		draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
-		draw.RoundedBox( 0, start_pos + size - ScreenScale( 1 ), ScrH() - ScreenScale( 5 ) - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
-
-		render.SetStencilEnable( false )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
+			draw.RoundedBox( 0, start_pos + size - ScreenScale( 5 ), ScrH() - ScreenScale( 1 ) - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
+			draw.RoundedBox( 0, start_pos + size - ScreenScale( 1 ), ScrH() - ScreenScale( 5 ) - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
+        KMASKS.Source()
+            draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, color_white )
+        KMASKS.End()
 
 		start_pos = start_pos + ( size + gap )
 	end

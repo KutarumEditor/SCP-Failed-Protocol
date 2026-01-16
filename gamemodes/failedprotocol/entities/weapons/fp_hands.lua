@@ -82,10 +82,6 @@ function SWEP:SecondaryAttack()
 			ply:ChatPrint( ent:GetModel() )
 		end
 
-		print( "eflags: ", ply:GetEFlags() )
-		print( "flags: ", ply:GetFlags() )
-		print( ent:GetClass() )
-
 		--ent:Remove()
 	else
 		if not SERVER then return end

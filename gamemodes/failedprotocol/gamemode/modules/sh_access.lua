@@ -10,14 +10,14 @@ local buttonEnts = {
 }
 
 function ACCESS.RecomputeButtons()
-	ACCESS_OVERRIDE = ACCESS_OVERRIDE or {}
+	local override = ACCESS_OVERRIDE or {}
 
 	for _, ent in ents.Iterator() do
 		if buttonEnts[ent:GetClass()] then
-			for i, v in ipairs( ACCESS_OVERRIDE ) do
+			for i, v in ipairs( override ) do
 				if v.pos == ent:GetPos() or v.map_id == ent:MapCreationID() then
 					ACCESS.BUTTON_CACHE[ent:EntIndex()] = {
-						access = v.access,
+						access = _G["ACCESS_"..v.access],
 					}
 					break
 				end

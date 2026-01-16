@@ -72,6 +72,7 @@ function PLAYER:DataTables()
 	player_manager.RunClass( self, "SetupDataTables" )
 
 	if SERVER then
+		self.depressedUse = true
 		self.FPArmor = {
 			vest = {
 				name = nil,

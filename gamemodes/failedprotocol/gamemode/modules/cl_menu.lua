@@ -5,9 +5,9 @@ local menuButtonsDrawn = false
 
 local bg_alpha, text_alpha = 1, 0
 
-local MENU_POS, MENU_ANG = Vector( 1780, -1635, -10 ), Angle( 0, 270, 90 )
+local MENU_POS, MENU_ANG = MENU_LOGO_POS[1] or Vector( 1780, -1635, -10 ), MENU_LOGO_POS[2] or Angle( 0, 270, 90 )
 
-local path = {
+local path = MENU_CAM_PATH or {
 	{
 		time = 1,
 		pos = Vector( -2983.405029, -2270.542725, 2943.881348 ),
@@ -82,30 +82,11 @@ local function _openStartMenu()
 	sbut:SetSize( 0, 0 )
 	sbut:SetText( "" )
 	function sbut:Paint( w, h )
-		render.SetStencilEnable( true )
-
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
-
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		draw.RoundedBox( 0, 0, ( 1 - bg_alpha ) * ( h / 2 ), w, bg_alpha * h, color_black )
-
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	    draw.SimpleTextOutlined( LANG.Get( "MENU", "start" ), "HUDBig", w/2, h/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
-
-	    render.SetStencilEnable( false )
+		KMASKS.Start()
+            draw.SimpleTextOutlined( LANG.Get( "MENU", "start" ), "HUDBig", w/2, h/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+        KMASKS.Source()
+            draw.RoundedBox( 0, 0, ( 1 - bg_alpha ) * ( h / 2 ), w, bg_alpha * h, color_black )
+        KMASKS.End()
 	end
 	function sbut:Think()
 		surface.SetFont( "HUDBig" )
@@ -151,30 +132,11 @@ local function _openMainMenu()
 	sbut:SetSize( 0, 0 )
 	sbut:SetText( "" )
 	function sbut:Paint( w, h )
-		render.SetStencilEnable( true )
-
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
-
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		draw.RoundedBox( 0, 0, ( 1 - logoAlpha ) * ( h / 2 ), w, logoAlpha * h, color_black )
-
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	    draw.SimpleTextOutlined( LANG.Get( "MENU", "join" ), "HUDBig", w/2, h/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
-
-	    render.SetStencilEnable( false )
+		KMASKS.Start()
+            draw.SimpleTextOutlined( LANG.Get( "MENU", "join" ), "HUDBig", w/2, h/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+        KMASKS.Source()
+            draw.RoundedBox( 0, 0, ( 1 - logoAlpha ) * ( h / 2 ), w, logoAlpha * h, color_black )
+        KMASKS.End()
 	end
 	function sbut:Think()
 		surface.SetFont( "HUDBig" )

@@ -29,7 +29,9 @@ SPAWNGROUPS = {
 
 			return next_mtf == nil or next_mtf <= 0
 		end,
-		callback = function() end
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", 2 )
+		end
 	},
 	["goc"] = {
 		weight = 40,
@@ -38,8 +40,14 @@ SPAWNGROUPS = {
 		support = true,
 		maxplayers = 4,
 		max = 1,
-		check = function() return true end,
-		callback = function() end
+		check = function()
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+
+			return next_mtf != nil and next_mtf > 0
+		end,
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+		end
 	},
 	["gru"] = {
 		weight = 40,
@@ -48,8 +56,14 @@ SPAWNGROUPS = {
 		support = true,
 		maxplayers = 4,
 		max = 1,
-		check = function() return true end,
-		callback = function() end
+		check = function()
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+
+			return next_mtf != nil and next_mtf > 0
+		end,
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+		end
 	},
 	["spear"] = {
 		weight = 40,
@@ -58,8 +72,14 @@ SPAWNGROUPS = {
 		support = true,
 		maxplayers = 4,
 		max = 1,
-		check = function() return true end,
-		callback = function() end
+		check = function()
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+
+			return next_mtf != nil and next_mtf > 0
+		end,
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+		end
 	},
 	["ci"] = {
 		weight = 40,
@@ -68,8 +88,14 @@ SPAWNGROUPS = {
 		support = true,
 		maxplayers = 6,
 		max = 1,
-		check = function() return true end,
-		callback = function() end
+		check = function()
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+
+			return next_mtf != nil and next_mtf > 0
+		end,
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+		end
 	},
 	["sh"] = {
 		weight = 40,
@@ -78,8 +104,14 @@ SPAWNGROUPS = {
 		support = true,
 		maxplayers = 5,
 		max = 1,
-		check = function() return true end,
-		callback = function() end
+		check = function()
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+
+			return next_mtf != nil and next_mtf > 0
+		end,
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+		end
 	},
 	["cbg"] = {
 		weight = 40,
@@ -88,8 +120,14 @@ SPAWNGROUPS = {
 		support = true,
 		maxplayers = 7,
 		max = 1,
-		check = function() return true end,
-		callback = function() end
+		check = function()
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+
+			return next_mtf != nil and next_mtf > 0
+		end,
+		callback = function()
+			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+		end
 	},
 }
 
@@ -305,8 +343,8 @@ CLASSES = {
 		spawngroup = "ntf",
 		team = TEAM_MTF,
 		model = "models/kutarum/brichevsk/personnel_models/medic.mdl",
-		weps = {},
-		ammo = {},
+		weps = { "tfa_ins2_wpn_coltm4a1" },
+		ammo = { ["ar2"] = 120 },
 		vest = "test_vest",
 		maxhp = 140,
 		hp = 140,
@@ -347,7 +385,7 @@ CLASSES = {
 		team = TEAM_GRU,
 		model = "models/kutarum/brichevsk/personnel_models/medic.mdl",
 		weps = { "tfa_ins2_wpn_ak74izh" },
-		ammo = { ["ar12"] = 120 },
+		ammo = { ["ar2"] = 120 },
 		armor = "test_vest",
 		inv_slots = 12,
 		maxhp = 150,

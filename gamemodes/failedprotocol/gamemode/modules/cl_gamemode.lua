@@ -31,6 +31,7 @@ function RoundStartCutscene()
 	HideHUD( true, true )
 
 	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
+	AMBIENT.TIME = .001
 	AMBIENT.Restart( "sound/scpfp/ambience/blue_feather.mp3" )
 
 	timer.Simple( 3, function()

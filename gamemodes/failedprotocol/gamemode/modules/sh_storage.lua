@@ -40,33 +40,14 @@ function OpenContainerUI( ent )
 
         eased = math.ease.OutCirc( self:GetAlpha()/245 )
 
-        render.SetStencilEnable( true )
+        KMASKS.Start()
+            draw.RoundedBox( 0, 0, 0, w, h, Color( 5, 5, 5, 240 ) )
+	        surface.SetDrawColor( 25, 25, 25, 55 )
 
-        render.ClearStencil()
-        
-        render.SetStencilTestMask( 255 )
-        render.SetStencilWriteMask( 255 )
-
-        render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-        render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-        render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-        render.SetStencilReferenceValue( 9 )
-        render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-        draw.RoundedBox( 0, 0 + ( w/2 ) * ( 1 - eased ), 0, w * eased, h, Color( 5, 5, 5, 240 ) )
-
-        render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-        render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-        draw.RoundedBox( 0, 0, 0, w, h, Color( 5, 5, 5, 240 ) )
-        surface.SetDrawColor( 25, 25, 25, 55 )
-
-        draw.SimpleText( LANG.Get( "ENT", container:GetClass() ), "HUDNormal", w/2, ScreenScale( 8 ), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-
-        render.SetStencilEnable( false )
+	        draw.SimpleText( LANG.Get( "ENT", container:GetClass() ), "HUDNormal", w/2, ScreenScale( 8 ), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+        KMASKS.Source()
+            draw.RoundedBox( 0, 0 + ( w/2 ) * ( 1 - eased ), 0, w * eased, h, Color( 5, 5, 5, 240 ) )
+        KMASKS.End()
 
         surface.SetDrawColor( color_white )
     end
@@ -100,40 +81,21 @@ function OpenContainerUI( ent )
 	        item:DockMargin( 0, 0, 0, ScreenScale( 2 ) )
 
 	        function item:Paint( w, h )
-	        	render.SetStencilEnable( true )
+	        	KMASKS.Start()
+			        draw.NoTexture()
+		            surface.SetDrawColor( Color( 15, 15, 15 ) )
+		            surface.DrawRect( 0, 0, w, h )
 
-		        render.ClearStencil()
-		        
-		        render.SetStencilTestMask( 255 )
-		        render.SetStencilWriteMask( 255 )
+		            if istable( v ) then
+		            	local wep_lang, ent_lang = LANG.Get( "WEP", v.class ), LANG.Get( "ENT", v.class )
 
-		        render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-		        render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-		        render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-		        render.SetStencilReferenceValue( 9 )
-		        render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		        draw.NoTexture()
-	            surface.SetDrawColor( color_white )
-		        surface.DrawRect( w/2 * ( 1 - eased ), 0, w * eased, h )
-
-		        render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-        		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-	            draw.NoTexture()
-	            surface.SetDrawColor( Color( 15, 15, 15 ) )
-	            surface.DrawRect( 0, 0, w, h )
-
-	            if istable( v ) then
-	            	local wep_lang, ent_lang = LANG.Get( "WEP", v.class ), LANG.Get( "ENT", v.class )
-
-	            	draw.SimpleText( wep_lang != "NULL_LANG" and wep_lang or ent_lang != "NULL_LANG" and ent_lang or v.name or v.class, "HUDNormal", w/2, h/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-	            end
-
-	            render.SetStencilEnable( false )
+		            	draw.SimpleText( wep_lang != "NULL_LANG" and wep_lang or ent_lang != "NULL_LANG" and ent_lang or v.name or v.class, "HUDNormal", w/2, h/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		            end
+			    KMASKS.Source()
+			        draw.NoTexture()
+		            surface.SetDrawColor( color_white )
+			        surface.DrawRect( w/2 * ( 1 - eased ), 0, w * eased, h )
+			    KMASKS.End()
 	        end
 
 	        function item:DoClick()

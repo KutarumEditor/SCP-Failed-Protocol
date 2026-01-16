@@ -63,6 +63,42 @@ hook.Add( "HUDPaint", "InfoPopup", function()
 	draw.RoundedBox( 0, ( ScrW() - totalW * info_eased ) / 2 - ScreenScale( 1 ), StartY, ScreenScale( 1 ), totalH, color_white )
     draw.RoundedBox( 0, ( ScrW() + totalW * info_eased ) / 2, StartY, ScreenScale( 1 ), totalH, color_white )
 
+    --[[KMASKS.Start()
+        draw.RoundedBox( 0, ( ScrW() - totalW ) / 2, StartY, totalW, totalH, Color( 15, 15, 15, 225 * info_eased ) )
+
+	    surface.SetDrawColor( Color( 0, 0, 0, 125 ) )
+
+		for i, tbl in ipairs( info_tbl ) do
+			text = isfunction( tbl.text ) and tbl.text() or tbl.text
+			font = isfunction( tbl.font ) and tbl.font() or tbl.font
+			ugap = isfunction( tbl.ugap ) and tbl.ugap() or tbl.ugap or 0
+			lgap = isfunction( tbl.lgap ) and tbl.lgap() or tbl.lgap
+			clr = isfunction( tbl.color ) and tbl.color() or tbl.color
+			clr.a = 255 * info_mult
+
+			surface.SetFont( font )
+			tw, th = surface.GetTextSize( text )
+
+			local lines = string.Wrap( font, text, width - ScreenScale( 16 ) )
+
+			StartY = StartY + ugap
+
+			for _, v in ipairs( lines ) do
+				draw.SimpleTextOutlined( v, font, ScrW() / 2, StartY, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 1, Color( 0, 0, 0, 125 * info_mult ) )
+				
+				StartY = StartY + th
+			end
+
+			StartY = StartY + lgap
+		end
+    KMASKS.Source()
+        draw.RoundedBox( 0, ( ScrW() - totalW * info_eased ) / 2, StartY, totalW * info_eased, totalH, color_white )
+    KMASKS.End()
+
+    - Why is it impossible?
+    - It's just not...
+    - Why not, you stupid bastard?]]
+
     render.SetStencilEnable( true )
 
     render.ClearStencil()
@@ -118,8 +154,6 @@ end )
 net.Receive( "FPInfoPopup", function()
 	info_tbl = net.ReadTable( true )
 
-	PrintTable( info_tbl )
-
 	for i, v in ipairs( info_tbl ) do
 		txt_tbl = info_tbl[i].text
 
@@ -133,7 +167,6 @@ net.Receive( "FPInfoPopup", function()
 					text[#text + 1] = tostring( sub )
 				end
 
-				PrintTable( text )
 				info_tbl[i].text = info_tbl[i].text .. LANG.Get( unpack( text ) )
 			else
 				info_tbl[i].text = info_tbl[i].text .. t

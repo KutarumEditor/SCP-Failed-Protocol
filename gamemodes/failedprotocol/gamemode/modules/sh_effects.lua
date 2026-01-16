@@ -148,39 +148,20 @@ hook.Add( "HUDPaint", "HUDActiveEffects", function()
 	local start_pos = ( ScrH() - total_space )/2
 
 	for k, v in pairs( effs ) do
-		render.SetStencilEnable( true )
+		KMASKS.Start()
+            local clr = LerpColor( .9, REGISTERED_EFFECTS[k].color, Color( 15, 15, 15 ) )
+			clr.a = 225
+			draw.RoundedBox( 0, gap, start_pos, size, size, clr )
 
-	    render.ClearStencil()
-	    
-	    render.SetStencilTestMask( 255 )
-	    render.SetStencilWriteMask( 255 )
+			surface.SetDrawColor( Color( 0, 0, 0, 125 ) )
 
-	    render.SetStencilPassOperation( STENCILOPERATION_KEEP )
-	    render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-
-	    render.SetStencilReferenceValue( 9 )
-	    render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-
-		draw.RoundedBox( 0, gap, start_pos, size, size, color_white )
-		
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-
-		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-
-		local clr = LerpColor( .9, REGISTERED_EFFECTS[k].color, Color( 15, 15, 15 ) )
-		clr.a = 225
-		draw.RoundedBox( 0, gap, start_pos, size, size, clr )
-
-		surface.SetDrawColor( Color( 0, 0, 0, 125 ) )
-
-		surface.SetDrawColor( REGISTERED_EFFECTS[k].color )
-		surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
-		--draw.RoundedBox( 0, gap + ScreenScale( 2 ), start_pos + ScreenScale( 2 ), size - ScreenScale( 4 ),  - ScreenScale( 4 ), REGISTERED_EFFECTS[k].color )
-		surface.DrawTexturedRect( gap + ScreenScale( 2 ), start_pos + ScreenScale( 2 ), size - ScreenScale( 4 ), size - ScreenScale( 4 ) )
-
-		render.SetStencilEnable( false )
+			surface.SetDrawColor( REGISTERED_EFFECTS[k].color )
+			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
+			--draw.RoundedBox( 0, gap + ScreenScale( 2 ), start_pos + ScreenScale( 2 ), size - ScreenScale( 4 ),  - ScreenScale( 4 ), REGISTERED_EFFECTS[k].color )
+			surface.DrawTexturedRect( gap + ScreenScale( 2 ), start_pos + ScreenScale( 2 ), size - ScreenScale( 4 ), size - ScreenScale( 4 ) )
+        KMASKS.Source()
+            draw.RoundedBox( 0, gap, start_pos, size, size, color_white )
+        KMASKS.End()
 
 		start_pos = start_pos + ( size + gap )
 	end
