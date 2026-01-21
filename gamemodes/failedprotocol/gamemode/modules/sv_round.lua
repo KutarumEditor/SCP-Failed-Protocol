@@ -41,14 +41,16 @@ REGISTERED_ROUND_TYPES = {
 		callback = function()
 			SetupExits()
 
+			SpawnDefaultMapEntities()
+
 			SpawnDefaultItems()
 
 			SetupFirstSupportTimer()
 
-			ClearPersonas()
-			SetupPlayers( "default" )
-
 			net.Ping( "ClearCSData", "" )
+
+			ClearPersonas()
+			SetupPlayers( "default" )	
 		end,
 		endcheck = function()
 			return RoundFinishCheck()
@@ -78,6 +80,7 @@ function RoundStart( type )
 		used_roles = {}
 
 		TIMERS.DestroyAll()
+		PA.Reset()
 
 		AnnulScore()
 
@@ -290,7 +293,9 @@ local function GetRandomSCP()
 end
 
 function SetupPlayers( type )
-	local all_players = player.GetAll()
+	local all_players = player.GetReady()
+
+	--if all_players == 0 then
 
 	local scps = 0
 
@@ -358,6 +363,8 @@ end
 
 hook.Add( "PostPlayerClassAssignation", "SelectSecretRussian", function()
 	local ply = table.Random( FPTeams.GetPlayersByTeam( TEAM_CLASSD ) )
+
+	if ply == nil then return end
 	
 	ply.amnesicrussian = true
 	print( ply:Name().." is selected as amnestic gru agent!" )

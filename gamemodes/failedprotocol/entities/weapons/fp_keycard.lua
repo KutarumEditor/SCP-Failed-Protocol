@@ -21,8 +21,8 @@ end
 
 function SWEP:InitKeycardLang()
 	if SERVER then return end
-
-	self.PrintName = LANG.Get( "WEP", self:GetClass() ).name.." - "..LANG.Get( "KEYCARDS", self:GetKeycard() )
+	
+	self.PrintName = LANG.Get( "WEP", self:GetClass(), "name" ).." - "..LANG.Get( "KEYCARDS", self:GetKeycard() )
 end
 
 function SWEP:Initialize()
@@ -56,22 +56,24 @@ function SWEP:UseKeycard( ent )
 		vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( ACT_VM_PRIMARYATTACK ) )
 		vm:SetPlaybackRate( 1 )
 
-		TIMERS.Create( ply:SteamID64().."KeycardUse", vm:SequenceDuration( vm:GetSequence() ) / 2.5, function()
-			local wep = ply:GetActiveWeapon()
-			if IsValid( ply ) and IsValid( wep ) and wep == self then
-				wep:SetState( KEYCARD_USED )
+		if SERVER then
+			TIMERS.Create( ply:SteamID64().."KeycardUse", vm:SequenceDuration( vm:GetSequence() ) / 2.5, function()
+				local wep = ply:GetActiveWeapon()
+				if IsValid( ply ) and IsValid( wep ) and wep == self then
+					wep:SetState( KEYCARD_USED )
 
-				if ACCESS.CheckKeycardAccess( ent:EntIndex(), wep:GetKeycard() ) then
-					ent:Input( "Use", ply, ply )
+					if ACCESS.CheckKeycardAccess( ent:EntIndex(), wep:GetKeycard() ) then
+						ent:Input( "Use", ply, ply )
 
-					ent:EmitSound( "scpfp/doors/granted.wav", 55, 100, 1, CHAN_ITEM )
-				else
-					ent:EmitSound( "scpfp/doors/denied.wav", 55, 100, 1, CHAN_ITEM )
+						ent:EmitSound( "scpfp/doors/granted.wav", 55, 100, 1, CHAN_ITEM )
+					else
+						ent:EmitSound( "scpfp/doors/denied.wav", 55, 100, 1, CHAN_ITEM )
+					end
+
+					wep:SetState( KEYCARD_CALM )
 				end
-
-				wep:SetState( KEYCARD_CALM )
-			end
-		end )
+			end, false )
+		end
 	end
 end
 

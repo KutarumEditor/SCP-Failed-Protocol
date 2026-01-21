@@ -14,19 +14,31 @@ function PA.Play( snd, subs )
 		snd = snd or "",
 		subs = subs or ""
 	}
-
-	PA.NEXT = CurTime() + ( sound_duration_override[snd] or SoundDuration( snd ) )
 end
 
-local nextThink = 0
+function PA.Reset()
+	PA.QUEUE = {}
+
+	if SERVER then
+		net.Ping( "PAReset" )
+	end
+end
+
 hook.Add( "Think", "PAThink", function()
 	local ct = CurTime()
-	if nextThink < ct and PA.NEXT < ct and PA.QUEUE[1] != nil then
+	if PA.NEXT < ct and PA.QUEUE[1] != nil then
 		local q = PA.QUEUE
-		for i, ply in player.Iterator() do
-			PHRASES.Cast( ply, q[1].snd, "pa", q[1].subs )
-		end
+		local snd = q[1].snd
+		PHRASES.Cast( ply, snd, "pa", q[1].subs )
 
-		nextThink = ct + 3
+		PA.NEXT = CurTime() + ( sound_duration_override[snd] or SoundDuration( snd ) )
+
+		table.remove( PA.QUEUE, 1 )
 	end
+end )
+
+if not CLIENT then return end
+
+net.ReceivePing( "PAReset", function()
+	PA.QUEUE = {}
 end )

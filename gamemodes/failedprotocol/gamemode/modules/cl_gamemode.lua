@@ -31,8 +31,20 @@ function RoundStartCutscene()
 	HideHUD( true, true )
 
 	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
-	AMBIENT.TIME = .001
+	AMBIENT.Ban( 188 )
 	AMBIENT.Restart( "sound/scpfp/ambience/blue_feather.mp3" )
+	TIMERS.Create( "ClientBreachStart", 3, function()
+		AMBIENT.Restart( "sound/scpfp/ambience/breach_ambience.wav" )
+		surface.PlaySound( "scpfp/breach_action.wav" )
+
+		TIMERS.Create( "PAMalfunction", 3, function()
+			PA.Play( "scpfp/public_announcements/malfunction.wav", "malfunction" )
+		end)
+
+		TIMERS.Create( "PABreach", 15, function()
+			PA.Play( "scpfp/public_announcements/breach.wav", "breach" )
+		end)
+	end )
 
 	timer.Simple( 3, function()
 		HideHUD( false )

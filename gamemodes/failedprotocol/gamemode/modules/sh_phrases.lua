@@ -1,3 +1,10 @@
+if CLIENT then
+
+local utf8 = utf8
+local draw = draw
+
+end
+
 PHRASES = PHRASES or {
 	CUR = {}
 }
@@ -8,9 +15,12 @@ local sndDurTbl = {
 	["scpfp/gocsniper/fire1.wav"] = 1.45,
 	["scpfp/gocsniper/fire2.wav"] = 1.65,
 	["scpfp/gocsniper/scp.wav"] = 1.45,
+	["scpfp/public_announcements/malfunction.wav"] = 6.5,
+	["scpfp/public_announcements/breach.wav"] = 14.6,
 }
 
 local senderColor = {
+	pa = Color( 93, 122, 184 ),
 	gocsniper = Color( 97, 132, 149 ),
 	gruspy = Color( 158, 145, 99 ),
 }
@@ -19,14 +29,12 @@ local function castPhraseInternal( sound, sender, text )
 	surface.PlaySound( sound )
 
 	PHRASES.PopUp( sender, text, sndDurTbl[sound] or SoundDuration( sound ) )
-
-	print( LANG.Get( "PHRASES", sender, text ) )
 end
 
 function PHRASES.Cast( ply, sound, sender, text )
 	if SERVER then
 		net.Start( "FPPhrases" )
-			net.WriteString( sound )
+			net.WriteString( sound or "" )
 			net.WriteString( sender )
 			net.WriteString( text )
 		if ply:IsPlayer() then
@@ -35,7 +43,7 @@ function PHRASES.Cast( ply, sound, sender, text )
 			net.Broadcast()
 		end
 	else
-		castPhraseInternal( ply, sound, sender )
+		castPhraseInternal( sound or "", sender, text )
 	end
 end
 
@@ -52,22 +60,32 @@ function PHRASES.PopUp( s, t, d )
 	} )
 end
 
+local line = 0
 hook.Add( "HUDPaint", "PhrasesDisplay", function()
 	if #PHRASES.CUR == 0 then return end
 
+	line = 0
+
+	local ct = CurTime()
 	for k, v in ipairs( PHRASES.CUR ) do
 		if k > 3 then continue end
 
-		local speed = ( v.duration - 3 ) / #v.text
+		local speed = ( v.duration - 3 ) / utf8.len( v.text )
 
-		if CurTime() >= v.nextletter and #v.curtext != #v.text then
-			v.nextletter = CurTime() + speed
-			v.curtext = utf8.sub( v.text, 1, utf8.len( v.curtext ) + 1 )
+		if #v.curtext != #v.text and ct >= v.nextletter then
+			v.nextletter = ct + speed
+			v.curtext = v.curtext..utf8.GetChar( v.text, utf8.len( v.curtext ) + 1 )
 		end
 
-		draw.MultiColorText( "HUDNormal", ScrW() / 4, ScrH()*3/4 - ( k - 1 ) * ScreenScale( 12 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1, color_black, v.color, v.sender, color_white, " : "..v.curtext )
+		local txt_tbl = string.Explode( "\n", v.curtext )
 
-		if CurTime() >= v.endtime then
+		for i, t in ipairs( txt_tbl ) do
+			local text = i == 1 and { v.color, v.sender, color_white, " : "..t } or { color_white, t }
+			draw.MultiColorText( "HUDNormal", ScrW() / 4, ScrH()*3/4 + line * ScreenScale( 12 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 0, color_black, unpack( text ) )
+			line = line + 1
+		end
+
+		if ct >= v.endtime then
 			table.remove( PHRASES.CUR, k )
 		end
 	end

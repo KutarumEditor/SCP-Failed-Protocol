@@ -2,6 +2,7 @@ local draw = draw
 local vgui = vgui
 local ScrW = ScrW
 local ScrH = ScrH
+local ScreenScale = ScreenScale
 local surface = surface
 local hook = hook
 local tostring = tostring
@@ -14,6 +15,8 @@ local net = net
 local Angle = Angle
 local Vector = Vector
 local KMASKS = KMASKS
+
+local LerpColor = LerpColor
 local lply
 local lrag
 
@@ -116,9 +119,8 @@ local hud_shake = 0
 local alpha_death_mult = 1
 
 local total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
-function GM:HUDPaint()
-	lply = lply or LocalPlayer()
 
+function DrawFPHUD()
 	local bars = {
 		[2] = {	--Health
 			icon = hp_mat,
@@ -142,40 +144,6 @@ function GM:HUDPaint()
 			show = function() return lply:Armor() > 0 and lply:FPTeam() != TEAM_SPEC end,
 		},
 	}
-
-	if not CL_SETTINGS.Get( "fp_disable_vignette", "bool" ) then
-		surface.SetDrawColor( 0, 0, 0, 240 )
-		surface.SetMaterial( vignette_mat )
-		surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
-	end
-
-	for i, elem in ipairs( drawTable ) do
-		surface.SetDrawColor( elem.clr )
-		surface.SetMaterial( elem.mat )
-		surface.DrawTexturedRect( elem.x, elem.y, elem.w, elem.h )
-
-		elem.time = elem.time - FrameTime()
-
-		if elem.time <= 0 then
-			drawTable[i] = nil
-		end
-	end
-
-	if hud_hidden then
-		hud_hide_alpha = math.max( 0, hud_hide_alpha - .01 )
-	else
-		hud_hide_alpha = math.min( 1, hud_hide_alpha + .01 )
-	end
-
-	alpha_death_mult = ( lply:Alive() or lply:FPTeam() == TEAM_SPEC ) and 1 or math.max( alpha_death_mult - FrameTime(), 0 )
-
-	total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
-
-	if total_alpha_mult == 0 then return end
-
-	if not MENU_CLOSED then return end
-
-	hook.Run( "HUDDrawTargetID" )
 
 	local scrw = ScrW()
 	local scrh = ScrH()
@@ -280,8 +248,9 @@ function GM:HUDPaint()
 		    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
 		KMASKS.End()
 	end
+end
 
-	--Spectate Info
+function DrawFPSpectateInfo()
 	if lply:FPTeam() == TEAM_SPEC then
 		local ent = lply:GetObserverTarget()
 		if IsValid( ent ) then
@@ -294,15 +263,137 @@ function GM:HUDPaint()
 	end
 end
 
+function DrawFPEffects()
+	local eff_size, eff_gap, eff_outline = ScreenScale( 16 ), ScreenScale( 4 ), ScreenScale( 2 )
+	local effs = lply:GetProperty( "Effects", {} )
+	local total_space = #effs * eff_size + ( #effs - 1 ) * eff_gap
+	local start_pos = ( ScrH() - total_space )/2
+
+	for k, v in pairs( effs ) do
+		KMASKS.Start()
+            local clr = LerpColor( .9, REGISTERED_EFFECTS[k].color, Color( 15, 15, 15 ) )
+			clr.a = 225
+			draw.RoundedBox( 0, eff_gap, start_pos, eff_size, eff_size, clr )
+
+			surface.SetDrawColor( Color( 0, 0, 0, 125 ) )
+
+			surface.SetDrawColor( REGISTERED_EFFECTS[k].color )
+			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
+			surface.DrawTexturedRect( eff_gap + eff_outline, start_pos + eff_outline, eff_size - eff_outline * 2, eff_size - eff_outline * 2 )
+        KMASKS.Source()
+            draw.RoundedBox( 0, eff_gap, start_pos, eff_size, eff_size, color_white )
+        KMASKS.End()
+
+		start_pos = start_pos + ( eff_size + eff_gap )
+	end
+end
+
+function DrawFPAbilities()
+	local ply = LocalPlayer()
+	local abs = ply.FPAbilities or {}
+
+	local size = ScreenScale( 20 )
+	local gap = ScreenScale( 15 )
+	local total_space = #abs * size + ( #abs - 1 ) * gap
+	local start_pos = ( ScrW() - total_space )/2
+
+	for k, v in pairs( abs ) do
+		local name = v.name
+
+		local ratio = math.min( 1, ( abs[k].next - CurTime() ) / ABILITIES.REG[name].cooldown )
+
+		local time = math.max( 0, abs[k].next - CurTime() )
+		if time > 0 then
+			draw.SimpleTextOutlined( math.Round( time, time < 10 and 1 or 0 ), "HUDSmall", start_pos + size/2, ScrH() - size - gap*6/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+		end
+
+		local uses = v.uses
+		if uses > -1 then
+			draw.SimpleTextOutlined( uses, "HUDSmall", start_pos + size/2, ScrH() - gap*4/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+		end
+
+		KMASKS.Start()
+            local clr = ABILITIES.REG[name].color
+			local lerpclr = LerpColor( .9, clr, Color( 15, 15, 15 ) )
+			lerpclr.a = 225
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, lerpclr )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size * ratio, Color( 5, 5, 5, 175 ) )
+
+			local lerpclr = LerpColor( ratio, clr, Color( 45, 45, 45 ) )
+			surface.SetDrawColor( lerpclr )
+			surface.SetMaterial( ABILITIES.REG[name].icon )
+			surface.DrawTexturedRect( start_pos + ScreenScale( 1 ), ScrH() - size - gap + ScreenScale( 1 ), size - ScreenScale( 2 ), size - ScreenScale( 2 ) )
+
+			draw.SimpleTextOutlined( string.upper( input.GetKeyName( ABILITIES.REG[name].button ) ), "HUDMedium", start_pos + size/2, ScrH() - size/2 - gap, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
+			draw.RoundedBox( 0, start_pos + size - ScreenScale( 5 ), ScrH() - ScreenScale( 1 ) - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
+			draw.RoundedBox( 0, start_pos + size - ScreenScale( 1 ), ScrH() - ScreenScale( 5 ) - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
+        KMASKS.Source()
+            draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, color_white )
+        KMASKS.End()
+
+		start_pos = start_pos + ( size + gap )
+	end
+end
+
+function GM:HUDPaint()
+	lply = lply or LocalPlayer()
+
+	if not CL_SETTINGS.Get( "fp_disable_vignette", "bool" ) then
+		surface.SetDrawColor( 0, 0, 0, 240 )
+		surface.SetMaterial( vignette_mat )
+		surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
+	end
+
+	for i, elem in ipairs( drawTable ) do
+		surface.SetDrawColor( elem.clr )
+		surface.SetMaterial( elem.mat )
+		surface.DrawTexturedRect( elem.x, elem.y, elem.w, elem.h )
+
+		elem.time = elem.time - FrameTime()
+
+		if elem.time <= 0 then
+			drawTable[i] = nil
+		end
+	end
+
+	if hud_hidden then
+		hud_hide_alpha = math.max( 0, hud_hide_alpha - .01 )
+	else
+		hud_hide_alpha = math.min( 1, hud_hide_alpha + .01 )
+	end
+
+	alpha_death_mult = ( lply:Alive() or lply:FPTeam() == TEAM_SPEC ) and 1 or math.max( alpha_death_mult - FrameTime(), 0 )
+
+	total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
+
+	if total_alpha_mult == 0 then return end
+
+	if not MENU_CLOSED then return end
+
+	hook.Run( "HUDDrawTargetID" )
+
+	DrawFPHUD()
+
+	DrawFPSpectateInfo()
+
+	DrawFPEffects()
+
+	DrawFPAbilities()
+end
+
 local nametag_alpha_mult = 1
 hook.Add( "PostPlayerDraw", "PlayerSpecInfo", function( ply )
 	lply = lply or LocalPlayer()
 
+	local dist = ply:GetPos():Distance( EyePos() )
 	if lply:FPTeam() != TEAM_SPEC or lply:GetObserverTarget() == ply then return end
-	if ply:GetPos():Distance( EyePos() ) > 256 then return end
+	if dist > 256 then return end
 	if ply == lply then return end
 
-	nametag_alpha_mult = ( 256 - ply:GetPos():Distance( EyePos() ) ) / 256
+	nametag_alpha_mult = ( 256 - dist ) / 256
 	local pos = ply:GetPos() + ply:GetUp() * ( ply:OBBMaxs().z + 5 )
 	local angle = ( pos - EyePos() ):GetNormalized():Angle()
 	angle = Angle( 0, angle.y, 0 )

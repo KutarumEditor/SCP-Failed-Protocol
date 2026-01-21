@@ -84,6 +84,18 @@ function GM:AllowPlayerPickup( ply, ent )
 	return false
 end
 
+function player.GetReady()
+	local plys = {}
+
+	for i, ply in player.Iterator() do
+		if not ply:IsReady() then continue end
+
+		plys[#plys + 1] = ply
+	end
+
+	return plys
+end
+
 local PLAYER = FindMetaTable( "Player" )
 
 function PLAYER:CreatePlayerRagdoll()
@@ -217,8 +229,6 @@ function PLAYER:Cleanup()
 	self:SetMaxStamina( 100 )
 	self:SetSatiety( 100 )
 	self:SetMaxSatiety( 100 )
-	self:SetMoney( 0 )
-	self:SetJob( "" )
 
 	self:SetRenderMode( RENDERMODE_NORMAL )
 	self:SetColor( Color( 255, 255, 255, 255 ) )
@@ -323,8 +333,6 @@ function PLAYER:Setup( class, spawn_override, instant )
 	self:SetMaxStamina( class_tab.maxstamina or 100 )
 	self:SetStamina( class_tab.stamina or 100 )
 
-	self:SetMoney( class_tab.start_balance or 0 )
-
 	self:SetWalkSpeed( class_tab.walkspeed or 125 )
 	self:SetCrouchedWalkSpeed( class_tab.crouchspeed or .5 )
 	self:SetSlowWalkSpeed( class_tab.slowwalkspeed or 85 )
@@ -411,3 +419,7 @@ function PLAYER:SetupSCP( class, instant )
 
 	print( "Assigned "..self:Nick().." to '"..class.."' class" )
 end
+
+net.ReceivePing( "FPPassedMenu", function( data, ply )
+	ply:SetReady( true )
+end )

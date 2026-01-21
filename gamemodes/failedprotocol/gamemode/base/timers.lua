@@ -24,7 +24,9 @@ function TIMERS.Create( name, duration, callback, sync )
 	TIMERS.ongoing[name] = {
 		st = CurTime(),
 		et = CurTime() + duration,
-		cb = callback
+		cb = callback or function()
+			--
+		end
 	}
 
 	local syn = true
@@ -75,7 +77,7 @@ hook.Add( "Think", "FPTimersThink", function()
 
 			TIMERS.Destroy( name )
 
-			if SERVER then
+			if isfunction( cb ) then
 				cb()
 			end
 		end

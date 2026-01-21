@@ -5,7 +5,7 @@ local menuButtonsDrawn = false
 
 local bg_alpha, text_alpha = 1, 0
 
-local MENU_POS, MENU_ANG = MENU_LOGO_POS[1] or Vector( 1780, -1635, -10 ), MENU_LOGO_POS[2] or Angle( 0, 270, 90 )
+local MENU_POS, MENU_ANG = MENU_LOGO_POS != nil and MENU_LOGO_POS[1] or Vector( 1780, -1635, -10 ), MENU_LOGO_POS != nil and MENU_LOGO_POS[2] or Angle( 0, 270, 90 )
 
 local path = MENU_CAM_PATH or {
 	{
@@ -156,6 +156,8 @@ local function _openMainMenu()
 		surface.PlaySound( "scpfp/signal.wav" )
 
 		LocalPlayer():ScreenFade( SCREENFADE.IN, color_white, 2.5, .5 )
+
+		net.Ping( "FPPassedMenu" )
 
 		MENU_CLOSED = true
 

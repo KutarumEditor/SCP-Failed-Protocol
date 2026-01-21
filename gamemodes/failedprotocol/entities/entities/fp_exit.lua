@@ -2,6 +2,10 @@ AddCSLuaFile()
 
 ENT.Type = "anim"
 
+function ENT:SetupDataTables()
+    self:NetworkVar( "String", 0, "Name" )
+end
+
 function ENT:Initialize()
     if SERVER then
         self:SetModel( "models/hunter/blocks/cube025x025x025.mdl" )
@@ -21,23 +25,17 @@ function ENT:Initialize()
     self:DrawShadow( false )
 end
 
-function ENT:Touch( ent )
-    if ent:IsPlayer() and ent:Alive() and self:EscapeCheck( ent ) then
-        ent:KillSilent()
-        ent:SetupSpectator( true )
+function ENT:StartTouch( ply )
+    local name = self:GetName()
+    print( name )
+    if ply:IsPlayer() and ply:Alive() and EXITS[name].check( ply ) then
+        ply:KillSilent()
+        ply:SetupSpectator( true )
 
-        self:EscapeCallback( ent )
+        EXITS[name].callback( ply )
     end
 end
 
-function ENT:EscapeCheck( ply )
-    return true
-end
-
-function ENT:EscapeCallback( ply )
-    --
-end
-
 function ENT:Draw()
-    --self:DrawModel()
+    --
 end

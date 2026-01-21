@@ -2,36 +2,7 @@ local check_mat = Material( "failedprotocol/abilities/check.png" )
 
 ABILITIES = {
 	REG = {
-		--[[["test_ability1"] = {
-			icon = Material( "failedprotocol/icons/bleeding.png", "noclamp" ),
-			color = Color( 0, 225, 0 ),
-			cooldown = 3,
-			uses = 3,
-			button = KEY_B,
-			check = function( ply )
-				local tr = util.TraceLine( {
-					start = ply:GetShootPos(),
-					endpos = ply:GetShootPos() + ply:GetAimVector() * 100,
-					filter = function( ent ) return ent:IsPlayer() and ent != ply end
-				} )
-
-				return tr.Entity != NULL
-			end,
-			callback = function( ply )
-				ply:ChatPrint( "ПЕРЕОДЕЛИ НАХРЕН" )
-
-				local tr = util.TraceLine( {
-					start = ply:GetShootPos(),
-					endpos = ply:GetShootPos() + ply:GetAimVector() * 100,
-					filter = function( ent ) return ent:IsPlayer() and ent != ply end
-				} )
-
-				tr.Entity:Setup( "classd", true )
-
-				ABILITIES.Spend( ply, "test_ability1" )
-			end
-		},]]
-		["grucheck"] = {
+		["gruspycheck"] = {
 			icon = check_mat,
 			color = Color( 255, 125, 0 ),
 			cooldown = 3,
@@ -56,8 +27,8 @@ ABILITIES = {
 
 				local ent = tr.Entity
 				if ent.amnesicrussian then
-					ABILITIES.Remove( ply, "grucheck" )
-					ABILITIES.Remove( ply, "grulocate" )
+					ABILITIES.Remove( ply, "gruspycheck" )
+					ABILITIES.Remove( ply, "gruspylocate" )
 
 					net.Ping( "FoundRussian", tostring( ent:UserID() ), ply )
 
@@ -72,7 +43,7 @@ ABILITIES = {
 				end
 			end
 		},
-		["grulocate"] = {
+		["gruspylocate"] = {
 			icon = check_mat,
 			color = Color( 215, 175, 0 ),
 			cooldown = 20,
@@ -176,56 +147,6 @@ hook.Add( "PlayerButtonDown", "FPUseAbility", function( ply, button )
 end)
 
 else
-
-hook.Add( "HUDPaint", "HUDAbilities", function()
-	local ply = LocalPlayer()
-	local abs = ply.FPAbilities or {}
-
-	local size = ScreenScale( 20 )
-	local gap = ScreenScale( 15 )
-	local total_space = #abs * size + ( #abs - 1 ) * gap
-	local start_pos = ( ScrW() - total_space )/2
-
-	for k, v in pairs( abs ) do
-		local name = v.name
-
-		local ratio = math.min( 1, ( abs[k].next - CurTime() ) / ABILITIES.REG[name].cooldown )
-
-		local time = math.max( 0, abs[k].next - CurTime() )
-		if time > 0 then
-			draw.SimpleTextOutlined( math.Round( time, time < 10 and 1 or 0 ), "HUDSmall", start_pos + size/2, ScrH() - size - gap*6/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
-		end
-
-		local uses = v.uses
-		if uses > -1 then
-			draw.SimpleTextOutlined( uses, "HUDSmall", start_pos + size/2, ScrH() - gap*4/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
-		end
-
-		KMASKS.Start()
-            local clr = ABILITIES.REG[name].color
-			local lerpclr = LerpColor( .9, clr, Color( 15, 15, 15 ) )
-			lerpclr.a = 225
-			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, lerpclr )
-			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size * ratio, Color( 5, 5, 5, 175 ) )
-
-			local lerpclr = LerpColor( ratio, clr, Color( 45, 45, 45 ) )
-			surface.SetDrawColor( lerpclr )
-			surface.SetMaterial( ABILITIES.REG[name].icon )
-			surface.DrawTexturedRect( start_pos + ScreenScale( 1 ), ScrH() - size - gap + ScreenScale( 1 ), size - ScreenScale( 2 ), size - ScreenScale( 2 ) )
-
-			draw.SimpleTextOutlined( string.upper( input.GetKeyName( ABILITIES.REG[name].button ) ), "HUDMedium", start_pos + size/2, ScrH() - size/2 - gap, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
-
-			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
-			draw.RoundedBox( 0, start_pos + size - ScreenScale( 5 ), ScrH() - ScreenScale( 1 ) - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
-			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
-			draw.RoundedBox( 0, start_pos + size - ScreenScale( 1 ), ScrH() - ScreenScale( 5 ) - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
-        KMASKS.Source()
-            draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, color_white )
-        KMASKS.End()
-
-		start_pos = start_pos + ( size + gap )
-	end
-end )
 
 net.Receive( "FPAbilities", function()
 	net.ReadPlayer().FPAbilities = net.ReadTable()

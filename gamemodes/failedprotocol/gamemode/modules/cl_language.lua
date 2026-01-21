@@ -40,10 +40,12 @@ function LANG.Get( ... )
 	local tbl = table.Pack( ... )
 
 	for i, v in ipairs( tbl ) do
-		path = path[v]
+		if path[v] != nil then
+			path = path[v]
+		end
 	end
 
-	return path or "NULL_LANG"
+	return isstring( path ) and path or "NULL_LANG"
 end
 
 function LANG.GetAllLangs()

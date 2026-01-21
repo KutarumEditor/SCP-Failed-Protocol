@@ -21,7 +21,7 @@ function ENT:Initialize()
     self:DrawShadow( false )
 end
 
-function ENT:StartTouch( ent )
+function ENT:Touch( ent )
     local gate = self:GetParent()
     if IsValid( gate ) and gate:GetShocking() then
         local d = DamageInfo()

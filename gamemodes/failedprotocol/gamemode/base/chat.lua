@@ -21,13 +21,7 @@ net.Receive( "FPChat", function()
 		if isstring( v ) and string.StartsWith( v, "$" ) then
 			local str_tbl = string.Explode( ".", string.Right( v, #v - 1 ) )
 
-			local new_str = lang
-
-			for i, txt in ipairs( str_tbl ) do
-				new_str = new_str[txt]
-			end
-
-			tbl[_] = new_str
+			tbl[_] = LANG.Get( unpack( str_tbl ) )
 		end
 	end
 

@@ -46,7 +46,7 @@ function AMBIENT.Remove()
 end
 
 function AMBIENT.Ban( time )
-	AMBIENT.BAN = time
+	AMBIENT.BAN = CurTime() + time
 end
 
 
@@ -59,10 +59,8 @@ hook.Add( "Think", "FPAmbience", function()
 				AMBIENT.SOUND = nil
 			end
 
-			if AMBIENT.BAN == 0 then
+			if CurTime() > AMBIENT.BAN then
 				AMBIENT.Restart()
-			else
-				AMBIENT.BAN = math.max( 0, AMBIENT.BAN - ambThinkDelay )
 			end
 
 			checkTime = CurTime() + ambThinkDelay

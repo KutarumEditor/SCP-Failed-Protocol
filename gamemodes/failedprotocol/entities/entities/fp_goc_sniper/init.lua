@@ -63,8 +63,6 @@ function ENT:SpeakPhrase( snd, speaker, phrase )
 end
 
 function ENT:Think()
-	PrintTable( self:GetAttachments() )
-
 	local nextThink = 3
 	local triggered = self:GetTriggered()
 	local aggressive = self:GetAggressive()

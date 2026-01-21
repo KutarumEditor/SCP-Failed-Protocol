@@ -49,7 +49,7 @@ function ENT:Think()
     local ct, ft = CurTime(), FrameTime()
     local active = false
     local pos = self:GetPos()
-    for i, ply in ipairs( ents.FindInSphere( self:GetPos(), 256 ) ) do
+    for i, ply in ipairs( ents.FindInSphere( self:GetPos(), 200 ) ) do
         if ply:IsPlayer() and ply:Alive() then
             active = true
         end
@@ -59,14 +59,16 @@ function ENT:Think()
         windinUp = false
         self:StopSound( "scpfp/tesla_gate/windup.wav" )
 
-        self:SetNextShock( ct + 1 )
+        self:SetNextShock( ct + .75 )
 
-        self:NextThink( ct + .25 )
+        self:NextThink( ct + .1 )
         return true
     elseif active then
         if not windinUp then
             windinUp = true
-            self:EmitSound( "scpfp/tesla_gate/windup.wav" )
+            if SERVER then
+                self:EmitSound( "scpfp/tesla_gate/windup.wav" )
+            end
         end
 
         if ct >= self:GetNextShock() then
@@ -79,7 +81,7 @@ function ENT:Think()
         end
     end
 
-    self:NextThink( ct + .25 )
+    self:NextThink( ct + .1 )
 
     return true
 end
@@ -87,7 +89,9 @@ end
 function ENT:Shock()
     self:SetShocking( true )
 
-    self:EmitSound( "scpfp/tesla_gate/shock.wav" )
+    if SERVER then
+        self:EmitSound( "scpfp/tesla_gate/shock.wav" )
+    end
 
     timer.Simple( 1.25, function()
         if IsValid( self ) then

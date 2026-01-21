@@ -298,8 +298,8 @@ CLASSES = {
 		runspeed = 225,
 		jumppower = 175,
 		callback = function( ply )
-			ABILITIES.Setup( ply, "grucheck" )
-			ABILITIES.Setup( ply, "grulocate" )
+			ABILITIES.Setup( ply, "gruspycheck" )
+			ABILITIES.Setup( ply, "gruspylocate" )
 
 			ply:GiveKeycard( "res" )
 

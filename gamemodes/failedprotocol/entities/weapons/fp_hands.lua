@@ -32,6 +32,8 @@ SWEP.CantBeCarried = {
 	["cv_delivery_point"] = true,
 	["cv_deliverer_locker"] = true,
 	["cv_fading_bag"] = true,
+	["fp_tesla_gate"] = true,
+	["fp_tesla_killer"] = true,
 }
 
 function SWEP:SetupDataTables()

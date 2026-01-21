@@ -68,6 +68,7 @@ CLASSES.gruspy = "GRU Spy"
 CLASSES.guard_pacificator = "SD Pacificator"
 CLASSES.guard = "SD Officer"
 CLASSES.guard_storm = "SD Stormtrooper"
+CLASSES.cispy = "CI Spy"
 
 CLASSES.ntfsoldier = "Epsilon-11 Soldier"
 
@@ -83,8 +84,9 @@ CLASSES.shsoldier = "SH Soldier"
 
 CLASSES.cbgsoldier = "CBG Soldier"
 
-CLASSES.SCP008 = "SCP-008"
-CLASSES.SCP035 = "SCP-035"
+CLASSES.SCP008 = "SCP-008-2"
+CLASSES.SCP035 = "SCP-035-2"
+CLASSES.SCP096 = "SCP-096"
 
 local DESC = {}
 lang.DESC = DESC
@@ -103,6 +105,7 @@ DESC.gruspy = "Deez nuts"
 DESC.guard_pacificator = "Deez nuts"
 DESC.guard = "Deez nuts"
 DESC.guard_storm = "Deez nuts"
+DESC.cispy = "Deez nuts"
 
 DESC.ntfsoldier = "Deez nuts"
 
@@ -168,21 +171,34 @@ ROUNDENDINFO.warheads = "Warheads detonated"
 local WEP = {}
 lang.WEP = WEP
 
-WEP.fp_hands = "Hands"
-WEP.fp_keycard = "Keycard"
-WEP.fp_knife = "Knife"
-WEP.fp_bandage = "Bandage"
+WEP.fp_hands = {
+	name = "Hands"
+}
+WEP.fp_keycard = {
+	name = "Keycard"
+}
+WEP.fp_knife = {
+	name = "Knife"
+}
+WEP.fp_bandage = {
+	name = "Bandage"
+}
 
 local ENT = {}
 lang.ENT = ENT
 
 ENT.prop_ragdoll = "Body"
+ENT.fp_box = "Box"
 
 local ACTIONS = {}
 lang.ACTIONS = ACTIONS
 
 ACTIONS.prop_ragdoll = {
 	check = "Check",
+}
+
+ACTIONS.fp_box = {
+	open = "Открыть",
 }
 
 local PHRASES = {}
@@ -202,6 +218,12 @@ PHRASES.gruspy = {
 	found1 = "Copy. Target found, escorting...",
 	found2 = "Copy. Object found...",
 	found3 = "Copy. Target found...",
+}
+
+PHRASES.pa_name = " Announcements system"
+PHRASES.pa = {
+	malfunction = "We've received reports of multiple electrical and door control issues. \nPlease remain calm and...",
+	breach = "We've got multiple site-wide containment breaches. \nAll military personnel are ordered to head to the light, organic and heavy containment zones to localize the threat. \nOther staff are advised to stay in any safe area until site is secured."
 }
 
 LANG.Register( "english", lang )

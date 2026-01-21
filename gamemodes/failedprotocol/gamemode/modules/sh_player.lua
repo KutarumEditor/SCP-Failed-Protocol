@@ -9,7 +9,6 @@ function CLASS:SetupDataTables()
 
 	ply:NetworkVar( "Int", 0, "_FPTeam" )
 	ply:NetworkVar( "Int", 1, "InvSlots" )
-	ply:NetworkVar( "Int", 2, "Money" )
 
 	ply:NetworkVar( "Float", 0, "Stamina" )
 	ply:NetworkVar( "Float", 1, "MaxStamina" )
@@ -19,14 +18,13 @@ function CLASS:SetupDataTables()
 	ply:NetworkVar( "String", 0, "_FPClass" )
 	ply:NetworkVar( "String", 1, "_Name" )
 	ply:NetworkVar( "String", 2, "_Surname" )
-	ply:NetworkVar( "String", 3, "Job" )
 
 	ply:NetworkVar( "Bool", 0, "Exhausted" )
+	ply:NetworkVar( "Bool", 1, "Ready" )
 
 	if SERVER then
 		ply:Set_FPTeam( 0 )
 		ply:SetInvSlots( 0 )
-		ply:SetMoney( 0 )
 
 		ply:SetMaxStamina( 100 )
 		ply:SetStamina( 100 )
@@ -34,12 +32,12 @@ function CLASS:SetupDataTables()
 		ply:SetMaxSatiety( 100 )
 		
 		ply:SetExhausted( false )
+		ply:SetReady( ply:IsBot() and true or false )
 		ply:SetCanZoom( false )
 
 		ply:Set_FPClass( "spectator" )
 		ply:Set_Name( "John" )
 		ply:Set_Surname( "Doe" )
-		ply:SetJob( "" )
 	end
 end
 
@@ -49,15 +47,23 @@ player_manager.RegisterClass( "fp_player", CLASS, "player_default" )
 -- Player funcs --
 ------------------
 
+local translateKeyToFunc = {
+	[IN_ATTACK] = function( ply )
+		ply:SpectatePlayerNext()
+	end,
+	[IN_ATTACK2] = function( ply )
+		ply:SpectatePlayerPrev()
+	end,
+	[IN_RELOAD] = function( ply )
+		ply:ChangeSpectateMode()
+	end,
+}
+
 function GM:KeyPress( ply, key )
 	if SERVER and !ply:IsBot() then
 		if ply:FPTeam() == TEAM_SPEC then
-			if key == IN_ATTACK then
-				ply:SpectatePlayerNext()
-			elseif key == IN_ATTACK2 then
-				ply:SpectatePlayerPrev()
-			elseif key == IN_RELOAD then
-				ply:ChangeSpectateMode()
+			if translateKeyToFunc[key] != nil then
+				translateKeyToFunc[key]( ply )
 			end
 		end
 	end
@@ -98,6 +104,17 @@ end
 
 function PLAYER:GetPlayerRagdoll()
 	return self:GetNWEntity( "CorpseEnt" )
+end
+
+function PLAYER:IsReady()
+	local ready = self:GetReady()
+
+	if ready == nil then
+		self:DataTables()
+		ready = self:GetReady()
+	end
+
+	return ready
 end
 
 function PLAYER:IsAlly( ply )

@@ -136,6 +136,7 @@ function CreateInventoryUI()
     frame:MakePopup()
     frame:SetAlpha( 0 )
     frame:AlphaTo( 245, .5, 0, function() end )
+    frame:SetKeyboardInputEnabled( false )
 
     function frame:Paint( w, h )
         if not LocalPlayer():Alive() or not input.IsButtonDown( CL_SETTINGS.Get( "fp_inventory_button" ) ) then self:Remove() end
@@ -668,11 +669,7 @@ function CreateInventoryUI()
 end
 
 hook.Add( "PlayerButtonDown", "FPInventoryOpen", function( ply, button )
-    if button != CL_SETTINGS.Get( "fp_inventory_button" ) then return end
-
-    if CLIENT and not IsFirstTimePredicted() then
-        return
+    if CLIENT and button == CL_SETTINGS.Get( "fp_inventory_button" ) and IsFirstTimePredicted() then
+        CreateInventoryUI()
     end
-
-    CreateInventoryUI()
 end)

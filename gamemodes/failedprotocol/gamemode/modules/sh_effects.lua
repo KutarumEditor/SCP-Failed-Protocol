@@ -136,35 +136,4 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 	end
 end )
 
-elseif CLIENT then
-
-hook.Add( "HUDPaint", "HUDActiveEffects", function()
-	local ply = LocalPlayer()
-	local effs = ply:GetProperty( "Effects", {} )
-
-	local size = ScreenScale( 16 )
-	local gap = ScreenScale( 4 )
-	local total_space = #effs * size + ( #effs - 1 ) * gap
-	local start_pos = ( ScrH() - total_space )/2
-
-	for k, v in pairs( effs ) do
-		KMASKS.Start()
-            local clr = LerpColor( .9, REGISTERED_EFFECTS[k].color, Color( 15, 15, 15 ) )
-			clr.a = 225
-			draw.RoundedBox( 0, gap, start_pos, size, size, clr )
-
-			surface.SetDrawColor( Color( 0, 0, 0, 125 ) )
-
-			surface.SetDrawColor( REGISTERED_EFFECTS[k].color )
-			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
-			--draw.RoundedBox( 0, gap + ScreenScale( 2 ), start_pos + ScreenScale( 2 ), size - ScreenScale( 4 ),  - ScreenScale( 4 ), REGISTERED_EFFECTS[k].color )
-			surface.DrawTexturedRect( gap + ScreenScale( 2 ), start_pos + ScreenScale( 2 ), size - ScreenScale( 4 ), size - ScreenScale( 4 ) )
-        KMASKS.Source()
-            draw.RoundedBox( 0, gap, start_pos, size, size, color_white )
-        KMASKS.End()
-
-		start_pos = start_pos + ( size + gap )
-	end
-end )
-
 end
