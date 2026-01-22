@@ -12,8 +12,6 @@ function CLASS:SetupDataTables()
 
 	ply:NetworkVar( "Float", 0, "Stamina" )
 	ply:NetworkVar( "Float", 1, "MaxStamina" )
-	ply:NetworkVar( "Float", 2, "Satiety" )
-	ply:NetworkVar( "Float", 3, "MaxSatiety" )
 
 	ply:NetworkVar( "String", 0, "_FPClass" )
 	ply:NetworkVar( "String", 1, "_Name" )
@@ -28,8 +26,6 @@ function CLASS:SetupDataTables()
 
 		ply:SetMaxStamina( 100 )
 		ply:SetStamina( 100 )
-		ply:SetSatiety( 100 )
-		ply:SetMaxSatiety( 100 )
 		
 		ply:SetExhausted( false )
 		ply:SetReady( ply:IsBot() and true or false )

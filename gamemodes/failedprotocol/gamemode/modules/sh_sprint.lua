@@ -4,7 +4,7 @@ hook.Add( "StartCommand", "FPSprint", function( ply, cmd )
 	if ply:GetWalkSpeed() >= ply:GetRunSpeed() then return end
 	local exhausted = ply:GetExhausted()
 
-	if exhausted or ply:GetSatiety() <= 25 then
+	if exhausted then
 		cmd:RemoveKey( IN_JUMP )
 		cmd:RemoveKey( IN_SPEED )
 	elseif cmd:KeyDown( IN_JUMP ) and IsFirstTimePredicted() then

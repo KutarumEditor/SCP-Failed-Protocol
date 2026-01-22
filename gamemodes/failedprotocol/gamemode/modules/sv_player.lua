@@ -227,8 +227,6 @@ function PLAYER:Cleanup()
 	self:SetExhausted( false )
 	self:SetStamina( 100 )
 	self:SetMaxStamina( 100 )
-	self:SetSatiety( 100 )
-	self:SetMaxSatiety( 100 )
 
 	self:SetRenderMode( RENDERMODE_NORMAL )
 	self:SetColor( Color( 255, 255, 255, 255 ) )
@@ -326,9 +324,6 @@ function PLAYER:Setup( class, spawn_override, instant )
 
 	self:SetMaxHealth( class_tab.maxhp or 100 )
 	self:SetHealth( class_tab.hp or 100 )
-
-	self:SetMaxSatiety( class_tab.maxsatiety or 100 )
-	self:SetSatiety( class_tab.satiety or 100 )
 
 	self:SetMaxStamina( class_tab.maxstamina or 100 )
 	self:SetStamina( class_tab.stamina or 100 )
