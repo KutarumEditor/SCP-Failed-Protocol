@@ -71,8 +71,8 @@ function SWEP:Think()
 			end
 		end
 
-		print( "Charge: "..self:GetCharge(), "Rage: "..self:GetRage(), self:GetRageBan() )
-		PrintTable( self.Victims )
+		--print( "Charge: "..self:GetCharge(), "Rage: "..self:GetRage(), self:GetRageBan() )
+		--PrintTable( self.Victims )
 	end
 end
 

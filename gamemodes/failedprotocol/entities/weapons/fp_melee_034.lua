@@ -1,9 +1,9 @@
-SWEP.Base = "fp_swep_base"
+SWEP.Base = "fp_melee_base"
 
-SWEP.ViewModelFOV = 70
-SWEP.ViewModel = "models/kutarum/scpfp/c_baton.mdl"
+SWEP.ViewModelFOV = 75
+SWEP.ViewModel = "models/kutarum/scpfp/c_034.mdl"
 SWEP.ShouldDrawVM = true
-SWEP.WorldModel = "models/weapons/w_357.mdl"
+SWEP.WorldModel = "models/kutarum/scpfp/w_034.mdl"
 SWEP.ShouldDrawWM = false
 SWEP.SwayScale = 2
 SWEP.BobScale = 2
@@ -11,23 +11,23 @@ SWEP.BobScale = 2
 SWEP.AutoSwitchTo = true
 SWEP.Weight = 1
 
-SWEP.Damage = { 20, 40 }
-SWEP.DamageType = DMG_CLUB
-SWEP.Cooldown = 2
+SWEP.Damage = { 33, 40 }
+SWEP.DamageType = DMG_SLASH
+SWEP.Cooldown = .25
 
-SWEP.HoldType = "melee"
+SWEP.HoldType = "knife"
 
 SWEP.Sounds = {
-	Draw = "common_draw",
+	Draw = "expbat_draw",
 	Swing = "common_swing",
 	HitWall = "common_hit",
 	HitFlesh = "blunt_flesh_hit"
 }
 
 SWEP.AnimSpeed = {
-	Draw = 1,
+	Draw = .5,
 	Idle = 1,
-	Attack = 1
+	Attack = .75
 }
 
 function SWEP:Initialize()
@@ -57,7 +57,7 @@ local anim_tbl = {
 	[ACT_VM_PRIMARYATTACK_2] = {
 		hit = ACT_VM_HITCENTER2,
 		miss = ACT_VM_MISSCENTER2,
-		punch = Angle( 0, -10, 0 )
+		punch = Angle( 0, 5, 5 )
 	},
 }
 
@@ -84,11 +84,6 @@ function SWEP:CalcHit()
 
 	vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( hit and anim_tbl[curanim].hit or anim_tbl[curanim].miss ) )
 	vm:SetPlaybackRate( self.AnimSpeed.Attack )
-
-	local time = self.Cooldown
-
-	self:SetNextPrimaryFire( CurTime() + time )
-	self:SetNextSecondaryFire( CurTime() + time )
 
 	if hit then
 		local victim = tr.Entity
@@ -124,8 +119,6 @@ function SWEP:CalcHit()
 	if sound != nil then
 		EmitSound( sound, tr.HitPos )
 	end
-
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )
 end
 
 function SWEP:PrimaryAttack()
@@ -135,15 +128,25 @@ function SWEP:PrimaryAttack()
 	vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( math.random( 1, 100 ) > 50 and ACT_VM_PRIMARYATTACK_2 or ACT_VM_PRIMARYATTACK_1 ) )
 	vm:SetPlaybackRate( self.AnimSpeed.Attack )
 
+	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+
 	local time = vm:SequenceDuration( vm:GetSequence() )
 
-	self:SetNextPrimaryFire( CurTime() + time )
-	self:SetNextSecondaryFire( CurTime() + time )
+	self:SetNextPrimaryFire( CurTime() + time + self.Cooldown )
+	self:SetNextSecondaryFire( CurTime() + time + self.Cooldown )
 
-	timer.Simple( time/3, function()
+	timer.Simple( .01, function()
 		if IsValid( ply ) and ply:GetActiveWeapon() == self then
 			self:EmitSound( self.Sounds.Swing )
 		end
+
+		timer.Simple( .25, function()
+			if IsValid( ply ) and ply:GetActiveWeapon() == self then
+				if SERVER then
+					self:CalcHit()
+				end
+			end
+		end )
 	end )
 end
 
@@ -157,15 +160,10 @@ function SWEP:Think()
 
 	if vm:IsSequenceFinished() then
 		if istable( anim_tbl[vm:GetSequenceActivity( vm:GetSequence() )] ) then
-			self:CalcHit()
 			return
 		end
 
 		vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( ACT_VM_IDLE ) )
 		vm:SetPlaybackRate( self.AnimSpeed.Idle )
 	end
-end
-
-function SWEP:DrawWorldModel( flags )
-	self:DrawModel( flags )
 end

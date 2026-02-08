@@ -125,6 +125,10 @@ function PLAYER:IsEnemy( ply )
 	return self == ply and false or FPTeams.IsEnemy( self:FPTeam(), ply:FPTeam() )
 end
 
+function PLAYER:IsSCP()
+	return self:FPTeam() == TEAM_SCP
+end
+
 -----------------------
 -- Player properties -- ( thx Danx )
 -----------------------

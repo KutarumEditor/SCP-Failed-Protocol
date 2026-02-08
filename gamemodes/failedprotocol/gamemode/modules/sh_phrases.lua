@@ -3,6 +3,10 @@ if CLIENT then
 local utf8 = utf8
 local draw = draw
 
+net.ReceivePing( "PhrasesReset", function()
+	PHRASES.CUR = {}
+end )
+
 end
 
 PHRASES = PHRASES or {
@@ -17,6 +21,10 @@ local sndDurTbl = {
 	["scpfp/gocsniper/scp.wav"] = 1.45,
 	["scpfp/public_announcements/malfunction.wav"] = 6.5,
 	["scpfp/public_announcements/breach.wav"] = 14.6,
+	["scpfp/public_announcements/epsilon11_arrival.wav"] = 12,
+	["scpfp/public_announcements/1_scp.wav"] = 3.5,
+	["scpfp/public_announcements/2_scp.wav"] = 3.5,
+	["scpfp/public_announcements/3_scp.wav"] = 3.5,
 }
 
 local senderColor = {
@@ -60,8 +68,16 @@ function PHRASES.PopUp( s, t, d )
 	} )
 end
 
+function PHRASES.Clear( sync )
+	PHRASES.CUR = {}
+
+	if SERVER and sync then
+		net.Ping( "PhrasesReset" )
+	end
+end
+
 local line = 0
-hook.Add( "HUDPaint", "PhrasesDisplay", function()
+hook.Add( "RenderScreenspaceEffects", "PhrasesDisplay", function()
 	if #PHRASES.CUR == 0 then return end
 
 	line = 0

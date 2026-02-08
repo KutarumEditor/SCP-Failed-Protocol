@@ -3,11 +3,13 @@ function GM:ScaleNPCDamage( npc, hitgroup, dmginfo )
 end
 
 function GM:HandlePlayerArmorReduction( ply, dmginfo )
-	if ( ply:Armor() <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 ) then return end
+	local armor = ply:Armor()
+	if ( armor <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 ) then return end
 
-	local pntr = dmginfo:GetDamage() - ply:Armor()
+	local dmg = dmginfo:GetDamage()
+	local pntr = dmg - armor
 
-	ply:SetArmor( math.max( ply:Armor() - dmginfo:GetDamage(), 0 ) )
+	ply:SetArmor( math.max( armor - dmg, 0 ) )
 
 	if pntr > 0 then
 		dmginfo:SetDamage( pntr )
@@ -116,6 +118,14 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 				AddScore( ply:GetScoreTeam(), ply, -( score / 2 ) )
 			end
 		end
+	end
+end
+
+function GM:PlayerDeath( ply, inf, att )
+	if ply:FPTeam() == TEAM_SCP then return end
+
+	if inf:GetClass() == "fp_melee_034" then
+		att:Disguise( ply:GetModel(), 180 )
 	end
 end
 
@@ -261,6 +271,6 @@ concommand.Add( "fp_test_enemy_spawn", function( ply, cmd, args, argStr )
 	local s = ents.Create( "npc_combine_s" )
 
     s:SetPos( ply:GetEyeTrace().HitPos )
-    s:Give( "tfa_ins2_akm" )
+    s:Give( "weapon_smg1" )
     s:Spawn()
 end )

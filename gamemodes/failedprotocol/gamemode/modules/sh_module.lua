@@ -1,3 +1,5 @@
+local math = math
+
 function GM:Initialize()
 	print( "SCP: FAILED PROTOCOL loaded!" )
 
@@ -102,6 +104,18 @@ local function GetPartArmor( ply, hg )
 	return armorTbl
 end
 
+function DoImpactEffect( hitpos, attacker )
+	local normal = hitpos - attacker:GetPos()
+	normal:Normalize()
+	print( normal )
+	print( hitpos )
+
+	local effectdata = EffectData()
+	effectdata:SetOrigin( hitpos )
+	effectdata:SetNormal( normal )
+	util.Effect( "MetalSpark", effectdata )
+end
+
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 	if not SERVER then return end
 
@@ -129,6 +143,8 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 					armor.durability = 0
 				end
+
+				DoImpactEffect( dmginfo:GetDamagePosition(), dmginfo:GetAttacker() )
 			end
 		end
 
@@ -144,6 +160,8 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 			net.WritePlayer( ply )
 			net.WriteTable( ply.FPArmor )
 		net.Broadcast()
+	else
+		dmginfo:ScaleDamage( .4 )
 	end
 end
 
@@ -151,15 +169,37 @@ function GM:ShouldCollide( ent1, ent2 )
 	return true
 end
 
+local function ArmorRegenCheck( ply )
+	return ply:FPTeam() == TEAM_SCP
+end
+
 function GM:PlayerPostThink( ply )
 	if SERVER then
 		local active = ply:GetActiveWeapon()
-		for k, v in pairs( ply:GetWeapons() ) do
+		for k, v in ipairs( ply:GetWeapons() ) do
 			if IsValid( v ) and v != active then
 				if v.EnableHolsterThink and v.HolsterThink then
 					v:HolsterThink()
 				end
 			end
+		end
+
+		if ArmorRegenCheck( ply ) then
+			ply.nextArmorRegen = ply.nextArmorRegen or 0
+
+			local ct, arm, maxarm = CurTime(), ply:Armor(), ply:GetMaxArmor()
+			if arm < maxarm and ply.nextArmorRegen < ct then
+				ply:SetArmor( math.min( arm + 1, maxarm ) )
+				ply.nextArmorRegen = ct + .025
+			end
+		end
+
+		local et = ply:GetProperty( "FPDisguise", {
+			0,
+			0
+		} )
+		if et[1] != -1 and et[1] != 0 and CurTime() > et[1] then
+			ply:Undisguise()
 		end
 	end
 end

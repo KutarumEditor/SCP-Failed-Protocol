@@ -13,6 +13,7 @@ SWEP.Weight = 1
 
 SWEP.Damage = { 20, 40 }
 SWEP.DamageType = DMG_CLUB
+SWEP.Cooldown = .25
 
 SWEP.HoldType = "melee"
 

@@ -125,7 +125,7 @@ step_trace.maxs = Vector( 16, 16, 4 )
 step_trace.mask = MASK_PLAYERSOLID
 step_trace.output = step_trace
 
-function PLAYER:PlayStepSound()
+function PLAYER:PlayStepSound( no_update, force_loud )
 	if not SERVER or !self:Alive() then return end
 
 	local mv = self:GetMoveType()
@@ -173,15 +173,13 @@ function PLAYER:PlayStepSound()
 
 	if hook.Run( "FPPlayerFootstep", self, self.fp_foot, snd ) == true then return end
 
-	if self:Crouching() or self:IsWalking() then
+	if ( self:Crouching() or self:IsWalking() ) and force_loud != true then
 		add_snd_vol = add_snd_vol * .5
 	else
-		--self:EmitSound( snd, 30, 100, 1, CHAN_AUTO )
 		EmitSound( snd, self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 60, 0, 100 )
 	end
 
 	timer.Simple( 0, function()
-		--self:EmitSound( add_snd, 30, 100, add_snd_vol, CHAN_AUTO )
 		EmitSound( add_snd, self:GetPos(), self:EntIndex(), CHAN_AUTO, add_snd_vol, 60, 0, 100 )
 	end )
 

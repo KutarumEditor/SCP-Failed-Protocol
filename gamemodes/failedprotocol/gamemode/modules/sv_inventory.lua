@@ -1,13 +1,16 @@
 net.Receive( "FPInv", function( len, ply )
     local wep = net.ReadEntity()
-
     if ply:HasWeapon( wep:GetClass() ) then
-        if ply:GetActiveWeapon() == wep then
-            local hands = ply:GetWeapon( CLASSES[ply:GetFPClass()].hands_override or "fp_hands" )
-            ply:SelectWeapon( hands )
-        end
-
         if wep.Droppable != false then
+            if ply:GetActiveWeapon() == wep then
+                local hands = ply:GetWeapon( CLASSES[ply:GetFPClass()].hands_override or "fp_hands" )
+                timer.Simple( .01, function()
+                    if IsValid( hands ) then
+                        ply:SelectWeapon( hands )
+                    end
+                end )
+            end
+
             ply:DropWeapon( wep )
         end
     end

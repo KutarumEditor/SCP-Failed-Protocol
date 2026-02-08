@@ -3,6 +3,8 @@ local PLAYER = FindMetaTable( "Player" )
 function PLAYER:SetupSpectator( roam )
 	self:Cleanup()
 
+	self:StripWeapons()
+
 	self:SetFPTeam( TEAM_SPEC )
 	self:SetFPClass( "spectator" )
 

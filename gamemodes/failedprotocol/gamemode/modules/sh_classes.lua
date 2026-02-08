@@ -29,8 +29,23 @@ SPAWNGROUPS = {
 
 			return next_mtf == nil or next_mtf <= 0
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", 2 )
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "MTFSpawn", nil, ply )
+			end
+
+			TIMERS.Create( "NTFAnnounce", 7, function()
+				PA.Play( "scpfp/public_announcements/epsilon11_arrival.wav", "epsilon11" )
+
+				local scps = SCPCount()
+				if scps > 0 and scps < 4 then
+					PA.Play( "scpfp/public_announcements/"..scps.."_scp.wav", "scp"..scps )
+				else
+					PA.Play( "scpfp/public_announcements/intercom_end.wav" )
+				end
+			end )
 		end
 	},
 	["goc"] = {
@@ -45,7 +60,7 @@ SPAWNGROUPS = {
 
 			return next_mtf != nil and next_mtf > 0
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -57,12 +72,11 @@ SPAWNGROUPS = {
 		maxplayers = 4,
 		max = 1,
 		check = function()
-			local next_mtf = ROUNDPROP.Get( "next_mtf" )
-
-			return next_mtf != nil and next_mtf > 0
+			return false
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			SetNextSupport( "spear" )
 		end
 	},
 	["spear"] = {
@@ -77,7 +91,7 @@ SPAWNGROUPS = {
 
 			return next_mtf != nil and next_mtf > 0
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -93,7 +107,7 @@ SPAWNGROUPS = {
 
 			return next_mtf != nil and next_mtf > 0
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -109,7 +123,7 @@ SPAWNGROUPS = {
 
 			return next_mtf != nil and next_mtf > 0
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -125,7 +139,7 @@ SPAWNGROUPS = {
 
 			return next_mtf != nil and next_mtf > 0
 		end,
-		callback = function()
+		callback = function( plys )
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -339,18 +353,18 @@ CLASSES = {
 	["ntfsoldier"] = {
 		spawngroup = "ntf",
 		team = TEAM_MTF,
-		model = "models/kutarum/brichevsk/personnel_models/medic.mdl",
+		model = "models/kutarum/scpfp/playermodels/ntf.mdl",
 		weps = { "tfa_ins2_wpn_coltm4a1" },
 		ammo = { ["ar2"] = 120 },
 		vest = "test_vest",
 		maxhp = 140,
 		hp = 140,
-		maxstamina = 150,
-		stamina = 150,
-		walkspeed = 130,
+		maxstamina = 140,
+		stamina = 140,
+		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 240,
+		runspeed = 235,
 		jumppower = 175,
 		callback = function( ply )
 			ply:GiveKeycard( "mtf" )

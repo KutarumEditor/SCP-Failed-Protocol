@@ -34,10 +34,10 @@ REGISTERED_ROUND_TYPES = {
 		hasscps = true,
 		round_lenght = 1800,
 		support_time = {
-			first = 240,
-			repeating = 300
+			first = 300,
+			repeating = 240
 		},
-		max_supports = 5,
+		max_supports = 6,
 		callback = function()
 			SetupExits()
 
@@ -81,6 +81,7 @@ function RoundStart( type )
 
 		TIMERS.DestroyAll()
 		PA.Reset()
+		PHRASES.Clear( true )
 
 		AnnulScore()
 
@@ -91,6 +92,8 @@ function RoundStart( type )
 		timer.Simple( 0, function()
 			ACCESS.RecomputeButtons()
 		end )
+
+		BroadcastLua( [[RunConsoleCommand( "stopsound" )]] )
 
 		REGISTERED_ROUND_TYPES[type].callback()
 
@@ -320,6 +323,7 @@ function SetupPlayers( type )
 			selected_ply:SetupSCP( selected_scp, false )
 			selected_ply:PopupStartInfo()
 			selected_ply:ScreenFade( SCREENFADE.IN, color_black, 2, 3 )
+			net.Ping( "RoundStart", "", selected_ply )
 		end
 	end
 
@@ -351,7 +355,7 @@ function SetupPlayers( type )
 						pl:Setup( selected_class, istable( unique_spawns[selected_class] ) and table.remove( unique_spawns[selected_class], FPRandom( 1, #unique_spawns[selected_class] ) ) or isvector( unique_spawns[selected_class] ) and unique_spawns[selected_class] or table.remove( available_spawns, FPRandom( 1, #available_spawns ) ), false )
 						pl:PopupStartInfo()
 						pl:ScreenFade( SCREENFADE.IN, color_black, 2, 3 )
-						net.Ping( "StartRoundAmbient", "", pl )
+						net.Ping( "RoundStart", "", pl )
 					end
 				end )
 			end
@@ -450,6 +454,7 @@ function SpawnSupport( custom_group )
 		return
 	end
 
+	local ply_tbl = {}
 	for i, v in ipairs( selected_plys ) do
 		timer.Simple( FrameTime() * i, function()
 			local ply, sel_class = v[1], v[2]
@@ -459,9 +464,14 @@ function SpawnSupport( custom_group )
 				ply:Setup( sel_class, istable( unique_spawns[sel_class] ) and table.remove( unique_spawns[sel_class], FPRandom( 1, #unique_spawns[sel_class] ) ) or isvector( unique_spawns[sel_class] ) and unique_spawns[sel_class] or table.remove( available_spawns, FPRandom( 1, #available_spawns ) ), false )
 				ply:PopupStartInfo()
 				ply:ScreenFade( SCREENFADE.IN, color_black, 2, 3 )
+				ply_tbl[#ply_tbl + 1] = ply
 			end
 		end )
 	end
+
+	timer.Simple( FrameTime() * ( #selected_plys + 1 ), function()
+		SPAWNGROUPS[group].callback( ply_tbl )
+	end )
 end
 
 hook.Add( "Think", "FPRoundThink", function()

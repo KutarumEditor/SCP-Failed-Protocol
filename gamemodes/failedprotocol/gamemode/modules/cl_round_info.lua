@@ -129,7 +129,7 @@ hook.Add( "HUDPaint", "InfoPopup", function()
 		font = isfunction( tbl.font ) and tbl.font() or tbl.font
 		ugap = isfunction( tbl.ugap ) and tbl.ugap() or tbl.ugap or 0
 		lgap = isfunction( tbl.lgap ) and tbl.lgap() or tbl.lgap
-		clr = isfunction( tbl.color ) and tbl.color() or tbl.color
+		clr = isfunction( tbl.color ) and tbl.color() or tbl.color:Copy()
 		clr.a = 255 * info_mult
 
 		surface.SetFont( font )
@@ -151,8 +151,8 @@ hook.Add( "HUDPaint", "InfoPopup", function()
 	render.SetStencilEnable( false )
 end )
 
-net.Receive( "FPInfoPopup", function()
-	info_tbl = net.ReadTable( true )
+function PopupInfo( time, tbl )
+	info_tbl = tbl
 
 	for i, v in ipairs( info_tbl ) do
 		txt_tbl = info_tbl[i].text
@@ -177,7 +177,18 @@ net.Receive( "FPInfoPopup", function()
 		info_tbl[i].lgap = ScreenScale( info_tbl[i].lgap )
 	end
 
-	info_end = net.ReadFloat()
+	info_end = CurTime() + time
 	info_active = true
 	info_mult = 0
+end
+
+function ClearInfoPopup()
+	info_end = 0
+	info_active = false
+	info_mult = 0
+end
+
+net.Receive( "FPInfoPopup", function()
+	local time, tbl = net.ReadFloat(), net.ReadTable( true )
+	PopupInfo( time, tbl )
 end )

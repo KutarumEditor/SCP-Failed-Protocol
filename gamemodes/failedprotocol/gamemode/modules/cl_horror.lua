@@ -1,4 +1,5 @@
-hook.Add("Think", "SomeMisc", function()
+local NextSeeSCPs = 0
+hook.Add( "Think", "Horror", function()
     local curTime = CurTime()
     local lply = LocalPlayer()
 
@@ -32,4 +33,37 @@ hook.Add("Think", "SomeMisc", function()
             end
         end
     end
-end)
+end )
+
+local horror_mat = Material( "failedprotocol/020_horror_face.png" )
+local horror_scale = ScreenScale( 200 )
+function Horror020Escape()
+    local ply = LocalPlayer()
+    local alpha = 1
+
+    HideHUD( true, true )
+
+    ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
+    surface.PlaySound( "scpfp/020_horror_whisper.wav" )
+
+    timer.Create( "020Horror", .05, 60, function()
+        DrawSprite( {
+            mat = horror_mat,
+            clr = Color( 255, 255, 255, 5 * alpha ),
+            time = .015,
+            x = ( ScrW() - horror_scale ) / 2,
+            y = ( ScrH() - horror_scale ) / 2,
+            w = horror_scale,
+            h = horror_scale
+        } )
+        alpha = alpha / 1.05
+    end )
+
+    timer.Simple( 3, function()
+        HideHUD( false )
+    end )
+end
+
+concommand.Add( "020horror", function( ply )
+    Horror020Escape()
+end )

@@ -17,8 +17,8 @@ local Vector = Vector
 local KMASKS = KMASKS
 
 local LerpColor = LerpColor
-local lply
-local lrag
+local lply, lrag
+local ft = FrameTime()
 
 local hide = {
 	["CHudHealth"] = true,
@@ -43,6 +43,7 @@ local vignette_mat = Material( "vignette/vignette.png" )
 local hp_mat = Material( "failedprotocol/icons/health.png" )
 local stam_mat = Material( "failedprotocol/icons/stamina.png" )
 local armor_mat = Material( "failedprotocol/icons/armor.png" )
+local disg_mat = Material( "failedprotocol/icons/disguise.png" )
 
 current_observer = current_observer || nil
 function inspectPanel( target )
@@ -101,6 +102,7 @@ local drawTable = {
 		mat = Material( "failedprotocol/020_horror_face.png" ),
 		clr = color_white,
 		time = 3,
+		fade = 3,
 		x = ScrW() / 2,
 		y = ScrH() / 2,
 		w = 256,
@@ -109,7 +111,20 @@ local drawTable = {
 }
 
 function DrawSprite( data )
-	table.insert( drawTable, data )
+	local d = {}
+	d.mat = data.mat or Material( "failedprotocol/menu_logo.png" )
+	d.clr = data.clr:Copy() or color_white
+	d.time = data.time or 1
+	d.x = data.x or ScrW() / 2
+	d.y = data.y or ScrH() / 2
+	d.w = data.w or 256
+	d.h = data.h or 256
+
+	local f = data.fade or 0
+	d.fade = f
+	d.fade_total = f
+
+	table.insert( drawTable, d )
 end
 
 local hud_hidden = false
@@ -120,7 +135,12 @@ local alpha_death_mult = 1
 
 local total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
 
-function DrawFPHUD()
+hook.Add( "DrawFPHUD", "MainHUD", function()
+	local disg = lply:GetProperty( "FPDisguise", {
+		0,
+		0
+	} )
+
 	local bars = {
 		[2] = {	--Health
 			icon = hp_mat,
@@ -142,6 +162,14 @@ function DrawFPHUD()
 			curvalue = lply:Armor(),
 			maxvalue = lply:GetMaxArmor(),
 			show = function() return lply:Armor() > 0 and lply:FPTeam() != TEAM_SPEC end,
+		},
+		[4] = {	--Disguise
+			icon = disg_mat,
+			clr = Color( 81, 60, 143 ),
+			curvalue = disg[1] - CurTime(),
+			maxvalue = disg[2],
+			textoverride = function( cur, max ) return disg[1] == -1 and "∞" or tostring( math.ceil( cur ) ) end,
+			show = function() return disg[1] > CurTime() or disg[1] == -1 end,
 		},
 	}
 
@@ -168,6 +196,9 @@ function DrawFPHUD()
 		if isnumber( bar.maxvalue ) then
 			text = text.."/"..tostring( bar.maxvalue )
 			hCoef = math.min( bar.curvalue / bar.maxvalue, 1 )
+		end
+		if bar.textoverride != nil then
+			text = bar.textoverride( bar.curvalue, bar.maxvalue )
 		end
 		--Icon
 		surface.SetDrawColor( clr )
@@ -248,7 +279,7 @@ function DrawFPHUD()
 		    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
 		KMASKS.End()
 	end
-end
+end )
 
 function DrawFPSpectateInfo()
 	if lply:FPTeam() == TEAM_SPEC then
@@ -289,8 +320,8 @@ function DrawFPEffects()
 end
 
 function DrawFPAbilities()
-	local ply = LocalPlayer()
-	local abs = ply.FPAbilities or {}
+	local ct = CurTime()
+	local abs = lply.FPAbilities or {}
 
 	local size = ScreenScale( 20 )
 	local gap = ScreenScale( 15 )
@@ -300,9 +331,9 @@ function DrawFPAbilities()
 	for k, v in pairs( abs ) do
 		local name = v.name
 
-		local ratio = math.min( 1, ( abs[k].next - CurTime() ) / ABILITIES.REG[name].cooldown )
+		local ratio = math.min( 1, ( abs[k].next - ct ) / ABILITIES.REG[name].cooldown )
 
-		local time = math.max( 0, abs[k].next - CurTime() )
+		local time = math.max( 0, abs[k].next - ct )
 		if time > 0 then
 			draw.SimpleTextOutlined( math.Round( time, time < 10 and 1 or 0 ), "HUDSmall", start_pos + size/2, ScrH() - size - gap*6/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
 		end
@@ -341,6 +372,8 @@ end
 function GM:HUDPaint()
 	lply = lply or LocalPlayer()
 
+	ft = FrameTime()
+
 	if not CL_SETTINGS.Get( "fp_disable_vignette", "bool" ) then
 		surface.SetDrawColor( 0, 0, 0, 240 )
 		surface.SetMaterial( vignette_mat )
@@ -348,14 +381,19 @@ function GM:HUDPaint()
 	end
 
 	for i, elem in ipairs( drawTable ) do
-		surface.SetDrawColor( elem.clr )
+		local clr = elem.clr
+		surface.SetDrawColor( clr.r, clr.g, clr.b, clr.a * ( elem.fade / elem.fade_total ) )
 		surface.SetMaterial( elem.mat )
 		surface.DrawTexturedRect( elem.x, elem.y, elem.w, elem.h )
 
-		elem.time = elem.time - FrameTime()
+		elem.time = elem.time - ft
 
 		if elem.time <= 0 then
-			drawTable[i] = nil
+			elem.fade = elem.fade - ft
+
+			if elem.fade <= 0 then
+				table.remove( drawTable, i )
+			end
 		end
 	end
 
@@ -365,9 +403,9 @@ function GM:HUDPaint()
 		hud_hide_alpha = math.min( 1, hud_hide_alpha + .01 )
 	end
 
-	alpha_death_mult = ( lply:Alive() or lply:FPTeam() == TEAM_SPEC ) and 1 or math.max( alpha_death_mult - FrameTime(), 0 )
+	alpha_death_mult = ( lply:Alive() or lply:FPTeam() == TEAM_SPEC ) and 1 or math.max( alpha_death_mult - ft, 0 )
 
-	total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
+	total_alpha_mult = alpha_death_mult * hud_hide_alpha
 
 	if total_alpha_mult == 0 then return end
 
@@ -375,7 +413,7 @@ function GM:HUDPaint()
 
 	hook.Run( "HUDDrawTargetID" )
 
-	DrawFPHUD()
+	hook.Run( "DrawFPHUD" )
 
 	DrawFPSpectateInfo()
 
@@ -424,6 +462,82 @@ local function FirstPersonDeath( ply, oldview )
 	return view
 end
 
+local timeScale = GetConVar( "host_timescale" )
+local viewBobTime = 0
+local viewBobIntensity = 1
+local originalPos = Vector()
+local originalAng = Angle()
+local bobEyeFocus, minFocus = 512, 128
+local lastCalcViewBob = 0
+local rateMul = CreateClientConVar("cl_cbob_rate", 1.0, true, false, "Multiplies the rate viewbob occurs at.", 0.1, 5)
+local moveRW = false
+local ISCALC = false
+
+local function DoViewbob( ply, pos, ang, time, intensity, moveType )
+	local tr = ply:GetEyeTraceNoCursor()
+
+	if !tr or !tr.HitPos then
+        return
+    end
+
+    originalAng:Set( ang )
+
+    local sysTime = SysTime()
+    local delta = math.min( sysTime - lastCalcViewBob, ft or FrameTime(), 1 / 30 )
+    delta = ( delta * timeScale:GetFloat() ) * game.GetTimeScale()
+
+    moveType = moveType or ply:GetMoveType()
+
+    local right = vector_origin
+
+    if moveType != MOVETYPE_LADDER then
+        right = originalAng:Right()
+    end
+
+    originalPos:Set( pos )
+
+    local up = originalAng:Up()
+	local focusDist = tr.HitPos:Distance( pos )
+
+	if focusDist <= 0 then
+		local focusEnt = tr.Entity
+
+		if !( IsValid( focusEnt ) and !focusEnt:IsWorld() ) then
+			focusEnt = nil
+		end
+
+        local nextTr = util.TraceLine( {
+            start = pos,
+            endpos = originalAng:Forward() * 1048575,
+            filter = { ply, focusEnt }
+        } )
+
+		focusDist = nextTr.HitPos:Distance( pos )
+	end
+
+	focusDist = math.max( focusDist, minFocus )
+	bobEyeFocus = math.Approach( bobEyeFocus, focusDist, ( focusDist - bobEyeFocus ) * delta * 5 )
+
+    pos:Add( up * math.sin( ( time + 0.5 ) * ( 4 * math.pi ) ) * 0.3 * intensity * -7 )
+    pos:Add( right * math.sin( ( time + 0.5 ) * ( 2 * math.pi ) ) * 0.3 * intensity * -7 )
+
+    local fw = originalAng:Forward()
+
+    fw:Mul(bobEyeFocus)
+    originalPos:Add(fw)
+    originalPos:Sub(pos)
+
+    local newAng = originalPos:GetNormalized():Angle()
+    originalAng:Normalize()
+    newAng:Normalize()
+
+    local bobFac = math.Clamp( 1 - math.pow( math.abs( originalAng.p ) / 90, 3 ), 0, 1 )
+    ang.y = ang.y - math.Clamp( math.AngleDifference( originalAng.y, newAng.y ), -2, 2 ) * bobFac
+    ang.p = ang.p - math.Clamp( math.AngleDifference( originalAng.p, newAng.p ), -2, 2 ) * bobFac
+
+    lastCalcViewBob = sysTime
+end
+
 local narcosis = false
 local narcosis_mult = 0
 
@@ -431,6 +545,8 @@ local moveroll_mult = 0
 
 local Ang0, curang, curviewbob = Angle( 0, 0, 0 ), Angle( 0, 0, 0 ), Angle( 0, 0, 0 )
 function GM:CalcView( ply, origin, angles, fov, znear, zfar )
+	local ct = CurTime()
+	ft = FrameTime()
 	lrag = ply:GetPlayerRagdoll()
 
 	if not MENU_CLOSED then
@@ -471,26 +587,35 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 
 	player_manager.RunClass( ply, "CalcView", view )
 
-	ws = ply:GetWalkSpeed()
-	vel = ply:GetVelocity():Length()
+	--=======================================================================================================--
+	--============================================ cBobbing code ============================================-- Thanks to TFA and this guy (https://steamcommunity.com/id/laboratorymember001)
+	--=======================================================================================================--
 
-	local intensity = 1.5
+	if ply != GetViewEntity() then
+        return
+    end
 
-	if ply:OnGround() and vel > ws * 0.3 then
-		if vel < ws * 1.2 then
-			cos1 = math.cos( CurTime() * 15 )
-			cos2 = math.cos( CurTime() * 12 )
-			curviewbob.p = cos1 * 0.15 * intensity
-			curviewbob.y = cos2 * 0.1 * intensity
-		else
-			cos1 = math.cos( CurTime() * 20 )
-			cos2 = math.cos( CurTime() * 15 )
-			curviewbob.p = cos1 * 0.25 * intensity
-			curviewbob.y = cos2 * 0.15 * intensity
-		end
-	else
-		curviewbob = LerpAngle( FrameTime() * 10, curviewbob, Ang0 )
-	end
+    local moveType = ply:GetMoveType()
+
+    if moveType == MOVETYPE_NOCLIP or not ply:Alive() then
+        return
+    end
+
+    local airWalkScale = ply:IsFlagSet( FL_ONGROUND ) and 1 or 0.2
+
+    local runSpeed = ply:GetRunSpeed()
+
+    local velocity = ply:GetVelocity()
+    local velocityFrac = math.max( velocity:Length2D() * airWalkScale - velocity.z * 0.5, 0 )
+    local rate = math.Clamp( math.sqrt( velocityFrac / runSpeed ) * 1.75, 0.15, 2 )
+
+    viewBobTime = viewBobTime + ft * rate
+    viewBobIntensity = 0.15 + velocityFrac / runSpeed
+
+    DoViewbob( ply, origin, angles, viewBobTime, viewBobIntensity, moveType, ft )
+    ISCALC = true
+
+    --=======================================================================================================--
 
 	narcosis_mult = math.Clamp( narcosis_mult + ( narcosis and .001 or -.001 ), 0, 1 )
 
@@ -506,15 +631,56 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 		end
 	end
 
-	view.angles	= view.angles + curviewbob * 1.25 + Angle( 0, 0, math.cos( CurTime()/2 )*narcosis_mult ) + Angle( 0, 0, 1 * moveroll_mult )
+	view.angles	= view.angles + Angle( 0, 0, math.cos( ct/2 )*narcosis_mult ) + Angle( 0, 0, 1 * moveroll_mult )
 
-	local fov_add = math.Clamp( Lerp( FrameTime() * 10, ply.LastFOV or 0, ply:GetVelocity():Length() / math.max( 225, ply:GetRunSpeed() ) * 2.5 ), 0, 10 )
+	local fov_add = math.Clamp( Lerp( ft * 10, ply.LastFOV or 0, velocity:Length() / math.max( 225, ply:GetRunSpeed() ) * 2.5 ), 0, 10 )
 	ply.LastFOV = fov_add
-	view.fov = ( view.fov or fov ) - 5 + fov_add + math.sin( CurTime() )*3*narcosis_mult
+	view.fov = ( view.fov or fov ) - 5 + fov_add + math.sin( ct )*3*narcosis_mult
 
 	view.fov = CalcRussianFOV( view.fov )
 
 	return view
+end
+
+local excludeBases = {
+	["tfa_gun_base"] = true,
+	["tfa_melee_base"] = true,
+	["tfa_bash_base"] = true,
+	["tfa_bow_base"] = true,
+	["tfa_knife_base"] = true,
+	["tfa_nade_base"] = true,
+	["tfa_sword_advanced_base"] = true,
+	["tfa_ins2_base"] = true,
+}
+
+function GM:CalcViewModelView( wep, vm, oldEyePos, oldEyeAng, eyePos, eyeAng )
+	if !IsValid( wep ) then return end
+
+	lply = lply or LocalPlayer()
+
+	local vm_origin, vm_angles = eyePos, eyeAng
+
+	local pos, ang
+	local func = wep.GetViewModelPosition
+	if func then
+		pos, ang = func( wep, eyePos * 1, eyeAng * 1 )
+		vm_origin = pos or vm_origin
+		vm_angles = ang or vm_angles
+	end
+
+	func = wep.CalcViewModelView
+	if func then
+		local pos, ang = func( wep, vm, oldEyePos * 1, oldEyeAng * 1, eyePos * 1, eyeAng * 1 )
+		vm_origin = pos or vm_origin
+		vm_angles = ang or vm_angles
+	end
+
+	if excludeBases[wep.Base] != true and ISCALC and vm:GetOwner() == lply and lply:GetMoveType() != MOVETYPE_NOCLIP and !lply:ShouldDrawLocalPlayer() then
+		DoViewbob( lply, pos, ang, viewBobTime, viewBobIntensity )
+    	ISCALC = false
+	end
+
+	return vm_origin, vm_angles
 end
 
 local tab = {
@@ -536,7 +702,16 @@ net.Receive( "DamageBlur", function()
 	dmg_blur = math.Clamp( dmg_blur + dmg, 0, 4 )
 end )
 
+local gasmask_mat = Material( "kutarum/failed_protocol/glass_overlay.png" )
+local function DrawGasmask()
+	DrawMaterialOverlay( "kutarum/failed_protocol/glass_overlay", 0.01 )
+end
+
 function GM:RenderScreenspaceEffects()
+	if lply:HasGasmask() then
+		DrawGasmask()
+	end
+
 	tab["$pp_colour_brightness"], tab["$pp_colour_colour"] = CalcRussianScreenEffects( 0, .85 )
 
 	DrawColorModify( tab )
@@ -592,7 +767,7 @@ net.ReceivePing( "OnSpawnCS", function()
     hook.Run( "OnSpawn" )
 end )
 
-net.ReceivePing( "StartRoundAmbient", function()
+net.ReceivePing( "RoundStart", function()
 	RoundStartCutscene()
 end )
 

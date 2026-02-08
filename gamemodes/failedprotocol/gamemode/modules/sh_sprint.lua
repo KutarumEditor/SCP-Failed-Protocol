@@ -60,7 +60,7 @@ local function CalcStamina( ply )
 
 	if ply:IsSprinting() and ply:OnGround() and ( ply:KeyDown( IN_FORWARD ) or ply:KeyDown( IN_BACK ) or ply:KeyDown( IN_MOVELEFT ) or ply:KeyDown( IN_MOVERIGHT ) ) then
 		ply.StaminaRegen = CurTime() + .3
-		stamina = math.Clamp( stamina - .075, 0, max_stamina )
+		stamina = math.Clamp( stamina - .125, 0, max_stamina )
 	elseif ply.StaminaRegen < CurTime() then
 		stamina = math.Clamp( stamina + ply:GetMaxStamina()/1000, 0, max_stamina )
 	end

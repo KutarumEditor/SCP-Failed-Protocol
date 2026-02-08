@@ -1,27 +1,44 @@
-local horror_mat = Material( "failedprotocol/020_horror_face.png" )
-local horror_scale = ScreenScale( 200 )
-function Horror020Escape()
+local vignette_mat = Material( "vignette/vignette.png" )
+function BreachAction()
 	local ply = LocalPlayer()
+	if not ply:Alive() then return end
 
-	HideHUD( true, true )
+	AMBIENT.Restart( "sound/scpfp/ambience/breach_ambience.wav" )
+	surface.PlaySound( "scpfp/breach_action.wav" )
 
-	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
-	surface.PlaySound( "scpfp/020_horror_whisper.wav" )
+	timer.Simple( 1.3, function()
+		timer.Create( "BreachSirenRepeat", 1.4, 6, function()
+			DrawSprite( {
+	            mat = vignette_mat,
+	            clr = color_white,
+	            time = .75,
+	            fade = .5,
+	            x = -1,
+	            y = -1,
+	            w = ScrW() + 2,
+	            h = ScrH() + 2
+	        } )
 
-	timer.Create( "020Horror", .1, 15, function()
-		DrawSprite( {
-			mat = Material( "failedprotocol/020_horror_face.png" ),
-			clr = Color( 255, 255, 255, 5 ),
-			time = .01,
-			x = ( ScrW() - horror_scale ) / 2,
-			y = ( ScrH() - horror_scale ) / 2,
-			w = horror_scale,
-			h = horror_scale
-		} )
+	        ply:ScreenFade( SCREENFADE.IN, Color( 0, 0, 0, 100 ), .5, .65 )
+		end )
 	end )
 
-	timer.Simple( 3, function()
-		HideHUD( false )
+	timer.Simple( 9.5, function()
+		ply:ScreenFade( SCREENFADE.OUT, Color( 0, 0, 0, 200 ), .3, 4.2 )
+
+		util.ScreenShake( EyePos(), 7.5, 7.5, 5.5, 10000, true )
+
+		timer.Simple( 4.2 - FrameTime(), function()
+			ply:ScreenFade( SCREENFADE.IN, Color( 0, 0, 0, 200 ), .45, 0 )
+		end )
+	end )
+
+	TIMERS.Create( "PAMalfunction", 3, function()
+		PA.Play( "scpfp/public_announcements/malfunction.wav", "malfunction" )
+	end )
+
+	TIMERS.Create( "PABreach", 15, function()
+		PA.Play( "scpfp/public_announcements/breach.wav", "breach" )
 	end )
 end
 
@@ -31,19 +48,10 @@ function RoundStartCutscene()
 	HideHUD( true, true )
 
 	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
-	AMBIENT.Ban( 188 )
+	AMBIENT.Ban( 189 )
 	AMBIENT.Restart( "sound/scpfp/ambience/blue_feather.mp3" )
-	TIMERS.Create( "ClientBreachStart", 3, function()
-		AMBIENT.Restart( "sound/scpfp/ambience/breach_ambience.wav" )
-		surface.PlaySound( "scpfp/breach_action.wav" )
-
-		TIMERS.Create( "PAMalfunction", 3, function()
-			PA.Play( "scpfp/public_announcements/malfunction.wav", "malfunction" )
-		end)
-
-		TIMERS.Create( "PABreach", 15, function()
-			PA.Play( "scpfp/public_announcements/breach.wav", "breach" )
-		end)
+	TIMERS.Create( "ClientBreachStart", 46, function()
+		BreachAction()
 	end )
 
 	timer.Simple( 3, function()
@@ -51,6 +59,64 @@ function RoundStartCutscene()
 	end )
 end
 
-concommand.Add( "020horror", function( ply )
-	Horror020Escape()
+local logo_scale = ScreenScale( 100 )
+
+local mtf_mat = Material( "failedprotocol/emblems/ntf.png" )
+function MTFCutscene()
+	local ply = LocalPlayer()
+
+	RunConsoleCommand( "stopsound" )
+	AMBIENT.Ban( 1 )
+
+	timer.Simple( .1, function()
+		AMBIENT.Restart( "sound/scpfp/support_themes/mtf.wav" )
+	end )
+
+	ClearInfoPopup()
+
+	HideHUD( true, true )
+
+	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 9.1 )
+
+	TIMERS.Create( "MTFLogo", 5.1, function()
+		DrawSprite( {
+            mat = mtf_mat,
+            clr = color_white,
+            time = 4,
+            fade = 3,
+            x = ( ScrW() - logo_scale ) / 2,
+            y = ( ScrH() - logo_scale ) / 2,
+            w = logo_scale,
+            h = logo_scale
+        } )
+
+		TIMERS.Create( "GetMyHUDBack", 5, function()
+			PopupInfo( 15, {
+				{
+					text = { LANG.Get( "CLASSES", ply:GetFPClass() ) },
+					font = "RoundStartInfoBig",
+					color = FPTeams.GetColor( ply:FPTeam() ),
+					ugap = -8,
+					lgap = 4
+				},
+				{
+					text = { LANG.Get( "DESC", ply:GetFPClass() ) },
+					font = "RoundStartInfoExtraSmall",
+					color = color_white,
+					ugap = -8,
+					lgap = 4
+				},
+			} )
+
+			HideHUD( false )
+		end )
+	end )
+end
+
+net.ReceivePing( "MTFSpawn", function()
+	MTFCutscene()
 end )
+
+concommand.Add( "ntf_test", MTFCutscene )
+
+concommand.Add( "breach_test", BreachAction )

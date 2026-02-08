@@ -31,6 +31,8 @@ end
 function GM:OnPlayerHitGround( ply, in_water, on_floater, speed )
 	if in_water or not IsValid( ply ) then return end
 
+	ply:PlayStepSound( false, true )
+
 	local damage = ( speed - 526.5 ) * ( 100 / 396 )
 
 	if on_floater then damage = damage / 2 end
@@ -122,16 +124,15 @@ function PLAYER:CreatePlayerRagdoll()
 	body:SetNWInt( "invslots", self:GetInvSlots() )
 	body:SetNWFloat( "time", CurTime() )
 
-	local velocity = self:GetVelocity() * .25
+	local velocity = self:GetVelocity() * .5
 	if ( body and IsValid( body ) ) then
 		for i = 0, body:GetPhysicsObjectCount() - 1 do
 			local physicsObject = body:GetPhysicsObjectNum( i )
-			local boneIndex = body:TranslatePhysBoneToBone( i )
-			local position, angle = self:GetBonePosition( boneIndex )
+			local position, angle = self:GetBonePosition( body:TranslatePhysBoneToBone( i ) )
 	
 			if ( IsValid( physicsObject ) ) then
 				physicsObject:SetPos( position )
-				physicsObject:SetMass( 27.5 )
+				physicsObject:SetMass( 25 )
 				physicsObject:SetAngles( angle )
 				physicsObject:SetVelocity( velocity )
 			end
@@ -183,8 +184,8 @@ function PLAYER:PopupInfo( time, data )
 	if not IsValid( self ) or not self:IsPlayer() then return end
 
 	net.Start( "FPInfoPopup", true )
+		net.WriteFloat( time )
 		net.WriteTable( data, true )
-		net.WriteFloat( CurTime() + time )
 	net.Send( self )
 end
 
@@ -294,7 +295,9 @@ function PLAYER:Setup( class, spawn_override, instant )
 	self:Spawn()
 	self:RemoveAllDecals()
 
-	self:SetModel( istable( class_tab.model ) and table.Random( class_tab.model ) or class_tab.model )
+	local mdl = istable( class_tab.model ) and table.Random( class_tab.model ) or class_tab.model
+	self:SetModel( mdl )
+	self.FPOriginalModel = mdl
 
 	self:SetupHands()
 
@@ -324,6 +327,9 @@ function PLAYER:Setup( class, spawn_override, instant )
 
 	self:SetMaxHealth( class_tab.maxhp or 100 )
 	self:SetHealth( class_tab.hp or 100 )
+
+	self:SetMaxArmor( 0 )
+	self:SetArmor( 0 )
 
 	self:SetMaxStamina( class_tab.maxstamina or 100 )
 	self:SetStamina( class_tab.stamina or 100 )
@@ -386,6 +392,10 @@ function PLAYER:SetupSCP( class, instant )
 
 	self:SetMaxHealth( class_tab.maxhp or 100 )
 	self:SetHealth( class_tab.hp or 100 )
+
+	self:SetMaxArmor( class_tab.maxarmor or 0 )
+	self:SetArmor( class_tab.armor or 0 )
+	self.nextArmorRegen = CurTime() + 2.5
 
 	self:SetMaxStamina( class_tab.maxstamina or 100 )
 	self:SetStamina( class_tab.stamina or 100 )

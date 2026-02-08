@@ -53,10 +53,10 @@ function TIMERS.Destroy( name, sync )
 end
 
 function TIMERS.DestroyAll()
-	for name, timer in pairs( TIMERS.ongoing ) do
-		timer = nil
+	TIMERS.ongoing = {}
 
-		TIMERS.Sync( 0, name )
+	if SERVER then
+		net.Ping( "FPTotalTimerBreak" )
 	end
 end
 
@@ -94,4 +94,8 @@ net.Receive( "FPTimerSync", function()
 		st = startTime,
 		et = endTime
 	}
+end )
+
+net.ReceivePing( "FPTotalTimerBreak", function()
+	TIMERS.DestroyAll()
 end )

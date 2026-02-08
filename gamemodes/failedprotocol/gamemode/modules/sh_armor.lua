@@ -101,6 +101,22 @@ REGISTERED_ARMOR = {
 		},
 		class = 3,
 	},
+	["ntf_vest"] = {
+		type = "vest",
+		floor_model = "models/kutarum/scpfp/vests/ntf_vest.mdl",
+		model = "models/kutarum/scpfp/vests/ntf_vest.mdl",
+		durability = 300,
+		resistance = {
+			[HITGROUP_CHEST] = .5,
+			[HITGROUP_STOMACH] = .6,
+			[HITGROUP_RIGHTARM] = .5,
+			[HITGROUP_LEFTARM] = .5,
+			[HITGROUP_RIGHTLEG] = .5,
+			[HITGROUP_LEFTLEG] = .5,
+			[HITGROUP_GENERIC] = 1,
+		},
+		class = 4,
+	},
 	["sigma_vest"] = {
 		type = "vest",
 		floor_model = "models/kutarum/scpfp/vests/security_vest_heavy.mdl",

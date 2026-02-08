@@ -87,6 +87,8 @@ function GM:EntityTakeDamage( ent, dmginfo )
 		dmgCallback[dmgType]( ent, dmginfo )
 	end
 
+	ent.nextArmorRegen = CurTime() + 10
+
 	dmginfo:SetDamageForce( Vector( 0, 0, 0 ) )
 
 	ent:ViewPunch( Angle( 0, 0, FPRandom() > .5 and 2.5 or -2.5 ) )
@@ -94,4 +96,20 @@ function GM:EntityTakeDamage( ent, dmginfo )
 	net.Start( "DamageBlur" )
 		net.WriteFloat( dmginfo:GetDamage() )
 	net.Send( ent )
+end
+
+local ignore_tbl = {
+	["SCP0492"] = true,
+}
+
+function SCPCount()
+	local tbl = {}
+
+	for i, ply in player.Iterator() do
+		if ply:FPTeam() == TEAM_SCP and ignore_tbl[ply:GetFPClass()] != true then
+			tbl[ply:GetFPClass()] = true
+		end
+	end
+
+	return #table.GetKeys( tbl )
 end
