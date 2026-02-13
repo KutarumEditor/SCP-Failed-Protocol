@@ -175,6 +175,8 @@ function PopupInfo( time, tbl )
 
 		info_tbl[i].ugap = ScreenScale( info_tbl[i].ugap )
 		info_tbl[i].lgap = ScreenScale( info_tbl[i].lgap )
+
+		print( info_tbl[i].text.."\n" )
 	end
 
 	info_end = CurTime() + time

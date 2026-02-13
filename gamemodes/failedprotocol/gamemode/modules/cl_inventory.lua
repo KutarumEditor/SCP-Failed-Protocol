@@ -174,10 +174,10 @@ function CreateInventoryUI()
     mdl:SetFOV( 27.5 )
 
     local openTime = CurTime()
-    local vest, helmet = vest or nil, helmet or nil
-    local vest_mdl, helmet_mdl = vest_mdl or nil, helmet_mdl or nil
+    local clBMerges = {}
     function mdl:DrawModel()
-        local eased = math.ease.OutCirc( frame:GetAlpha()/245 )
+        local ply = LocalPlayer()
+        local eased = math.ease.OutCirc( frame:GetAlpha() / 245 )
         local curparent = self
         local leftx, topy = self:LocalToScreen( 0, 0 )
         local rightx, bottomy = self:LocalToScreen( self:GetWide(), self:GetTall() )
@@ -194,50 +194,31 @@ function CreateInventoryUI()
             previous = curparent
         end
 
-        if vest_mdl != nil then
-            vest_mdl:Remove()
-            vest_mdl = nil
-        end
-
-        if helmet_mdl != nil then
-            helmet_mdl:Remove()
-            helmet_mdl = nil
-        end
-
-        vest, helmet = LocalPlayer().FPArmor.vest.name, LocalPlayer().FPArmor.helmet.name
-
         render.ClearDepth( false )
 
         render.SetScissorRect( leftx, topy, rightx, bottomy, true )
 
         local ret = self:PreDrawModel( self.Entity )
         if ( ret != false ) then
-            if vest != nil and REGISTERED_ARMOR[vest].model != "" then
-                vest_mdl = ClientsideModel( REGISTERED_ARMOR[vest].model )
-                if IsValid( vest_mdl ) then
-                    vest_mdl:SetNoDraw( true )
-                    vest_mdl:AddEffects( EF_BONEMERGE )
-                    vest_mdl:SetParent( self.Entity )
-                end
-            end
+            for i, bm in ipairs( ply:GetChildren() ) do
+                if not bm:IsDerived( "fp_bonemerge" ) then continue end
 
-            if helmet != nil and REGISTERED_ARMOR[helmet].model != "" then
-                helmet_mdl = ClientsideModel( REGISTERED_ARMOR[helmet].model )
-                if IsValid( helmet_mdl ) then
-                    helmet_mdl:SetNoDraw( true )
-                    helmet_mdl:AddEffects( EF_BONEMERGE )
-                    helmet_mdl:SetParent( self.Entity )
+                local mdl = ClientsideModel( bm:GetModel(), RENDERGROUP_OPAQUE )
+                if IsValid( mdl ) then
+                    mdl:SetNoDraw( true )
+                    mdl:AddEffects( EF_BONEMERGE )
+                    mdl:SetParent( self.Entity )
                 end
+                clBMerges[#clBMerges + 1] = mdl
             end
 
             self.Entity:DrawModel()
-            if vest_mdl != nil then
-                vest_mdl:DrawModel()
+            for i, mdl in ipairs( clBMerges ) do
+                mdl:DrawModel()
+                mdl:Remove()
             end
 
-            if helmet_mdl != nil then
-                helmet_mdl:DrawModel()
-            end
+            clBMerges = {}
 
             self:PostDrawModel( self.Entity )
         end

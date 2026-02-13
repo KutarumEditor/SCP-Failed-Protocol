@@ -1,7 +1,7 @@
 SCPS = {
 	["SCP008"] = {
 		model = "models/scp049/player/049zombie.mdl",
-		swep = "fp_hands",
+		swep = "fp_scp_swep_008",
 		maxhp = 500,
 		hp = 500,
 		maxarmor = 250,

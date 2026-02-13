@@ -31,6 +31,26 @@ function CalcRussianFOV( fov )
 	return fov
 end
 
+function RussianEffect()
+	RussianAntiAmnestic = 1
+
+	util.ScreenShake( EyePos(), 7.5, 7.5, 3.5, 10000, true )
+
+	hook.Add( "Think", "RussianAntiAmnestic", function()
+		if RussianAntiAmnestic <= 0 then
+			hook.Remove( "Think", "RussianAntiAmnestic" )
+		else
+			RussianAntiAmnestic = RussianAntiAmnestic - FrameTime() * .5
+		end
+	end )
+
+	surface.PlaySound( "scpfp/gruspy/mnestic.wav" )
+end
+
+concommand.Add( "fp_become_russian", function()
+	RussianEffect()
+end )
+
 local unchecked_clr = Color( 125, 125, 125 )
 local time = 0
 hook.Add( "PreDrawOutlines", "GRULocator", function()
@@ -47,17 +67,7 @@ net.ReceivePing( "BecameRussian", function( data )
 	local ply = Player( tonumber( data ) )
 	ply.known = true
 
-	RussianAntiAmnestic = 1
-
-	hook.Add( "Think", "RussianAntiAmnestic", function()
-		if RussianAntiAmnestic <= 0 then
-			hook.Remove( "Think", "RussianAntiAmnestic" )
-		else
-			RussianAntiAmnestic = RussianAntiAmnestic - FrameTime() * .5
-		end
-	end )
-
-	surface.PlaySound( "scpfp/gruspy/antiamnestic.wav" )
+	RussianEffect()
 end )
 
 net.ReceivePing( "FoundRussian", function( data )

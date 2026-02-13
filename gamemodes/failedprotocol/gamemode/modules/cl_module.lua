@@ -45,6 +45,20 @@ local stam_mat = Material( "failedprotocol/icons/stamina.png" )
 local armor_mat = Material( "failedprotocol/icons/armor.png" )
 local disg_mat = Material( "failedprotocol/icons/disguise.png" )
 
+local clr_tbl = {
+	[TEAM_CLASSD] = Material( "failedprotocol/emblems/classd.png" ),
+	[TEAM_SCI] = Material( "failedprotocol/emblems/personnel.png" ),
+	[TEAM_SD] = Material( "failedprotocol/emblems/sd.png" ),
+	[TEAM_MTF] = Material( "failedprotocol/emblems/ntf.png" ),
+	[TEAM_GOC] = Material( "failedprotocol/emblems/goc.png" ),
+	[TEAM_SPEAR] = Material( "failedprotocol/emblems/spear.png" ),
+	[TEAM_GRU] = Material( "failedprotocol/emblems/gru.png" ),
+	[TEAM_CI] = Material( "failedprotocol/emblems/ci.png" ),
+	[TEAM_CBG] = Material( "failedprotocol/emblems/cbg.png" ),
+	[TEAM_SH] = Material( "failedprotocol/emblems/sh.png" ),
+	[TEAM_SCP] = Material( "failedprotocol/emblems/scp.png" ),
+}
+
 current_observer = current_observer || nil
 function inspectPanel( target )
 	current_observer = target
@@ -66,34 +80,21 @@ function inspectPanel( target )
 		draw.FramedBox( 0, 0, w, h, 2, 1, Color( 15, 15, 15, 225 ) )
 
 		surface.SetDrawColor( 255, 255, 255, 255 )
-		surface.DrawOutlinedRect( 25, h/2 - 50, 100, 100, outline )
 
 		draw.SimpleText( target:Nick(), "YoFont", 140, h/2-25, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
 		draw.SimpleText( LANG.Get( "MISC", "class" )..": "..LANG.Get( "CLASSES", target:GetFPClass() ), "YoFont", 140, h/2+25, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
 	end
 
-	local mdl = vgui.Create( "DModelPanel", INSPECT_PANEL )
+	local mdl = vgui.Create( "DPanel", INSPECT_PANEL )
 
 	mdl:SetPos( 25 + outline, 75 - 50 + outline )
 	mdl:SetSize( 100 - outline*2, 100 - outline*2 )
 
-	mdl:SetModel( target:GetModel() )
+	function mdl:Paint( w, h )
+		if not IsValid( current_observer ) then return end
 
-	mdl.Entity:SetSkin( target:GetSkin() )
-
-	mdl:SetFOV( 15 )
-
-	local vec = Vector( 0, 0, -23 )
-
-	local seq = mdl.Entity:LookupSequence( "idle" )
-
-	mdl.LayoutEntity = function( self, ent )
-		ent:SetPos(vec)
-		ent:SetAngles( Angle( -5, 45, 0 ) )
-	end
-
-	for i = 0, target:GetNumBodyGroups() do
-		mdl.Entity:SetBodygroup( i, target:GetBodygroup( i ) )
+		surface.SetMaterial( clr_tbl[current_observer:FPTeam()] )
+		surface.DrawTexturedRect( 0, 0, w, h )
 	end
 end
 
@@ -462,41 +463,44 @@ local function FirstPersonDeath( ply, oldview )
 	return view
 end
 
-local timeScale = GetConVar( "host_timescale" )
-local viewBobTime = 0
-local viewBobIntensity = 1
-local originalPos = Vector()
-local originalAng = Angle()
-local bobEyeFocus, minFocus = 512, 128
-local lastCalcViewBob = 0
-local rateMul = CreateClientConVar("cl_cbob_rate", 1.0, true, false, "Multiplies the rate viewbob occurs at.", 0.1, 5)
-local moveRW = false
-local ISCALC = false
+CL_VIEW = {}
+CL_VIEW.timeScale = GetConVar( "host_timescale" )
+CL_VIEW.viewBobTime = 0
+CL_VIEW.viewBobIntensity = 1
+CL_VIEW.originalPos = Vector()
+CL_VIEW.originalAng = Angle()
+CL_VIEW.bobEyeFocus = 512
+CL_VIEW.minFocus = 128
+CL_VIEW.lastCalcViewBob = 0
+CL_VIEW.ISCALC = false
+CL_VIEW.narcosis = false
+CL_VIEW.narcosis_mult = 0
+CL_VIEW.moveroll_mult = 0
 
-local function DoViewbob( ply, pos, ang, time, intensity, moveType )
+function DoViewbob( ply, pos, ang, time, intensity, moveType )
 	local tr = ply:GetEyeTraceNoCursor()
 
 	if !tr or !tr.HitPos then
         return
     end
 
-    originalAng:Set( ang )
+    CL_VIEW.originalAng:Set( ang )
 
     local sysTime = SysTime()
-    local delta = math.min( sysTime - lastCalcViewBob, ft or FrameTime(), 1 / 30 )
-    delta = ( delta * timeScale:GetFloat() ) * game.GetTimeScale()
+    local delta = math.min( sysTime - CL_VIEW.lastCalcViewBob, ft or FrameTime(), 1 / 30 )
+    delta = ( delta * CL_VIEW.timeScale:GetFloat() ) * game.GetTimeScale()
 
     moveType = moveType or ply:GetMoveType()
 
     local right = vector_origin
 
     if moveType != MOVETYPE_LADDER then
-        right = originalAng:Right()
+        right = CL_VIEW.originalAng:Right()
     end
 
-    originalPos:Set( pos )
+    CL_VIEW.originalPos:Set( pos )
 
-    local up = originalAng:Up()
+    local up = CL_VIEW.originalAng:Up()
 	local focusDist = tr.HitPos:Distance( pos )
 
 	if focusDist <= 0 then
@@ -508,42 +512,36 @@ local function DoViewbob( ply, pos, ang, time, intensity, moveType )
 
         local nextTr = util.TraceLine( {
             start = pos,
-            endpos = originalAng:Forward() * 1048575,
+            endpos = CL_VIEW.originalAng:Forward() * 1048575,
             filter = { ply, focusEnt }
         } )
 
 		focusDist = nextTr.HitPos:Distance( pos )
 	end
 
-	focusDist = math.max( focusDist, minFocus )
-	bobEyeFocus = math.Approach( bobEyeFocus, focusDist, ( focusDist - bobEyeFocus ) * delta * 5 )
+	focusDist = math.max( focusDist, CL_VIEW.minFocus )
+	CL_VIEW.bobEyeFocus = math.Approach( CL_VIEW.bobEyeFocus, focusDist, ( focusDist - CL_VIEW.bobEyeFocus ) * delta * 5 )
 
     pos:Add( up * math.sin( ( time + 0.5 ) * ( 4 * math.pi ) ) * 0.3 * intensity * -7 )
     pos:Add( right * math.sin( ( time + 0.5 ) * ( 2 * math.pi ) ) * 0.3 * intensity * -7 )
 
-    local fw = originalAng:Forward()
+    local fw = CL_VIEW.originalAng:Forward()
 
-    fw:Mul(bobEyeFocus)
-    originalPos:Add(fw)
-    originalPos:Sub(pos)
+    fw:Mul(CL_VIEW.bobEyeFocus)
+    CL_VIEW.originalPos:Add(fw)
+    CL_VIEW.originalPos:Sub(pos)
 
-    local newAng = originalPos:GetNormalized():Angle()
-    originalAng:Normalize()
+    local newAng = CL_VIEW.originalPos:GetNormalized():Angle()
+    CL_VIEW.originalAng:Normalize()
     newAng:Normalize()
 
-    local bobFac = math.Clamp( 1 - math.pow( math.abs( originalAng.p ) / 90, 3 ), 0, 1 )
-    ang.y = ang.y - math.Clamp( math.AngleDifference( originalAng.y, newAng.y ), -2, 2 ) * bobFac
-    ang.p = ang.p - math.Clamp( math.AngleDifference( originalAng.p, newAng.p ), -2, 2 ) * bobFac
+    local bobFac = math.Clamp( 1 - math.pow( math.abs( CL_VIEW.originalAng.p ) / 90, 3 ), 0, 1 )
+    ang.y = ang.y - math.Clamp( math.AngleDifference( CL_VIEW.originalAng.y, newAng.y ), -2, 2 ) * bobFac
+    ang.p = ang.p - math.Clamp( math.AngleDifference( CL_VIEW.originalAng.p, newAng.p ), -2, 2 ) * bobFac
 
-    lastCalcViewBob = sysTime
+    CL_VIEW.lastCalcViewBob = sysTime
 end
 
-local narcosis = false
-local narcosis_mult = 0
-
-local moveroll_mult = 0
-
-local Ang0, curang, curviewbob = Angle( 0, 0, 0 ), Angle( 0, 0, 0 ), Angle( 0, 0, 0 )
 function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 	local ct = CurTime()
 	ft = FrameTime()
@@ -609,33 +607,33 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
     local velocityFrac = math.max( velocity:Length2D() * airWalkScale - velocity.z * 0.5, 0 )
     local rate = math.Clamp( math.sqrt( velocityFrac / runSpeed ) * 1.75, 0.15, 2 )
 
-    viewBobTime = viewBobTime + ft * rate
-    viewBobIntensity = 0.15 + velocityFrac / runSpeed
+    CL_VIEW.viewBobTime = CL_VIEW.viewBobTime + ft * rate
+    CL_VIEW.viewBobIntensity = 0.15 + velocityFrac / runSpeed
 
-    DoViewbob( ply, origin, angles, viewBobTime, viewBobIntensity, moveType, ft )
-    ISCALC = true
+    DoViewbob( ply, origin, angles, CL_VIEW.viewBobTime, CL_VIEW.viewBobIntensity, moveType, ft )
+    CL_VIEW.ISCALC = true
 
     --=======================================================================================================--
 
-	narcosis_mult = math.Clamp( narcosis_mult + ( narcosis and .001 or -.001 ), 0, 1 )
+	CL_VIEW.narcosis_mult = math.Clamp( CL_VIEW.narcosis_mult + ( CL_VIEW.narcosis and .001 or -.001 ), 0, 1 )
 
 	if ply:KeyDown( IN_MOVERIGHT ) then
-		moveroll_mult = math.min( 1, moveroll_mult + .05 )
+		CL_VIEW.moveroll_mult = math.min( 1, CL_VIEW.moveroll_mult + .05 )
 	elseif ply:KeyDown( IN_MOVELEFT ) then
-		moveroll_mult = math.max( -1, moveroll_mult - .05 )
+		CL_VIEW.moveroll_mult = math.max( -1, CL_VIEW.moveroll_mult - .05 )
 	else
-		if moveroll_mult > 0 then
-			moveroll_mult = math.max( 0, moveroll_mult - .05 )
+		if CL_VIEW.moveroll_mult > 0 then
+			CL_VIEW.moveroll_mult = math.max( 0, CL_VIEW.moveroll_mult - .05 )
 		else
-			moveroll_mult = math.min( 0, moveroll_mult + .05 )
+			CL_VIEW.moveroll_mult = math.min( 0, CL_VIEW.moveroll_mult + .05 )
 		end
 	end
 
-	view.angles	= view.angles + Angle( 0, 0, math.cos( ct/2 )*narcosis_mult ) + Angle( 0, 0, 1 * moveroll_mult )
+	view.angles	= view.angles + Angle( 0, 0, math.cos( ct / 2 ) * CL_VIEW.narcosis_mult ) + Angle( 0, 0, 1 * CL_VIEW.moveroll_mult )
 
 	local fov_add = math.Clamp( Lerp( ft * 10, ply.LastFOV or 0, velocity:Length() / math.max( 225, ply:GetRunSpeed() ) * 2.5 ), 0, 10 )
 	ply.LastFOV = fov_add
-	view.fov = ( view.fov or fov ) - 5 + fov_add + math.sin( ct )*3*narcosis_mult
+	view.fov = ( view.fov or fov ) - 5 + fov_add + math.sin( ct ) * 3 * CL_VIEW.narcosis_mult
 
 	view.fov = CalcRussianFOV( view.fov )
 
@@ -675,9 +673,9 @@ function GM:CalcViewModelView( wep, vm, oldEyePos, oldEyeAng, eyePos, eyeAng )
 		vm_angles = ang or vm_angles
 	end
 
-	if excludeBases[wep.Base] != true and ISCALC and vm:GetOwner() == lply and lply:GetMoveType() != MOVETYPE_NOCLIP and !lply:ShouldDrawLocalPlayer() then
-		DoViewbob( lply, pos, ang, viewBobTime, viewBobIntensity )
-    	ISCALC = false
+	if excludeBases[wep.Base] != true and CL_VIEW.ISCALC and vm:GetOwner() == lply and lply:GetMoveType() != MOVETYPE_NOCLIP and !lply:ShouldDrawLocalPlayer() then
+		DoViewbob( lply, pos, ang, CL_VIEW.viewBobTime, CL_VIEW.viewBobIntensity )
+    	CL_VIEW.ISCALC = false
 	end
 
 	return vm_origin, vm_angles
@@ -708,6 +706,8 @@ local function DrawGasmask()
 end
 
 function GM:RenderScreenspaceEffects()
+	lply = lply or LocalPlayer()
+
 	if lply:HasGasmask() then
 		DrawGasmask()
 	end

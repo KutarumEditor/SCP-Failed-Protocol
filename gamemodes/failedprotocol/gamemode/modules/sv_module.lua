@@ -182,11 +182,15 @@ function PickUpCheck( ply, item )
 end
 
 concommand.Add( "bot_full", function( ply, cmd, args, argStr )
-	local t = 1
-	repeat
-		player.CreateNextBot( "Bot"..t )
-		t = t + 1
-	until #player.GetAll() == game.MaxPlayers()
+	for i = 1, game.MaxPlayers() - #player.GetAll() do
+		AsyncFunc(
+			function()
+				if SERVER then
+					player.CreateNextBot( "Bot"..i )
+				end 
+			end
+		)
+	end
 end )
 
 concommand.Add( "fp_spawn_as", function( ply, cmd, args, argStr )
@@ -273,4 +277,8 @@ concommand.Add( "fp_test_enemy_spawn", function( ply, cmd, args, argStr )
     s:SetPos( ply:GetEyeTrace().HitPos )
     s:Give( "weapon_smg1" )
     s:Spawn()
+end )
+
+concommand.Add( "fp_become_serpent", function( ply, cmd, args, argStr )
+	ply:SerpentMobilize()
 end )

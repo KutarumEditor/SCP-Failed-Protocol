@@ -1,5 +1,10 @@
 local check_mat = Material( "failedprotocol/abilities/check.png" )
 
+local availableForMobilization = {
+	[TEAM_CLASSD] = true,
+	[TEAM_SCI] = true
+}
+
 ABILITIES = {
 	REG = {
 		["gruspycheck"] = {
@@ -35,9 +40,27 @@ ABILITIES = {
 					local n = FPRandom( 1, 3 )
 					PHRASES.Cast( ply, "scpfp/gruspy/found"..n..".wav", "gruspy", "found"..n )
 
+					ply:PopupInfo( 10, {
+						{
+							text = { { "MISC", "grubackup" } },
+							font = "RoundStartInfoExtraSmall",
+							color = Color( 125, 255, 125 ),
+							ugap = 0,
+							lgap = 0
+						}
+					} )
+
 					ent:RevealRussian( ply )
 				else
-					ply:FPServerMessage( Color( 255, 125, 125 ), "$MISC.gruwrongtarget" )
+					ply:PopupInfo( 5, {
+						{
+							text = { { "MISC", "gruwrongtarget" } },
+							font = "RoundStartInfoExtraSmall",
+							color = Color( 255, 125, 125 ),
+							ugap = 0,
+							lgap = 0
+						}
+					} )
 
 					net.Ping( "RemoveForGRULocator", tostring( ent:UserID() ), ply )
 				end
@@ -53,6 +76,58 @@ ABILITIES = {
 			end,
 			callback = function( ply )
 				net.Ping( "RussianLocator", nil, ply )
+			end
+		},
+		["shmobilize"] = {
+			icon = check_mat,
+			color = Color( 0, 215, 175 ),
+			cooldown = 5,
+			uses = 3,
+			button = KEY_N,
+			check = function( ply )
+				local tr = util.TraceLine( {
+					start = ply:GetShootPos(),
+					endpos = ply:GetShootPos() + ply:GetAimVector() * 100,
+					filter = function( ent )
+						return ent:IsPlayer() and ent:Alive() and ent != ply
+					end
+				} )
+
+				return tr.Entity:IsValid()
+			end,
+			callback = function( ply )
+				local tr = util.TraceLine( {
+					start = ply:GetShootPos(),
+					endpos = ply:GetShootPos() + ply:GetAimVector() * 100,
+					filter = function( ent ) return ent:IsPlayer() and ent != ply end
+				} )
+
+				local ent = tr.Entity
+				if availableForMobilization[ent:FPTeam()] == true then
+					ply:PopupInfo( 5, {
+						{
+							text = { { "MISC", "shmobilized" } },
+							font = "RoundStartInfoExtraSmall",
+							color = Color( 155, 255, 125 ),
+							ugap = 0,
+							lgap = 0
+						}
+					} )
+
+					ent:SerpentMobilize()
+
+					ABILITIES.Spend( ply, "shmobilize", 1 )
+				else
+					ply:PopupInfo( 5, {
+						{
+							text = { { "MISC", "shnotmobilized" } },
+							font = "RoundStartInfoExtraSmall",
+							color = Color( 255, 125, 125 ),
+							ugap = 0,
+							lgap = 0
+						}
+					} )
+				end
 			end
 		}
 	}

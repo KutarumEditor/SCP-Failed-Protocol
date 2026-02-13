@@ -24,6 +24,14 @@ function LANG.Register( name, tbl )
 
 	if name != "english" then
 		table.Inherit( LANG.REG[name], LANG.REG.english )
+
+		for k, v in pairs( LANG.REG[name] ) do
+			local eng = LANG.REG.english[k]
+
+			if not istable( v ) or not istable( eng ) then continue end
+
+			table.Inherit( v, eng )
+		end
 	end
 
 	print( "Registered "..name.." language!" )

@@ -2,7 +2,6 @@ local ents = ents
 local CLASSES = CLASSES
 local timer = timer
 
-
 function GM:PlayerInitialSpawn( ply )
 	ply:DataTables()
 end
@@ -103,7 +102,6 @@ local PLAYER = FindMetaTable( "Player" )
 function PLAYER:CreatePlayerRagdoll()
 	local body = ents.Create( "prop_ragdoll" )
 	body:SetPos( self:GetPos() )
-	body:SetAngles( self:GetAngles() )
 	body:SetModel( self:GetModel() )
 	body:SetSkin( self:GetSkin() )
 	
@@ -166,6 +164,25 @@ function PLAYER:SetDeathReason( reason, pro_only )
 	tbl.pro = reason
 
 	self:SetProperty( "DeathReasonPro", tbl, true )
+end
+
+function PLAYER:SerpentMobilize()
+	self:SetFPTeam( TEAM_SH )
+
+	self:PopupInfo( 5, {
+		{
+			text = { { "MISC", "converted" } },
+			font = "RoundStartInfoExtraSmall",
+			color = FPTeams.GetColor( self:FPTeam() ),
+			ugap = 0,
+			lgap = 0
+		}
+	} )
+
+	local mask = ents.Create( "fp_bonemerge" )
+	mask:SetParent( self )
+	mask.Model = "models/kutarum/scpfp/helmets/sh_mask.mdl"
+	mask:Spawn()
 end
 
 function PLAYER:Heal( hp, effs )
@@ -307,13 +324,15 @@ function PLAYER:Setup( class, spawn_override, instant )
 
 	self:Give( "fp_hands" )
 
-	for _, v in pairs( class_tab.weps ) do
+	local weps = class_tab.weps or {}
+	for _, v in pairs( weps ) do
 		self:Give( v )
 	end
 
 	self:StripAmmo()
 
-	for k, v in pairs( class_tab.ammo ) do
+	local ammo = class_tab.ammo or {}
+	for k, v in pairs( ammo ) do
 		self:GiveAmmo( v, k, true )
 	end
 

@@ -7,7 +7,11 @@ MISC.class = "Класс"
 MISC.said_persona = "Вы сказали своё имя"
 MISC.heard_persona = " сказал своё имя"
 MISC.unknown_person = "Неизвестный"
-MISC.gruwrongtarget = "Неверная цель. Продолжайте поиски."
+MISC.gruwrongtarget = "Неверная цель. Продолжайте поиски"
+MISC.grubackup = "Подкрепление в пути"
+MISC.shmobilized = "Цель обращена"
+MISC.shnotmobilized = "Цель не может быть обращена"
+MISC.converted = "Вы были обращены"
 
 local MENU = {}
 lang.MENU = MENU

@@ -73,7 +73,7 @@ function HeadGib( ent, dmg )
 end
 
 local hitGroupDamage = {
-	[HITGROUP_HEAD] = 3,
+	[HITGROUP_HEAD] = 4,
 	[HITGROUP_LEFTARM] = .45,
 	[HITGROUP_RIGHTARM] = .45,
 	[HITGROUP_LEFTLEG] = .6,
@@ -84,10 +84,10 @@ local ammoPenetration = {
 	[3] = 2, --pistol
 	[7] = 1, --buckshot
 	[5] = 3, --smg1
-	[1] = 3, --ar2
-	[5] = 3, --357
-	[13] = 4, --SniperRound
-	[14] = 4, --SniperPenetratedRound
+	[1] = 4, --ar2
+	[5] = 4, --357
+	[13] = 5, --SniperRound
+	[14] = 5, --SniperPenetratedRound
 }
 
 local function GetPartArmor( ply, hg )
@@ -155,6 +155,8 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 		end
 
 		dmginfo:SetDamage( math.ceil( dmginfo:GetDamage() ) )
+
+		print( dmginfo:GetDamage() )
 
 		net.Start( "FPArmor" )
 			net.WritePlayer( ply )
