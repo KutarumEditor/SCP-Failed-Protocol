@@ -11,3 +11,22 @@ function SetupExits()
 		ent.EscapeCheck = exit.check
 	end
 end
+
+local PLAYER = FindMetaTable( "Player" )
+
+function PLAYER:StartEscape( name )
+	TIMERS.Create( self:SteamID64()..name.."Escape", EXITS[name].time, function()
+		self:KillSilent()
+        self:SetupSpectator( true )
+
+		EXITS[name].callback( self )
+	end, false )
+
+	net.Ping( "FPStartEscape", name, self )
+end
+
+function PLAYER:AbortEscape( name )
+	TIMERS.Destroy( self:SteamID64()..name.."Escape" )
+
+	net.Ping( "FPAbortEscape", name, self )
+end

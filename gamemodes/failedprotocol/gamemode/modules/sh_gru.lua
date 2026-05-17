@@ -51,17 +51,18 @@ concommand.Add( "fp_become_russian", function()
 	RussianEffect()
 end )
 
-local unchecked_clr = Color( 125, 125, 125 )
+local function removeDRender()
+	hook.Remove( "SetupOutlines", "GRULocator" )
+end
+
 local time = 0
-hook.Add( "PreDrawOutlines", "GRULocator", function()
-	if LocalPlayer():FPTeam() != TEAM_GRU then return end
+function GRULocator()
+	if LocalPlayer():FPTeam() != TEAM_GRU then removeDRender() end
+	if CurTime() > time then removeDRender() end
 
-	if time == 0 then return end
-
-	time = math.max( 0, time - FrameTime() )
-
-	outline.Add( UncheckedD, unchecked_clr, OUTLINE_MODE_BOTH )
-end )
+	outline.SetRenderType( OUTLINE_RENDERTYPE_BEFORE_VM )
+	outline.Add( UncheckedD, color_white, OUTLINE_MODE_BOTH )
+end
 
 net.ReceivePing( "BecameRussian", function( data )
 	local ply = Player( tonumber( data ) )
@@ -89,7 +90,9 @@ net.ReceivePing( "RussianLocator", function()
 		end
 	end
 
-	time = 5
+	hook.Add( "SetupOutlines", "GRULocator", GRULocator )
+
+	time = CurTime() + 20
 end )
 
 end

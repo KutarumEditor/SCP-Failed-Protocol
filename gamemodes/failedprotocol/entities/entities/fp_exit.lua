@@ -14,7 +14,7 @@ function ENT:Initialize()
 
     self:SetSolid( SOLID_BBOX )
     self:SetMoveType( MOVETYPE_NONE )
-    self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+    self:SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER )
 
     local phys = self:GetPhysicsObject()
     if IsValid( phys ) then
@@ -27,13 +27,15 @@ end
 
 function ENT:StartTouch( ply )
     local name = self:GetName()
-    print( name )
     if ply:IsPlayer() and ply:Alive() and EXITS[name].check( ply ) then
-        ply:KillSilent()
-        ply:SetupSpectator( true )
-
-        EXITS[name].callback( ply )
+        ply:StartEscape( name )
     end
+end
+
+function ENT:EndTouch( ply )
+    if not ply:IsPlayer() or not ply:Alive() then return end
+
+    ply:AbortEscape( self:GetName() )
 end
 
 function ENT:Draw()

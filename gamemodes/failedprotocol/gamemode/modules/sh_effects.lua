@@ -15,7 +15,7 @@ REGISTERED_EFFECTS = {
 	["bleeding"] = {
 		icon = Material( "crimeville/icons/bleeding.png", "noclamp" ),
 		color = Color( 225, 0, 0 ),
-		time = 7,
+		time = 999,
 		max_time = 20,
 		stacks = true,
 		think_freq = 2,
@@ -26,29 +26,7 @@ REGISTERED_EFFECTS = {
 			dmg:SetDamage( FPRandom( 3, 5 ) )
 			dmg:SetAttacker( ply )
 			dmg:SetInflictor( ply )
-			ply:TakeDamageInfo( dmg )
-		end,
-		end_check = function( ply )
-			return !ply:Alive()
-		end,
-		end_func = function( ply )
-
-		end
-	},
-	["acetone"] = {
-		icon = Material( "crimeville/icons/bleeding.png", "noclamp" ),
-		color = Color( 75, 0, 175 ),
-		time = 60,
-		stacks = false,
-		think_freq = 1,
-		think_func = function( ply )
-			ply:SetDeathReason( "acetone", true )
-
-			local dmg = DamageInfo()
-			dmg:SetDamage( 2 )
-			dmg:SetAttacker( Player( ply.AcetonedBy ) or ply )
-			dmg:SetInflictor( ply )
-			ply:TakeDamageInfo( dmg )
+			--ply:TakeDamageInfo( dmg )
 		end,
 		end_check = function( ply )
 			return !ply:Alive()
@@ -134,6 +112,10 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 			end
 		end
 	end
+end )
+
+concommand.Add( "fp_random_effect", function( ply )
+	ply:ApplyEffect( table.Random( table.GetKeys( REGISTERED_EFFECTS ) ) )
 end )
 
 end

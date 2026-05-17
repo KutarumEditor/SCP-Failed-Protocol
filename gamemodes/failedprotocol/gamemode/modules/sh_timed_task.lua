@@ -34,7 +34,7 @@ hook.Add( "Think", "FPTaskChecker", function()
 	for k, v in pairs( FPTASKS ) do
 		if not IsValid( v.player ) then
 			FPTASKS[k] = nil
-		elseif not v.check() then
+		elseif not v.check() or not v.player:Alive() then
 			FPTASKS[k] = nil
 			v.player.DoingTask = false
 			net.Start( "FPTask" )
@@ -72,7 +72,7 @@ local alpha = 0
 local dotCount = 1
 local maxDots = 3
 local nextDotChange = CurTime() + 0.5
-hook.Add( "HUDPaint", "FPTaskDrawer", function()
+hook.Add( "FPHUD", "FPTaskDrawer", function()
 	if ( CurTime() - FPTaskStartTime ) > FPTaskEndTime or FPCurTask == nil then
 		alpha = math.max( 0, alpha - .05 )
 	else

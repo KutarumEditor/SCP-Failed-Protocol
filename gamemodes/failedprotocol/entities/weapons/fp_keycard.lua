@@ -9,6 +9,9 @@ SWEP.ShouldDrawWM = false
 SWEP.AutoSwitchTo = true
 SWEP.Weight = 1
 
+SWEP.HoldType = "slam"
+-- SWEP.TPIKForce = true
+
 KEYCARD_CALM = 0
 KEYCARD_USED = 1
 

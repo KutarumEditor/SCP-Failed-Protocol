@@ -45,7 +45,7 @@ local stam_mat = Material( "failedprotocol/icons/stamina.png" )
 local armor_mat = Material( "failedprotocol/icons/armor.png" )
 local disg_mat = Material( "failedprotocol/icons/disguise.png" )
 
-local clr_tbl = {
+local mat_tbl = {
 	[TEAM_CLASSD] = Material( "failedprotocol/emblems/classd.png" ),
 	[TEAM_SCI] = Material( "failedprotocol/emblems/personnel.png" ),
 	[TEAM_SD] = Material( "failedprotocol/emblems/sd.png" ),
@@ -93,7 +93,7 @@ function inspectPanel( target )
 	function mdl:Paint( w, h )
 		if not IsValid( current_observer ) then return end
 
-		surface.SetMaterial( clr_tbl[current_observer:FPTeam()] )
+		surface.SetMaterial( mat_tbl[current_observer:FPTeam()] )
 		surface.DrawTexturedRect( 0, 0, w, h )
 	end
 end
@@ -111,9 +111,10 @@ local drawTable = {
 	}]]
 }
 
+local def_sprite = Material( "failedprotocol/menu_logo.png" )
 function DrawSprite( data )
 	local d = {}
-	d.mat = data.mat or Material( "failedprotocol/menu_logo.png" )
+	d.mat = data.mat or def_sprite
 	d.clr = data.clr:Copy() or color_white
 	d.time = data.time or 1
 	d.x = data.x or ScrW() / 2
@@ -136,7 +137,7 @@ local alpha_death_mult = 1
 
 local total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
 
-hook.Add( "DrawFPHUD", "MainHUD", function()
+hook.Add( "FPHUD", "MainHUD", function()
 	local disg = lply:GetProperty( "FPDisguise", {
 		0,
 		0
@@ -152,7 +153,7 @@ hook.Add( "DrawFPHUD", "MainHUD", function()
 		},
 		[1] = {	--Stamina
 			icon = stam_mat,
-			clr = Color( 95, 95, 95 ),
+			clr = Color( 155, 155, 155 ),
 			curvalue = math.max( lply:GetStamina(), 0 ),
 			maxvalue = lply:GetMaxStamina(),
 			show = function() return lply:FPTeam() != TEAM_SPEC and ( lply:FPTeam() != TEAM_SCP or SCPS[lply:GetFPClass()].has_stamina == true ) end,
@@ -186,11 +187,21 @@ hook.Add( "DrawFPHUD", "MainHUD", function()
 	local startY = scrh - h
 	local randShake = 0
 	local bar_height = ScreenScale( 1 )
+	local bar_pos = {
+		x = 8 + randShake + ind,
+		y = startY - ( 8 + randShake ) - h + ind
+	}
+	local bar_size = {
+		w = w - ind*2 + h,
+		h = h*1.5 - ind*2
+	}
+	local outline_size = 1
+
 	for _, bar in ipairs( bars ) do
 		if bar.show() == false then continue end
 
 		randShake = math.Rand( -hud_shake, hud_shake )
-		local clr = LerpColor( .9, Color( bar.clr.r, bar.clr.g, bar.clr.b ), Color( 15, 15, 15 ) )
+		local clr = LerpColor( .95, Color( bar.clr.r, bar.clr.g, bar.clr.b ), Color( 0, 0, 0 ) )
 		clr.a = 225 * total_alpha_mult
 		local text = tostring( math.ceil( bar.curvalue ) )
 		local hCoef = 1
@@ -201,29 +212,52 @@ hook.Add( "DrawFPHUD", "MainHUD", function()
 		if bar.textoverride != nil then
 			text = bar.textoverride( bar.curvalue, bar.maxvalue )
 		end
+
+		local bar_x, bar_y = 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind
+		local bar_w, bar_h = ( w - ind*2 ), h - ind*2
 		--Icon
 		surface.SetDrawColor( clr )
-	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, h - ind*2, h - ind*2 )
+	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, bar_h, bar_h )
+
+		surface.SetDrawColor( bar.clr )
+		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, outline_size, bar_h )
+		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( 8 + randShake + ind + bar_h - outline_size, startY - ( 8 + randShake ) + ind, outline_size, bar_h )
+		surface.DrawRect( 8 + randShake + ind + bar_h - ScreenScale( 2 ), startY - ( 8 + randShake ) + ind, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( 8 + randShake + ind + bar_h - ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
 
 	    KMASKS.Start()
-			draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2, ( w - ind*2 ) * hCoef, bar_height, bar.clr )
-		KMASKS.Source()
-		    surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
-			surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, h - ind*2, h - ind*2 )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2, ( w - ind*2 ) * hCoef, bar_height, bar.clr )
+			KMASKS.Source()
+			surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, bar_h, bar_h )
 		KMASKS.End()
 
-		surface.SetDrawColor( 255, 255, 255, 255 * total_alpha_mult )
+		surface.SetDrawColor( bar.clr.r, bar.clr.g, bar.clr.b, 255 * total_alpha_mult )
 		surface.SetMaterial( bar.icon )
-		surface.DrawTexturedRect( 8 + randShake + ind + outline + gap, startY - ( 8 + randShake ) + ind + outline + gap, h - ind*2 - ( outline + gap )*2, h - ind*2 - ( outline + gap )*2 )
+		surface.DrawTexturedRect( 8 + randShake + ind + outline + gap, startY - ( 8 + randShake ) + ind + outline + gap, bar_h - ( outline + gap )*2, bar_h - ( outline + gap )*2 )
 		-- Main bar
-		draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind, ( w - ind*2 ), h - ind*2, clr )
+		draw.RoundedBox( rad - ind, bar_x, bar_y, bar_w, bar_h, clr )
+
+		surface.SetDrawColor( bar.clr )
+		surface.DrawRect( bar_x, startY - ( 8 + randShake ) + ind, outline_size, bar_h )
+		surface.DrawRect( bar_x, startY - ( 8 + randShake ) + ind, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( bar_x, startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
+
+		surface.DrawRect( bar_x + bar_w - outline_size, startY - ( 8 + randShake ) + ind, outline_size, bar_h )
+		surface.DrawRect( bar_x + bar_w - ScreenScale( 2 ), startY - ( 8 + randShake ) + ind, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( bar_x + bar_w - ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
 
 		KMASKS.Start()
-			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2, ( w - ind*2  - ScreenScale( 4 ) ) * hCoef, bar_height, bar.clr )
-			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 1 ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2 - ScreenScale( 1 ), ScreenScale( 1 ), bar_height + ScreenScale( 2 ), color_white )
-			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ) + ( w - ind*2  - ScreenScale( 4 ) ), startY - ( 8 + randShake ) + ind + ( h - ind*2 )/2 - bar_height/2 - ScreenScale( 1 ), ScreenScale( 1 ), bar_height + ScreenScale( 2 ), color_white )
+			surface.SetDrawColor( Color( bar.clr.r, bar.clr.g, bar.clr.b, 25 ) )
+
+			draw.HAnimatedLines( _.."bar", ScreenScale( 4 ), 10 )
+
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2, ( w - ind*2  - ScreenScale( 4 ) ) * hCoef, bar_height, bar.clr )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2 - outline_size, outline_size, bar_height + ScreenScale( 1 ), color_white )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ) + ( w - ind*2  - ScreenScale( 4 ) ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2 - outline_size, outline_size, bar_height + ScreenScale( 1 ), color_white )
 	    KMASKS.Source()
-		    draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind, ( w - ind*2 ), h - ind*2, clr )
+		    draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind, ( w - ind*2 ), bar_h, clr )
 	    KMASKS.End()
 
 	    draw.SimpleTextOutlined( text, "HUDSmall", ( 8 + randShake + ind ) + ( w - ind*2 )/2 + h, startY - ( 8 + randShake ) + h/2, Color( 255, 255, 255, 255 * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
@@ -231,53 +265,86 @@ hook.Add( "DrawFPHUD", "MainHUD", function()
 		startY = startY - h
 	end
 
+	startY = startY + h*.5
+
+	local bar_pos = {
+		x = 8 + randShake + ind,
+		y = startY - ( 8 + randShake ) - h + ind
+	}
+	local bar_size = {
+		w = w - ind*2 + h,
+		h = h*1.5 - ind*2
+	}
+
 	--Class bar
 	local team_clr = FPTeams.GetColor( lply:FPTeam() )
-	local clr = LerpColor( .9, Color( team_clr.r, team_clr.g, team_clr.b ), Color( 15, 15, 15 ) )
+	local clr = LerpColor( .95, Color( team_clr.r, team_clr.g, team_clr.b ), Color( 0, 0, 0 ) )
 	clr.a = 225 * total_alpha_mult
+	
 
 	surface.SetDrawColor( clr )
-    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
+    surface.DrawRect( bar_pos.x, bar_pos.y, bar_size.w, bar_size.h )
 
     KMASKS.Start()
-		surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
-
 	    surface.SetFont( "HUDNormal" )
 	    local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
 
-	    surface.SetDrawColor( color_white )
-	    surface.DrawRect( 8 + randShake + ind + ( w - ind*2 + h ) - ScreenScale( 2 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
-	    surface.DrawRect( 8 + randShake + ind + ScreenScale( 1 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
+		surface.SetDrawColor( Color( team_clr.r, team_clr.g, team_clr.b, 25 ) )
 
-	    draw.SimpleTextOutlined( LANG.Get( "CLASSES", lply:GetFPClass() ), "HUDNormal", ( 8 + randShake + ind ) + ( w - ind*2 + h )/2, startY - ( 8 + randShake ) - h/2 + ind + (h - ind*2)/2, Color( team_clr.r, team_clr.g, team_clr.b, team_clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
+		draw.HAnimatedLines( "classbar", ScreenScale( 4 ), 10 )
+
+	    surface.SetDrawColor( team_clr )
+	    surface.DrawRect( bar_pos.x, bar_pos.y, outline_size, bar_size.h )
+		surface.DrawRect( bar_pos.x, bar_pos.y, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( bar_pos.x, bar_pos.y + bar_size.h - outline_size, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( bar_pos.x + bar_size.w - outline_size, bar_pos.y, outline_size, bar_size.h )
+		surface.DrawRect( bar_pos.x + bar_size.w - ScreenScale( 2 ), bar_pos.y, ScreenScale( 2 ), outline_size )
+		surface.DrawRect( bar_pos.x + bar_size.w - ScreenScale( 2 ), bar_pos.y + bar_size.h - outline_size, ScreenScale( 2 ), outline_size )
+
+	    draw.SimpleTextOutlined( string.upperPlus( LANG.Get( "CLASSES", lply:GetFPClass() ) ), "HUDNormal", bar_pos.x + ( bar_size.w )/2, startY - ( 8 + randShake ) - h/1.5 + ind + (h - ind*2)/2 - ScreenScale( .5 ), Color( team_clr.r, team_clr.g, team_clr.b, team_clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
 	KMASKS.Source()
-	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
+	    surface.DrawRect( bar_pos.x, bar_pos.y, bar_size.w, bar_size.h )
 	KMASKS.End()
 
-    startY = startY - h*2
+    startY = startY - h*1.5
+
+	local bar_pos = {
+		x = 8 + randShake + ind,
+		y = startY - ( 8 + randShake ) - h + ind
+	}
+	local bar_size = {
+		w = w - ind*2 + h,
+		h = h*1.5 - ind*2
+	}
 
     --Name bar
     if lply:FPTeam() != TEAM_SPEC and lply:FPTeam() != TEAM_SCP then
-		local clr = Color( 75, 75, 75 )
+		local clr = Color( 125, 125, 125 )
 		local bg_clr = Color( 5, 5, 5 )
 		bg_clr.a = 225 * total_alpha_mult
 
 		surface.SetDrawColor( bg_clr )
-	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
+	    surface.DrawRect( bar_pos.x, bar_pos.y, bar_size.w, bar_size.h )
 
-	    KMASKS.Start()
-			surface.SetDrawColor( 0, 0, 0, 125 * total_alpha_mult )
+		KMASKS.Start()
+			surface.SetFont( "HUDNormal" )
+			local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
 
-		    surface.SetFont( "HUDNormal" )
-		    local tx, ty = surface.GetTextSize( LANG.Get( "CLASSES", lply:GetFPClass() ) )
+			surface.SetDrawColor( Color( clr.r, clr.g, clr.b, 25 ) )
 
-		    surface.SetDrawColor( color_white )
-		    surface.DrawRect( 8 + randShake + ind + ( w - ind*2 + h ) - ScreenScale( 2 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
-		    surface.DrawRect( 8 + randShake + ind + ScreenScale( 1 ), startY - ( 8 + randShake ) - h + ind + ( h*2 - ind*2 )/2 - ty/3, ScreenScale( 1 ), ty/1.5 )
+			draw.HAnimatedLines( "namebar", ScreenScale( 4 ), 10 )
 
-		    draw.SimpleTextOutlined( lply:FPName().." "..lply:FPSurname(), "HUDNormal", ( 8 + randShake + ind ) + ( w - ind*2 + h )/2, startY - ( 8 + randShake ) - h/2 + ind + (h - ind*2)/2, Color( clr.r, clr.g, clr.b, clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
+			surface.SetDrawColor( clr )
+			surface.DrawRect( bar_pos.x, bar_pos.y, outline_size, bar_size.h )
+			surface.DrawRect( bar_pos.x, bar_pos.y, ScreenScale( 2 ), outline_size )
+			surface.DrawRect( bar_pos.x, bar_pos.y + bar_size.h - outline_size, ScreenScale( 2 ), outline_size )
+			surface.DrawRect( bar_pos.x + bar_size.w - outline_size, bar_pos.y, outline_size, bar_size.h )
+			surface.DrawRect( bar_pos.x + bar_size.w - ScreenScale( 2 ), bar_pos.y, ScreenScale( 2 ), outline_size )
+			surface.DrawRect( bar_pos.x + bar_size.w - ScreenScale( 2 ), bar_pos.y + bar_size.h - outline_size, ScreenScale( 2 ), outline_size )
+
+			draw.SimpleTextOutlined( string.upperPlus( lply:FPName().." "..lply:FPSurname() ), "HUDNormal", bar_pos.x + ( bar_size.w )/2, startY - ( 8 + randShake ) - h/1.5 + ind + (h - ind*2)/2 - ScreenScale( .5 ), Color( clr.r, clr.g, clr.b, clr.a * total_alpha_mult ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, 125 * total_alpha_mult ) )
 		KMASKS.Source()
-		    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) - h + ind, w - ind*2 + h, h*2 - ind*2 )
+			surface.DrawRect( bar_pos.x, bar_pos.y, bar_size.w, bar_size.h )
 		KMASKS.End()
 	end
 end )
@@ -296,20 +363,33 @@ function DrawFPSpectateInfo()
 end
 
 function DrawFPEffects()
-	local eff_size, eff_gap, eff_outline = ScreenScale( 16 ), ScreenScale( 4 ), ScreenScale( 2 )
+	local outline_size = 1
+	local eff_size, eff_gap, eff_outline = ScreenScale( 12 ), ScreenScale( 4 ), ScreenScale( 2 )
 	local effs = lply:GetProperty( "Effects", {} )
 	local total_space = #effs * eff_size + ( #effs - 1 ) * eff_gap
 	local start_pos = ( ScrH() - total_space )/2
 
 	for k, v in pairs( effs ) do
 		KMASKS.Start()
-            local clr = LerpColor( .9, REGISTERED_EFFECTS[k].color, Color( 15, 15, 15 ) )
+			local effclr = REGISTERED_EFFECTS[k].color
+            local clr = LerpColor( .95, effclr, Color( 0, 0, 0 ) )
 			clr.a = 225
 			draw.RoundedBox( 0, eff_gap, start_pos, eff_size, eff_size, clr )
 
-			surface.SetDrawColor( Color( 0, 0, 0, 125 ) )
+			surface.SetDrawColor( Color( effclr.r, effclr.g, effclr.b, 25 ) )
 
-			surface.SetDrawColor( REGISTERED_EFFECTS[k].color )
+			draw.HAnimatedLines( k.."effect", ScreenScale( 2 ), 10 )
+
+			surface.SetDrawColor( effclr )
+
+			surface.DrawRect( eff_gap, start_pos, outline_size, eff_size )
+			surface.DrawRect( eff_gap, start_pos, ScreenScale( 2 ), outline_size )
+			surface.DrawRect( eff_gap, start_pos + eff_size - outline_size, ScreenScale( 2 ), outline_size )
+			surface.DrawRect( eff_gap + eff_size - outline_size, start_pos, outline_size, eff_size )
+			surface.DrawRect( eff_gap + eff_size - ScreenScale( 2 ), start_pos, ScreenScale( 2 ), outline_size )
+			surface.DrawRect( eff_gap + eff_size - ScreenScale( 2 ), start_pos + eff_size - outline_size, ScreenScale( 2 ), outline_size )
+			
+			surface.SetDrawColor( effclr )
 			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
 			surface.DrawTexturedRect( eff_gap + eff_outline, start_pos + eff_outline, eff_size - eff_outline * 2, eff_size - eff_outline * 2 )
         KMASKS.Source()
@@ -414,7 +494,7 @@ function GM:HUDPaint()
 
 	hook.Run( "HUDDrawTargetID" )
 
-	hook.Run( "DrawFPHUD" )
+	hook.Run( "FPHUD" )
 
 	DrawFPSpectateInfo()
 
@@ -649,6 +729,7 @@ local excludeBases = {
 	["tfa_nade_base"] = true,
 	["tfa_sword_advanced_base"] = true,
 	["tfa_ins2_base"] = true,
+	["tfa_fp_base"] = true,
 }
 
 function GM:CalcViewModelView( wep, vm, oldEyePos, oldEyeAng, eyePos, eyeAng )

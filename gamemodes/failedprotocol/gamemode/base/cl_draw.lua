@@ -4,10 +4,6 @@ local draw = draw
 local surface = surface
 local color_white = color_white
 
-PARTICLE_DEBUG = false
-
-DRAWN_PARTICLES = DRAWN_PARTICLES or {}
-
 function draw.Circle( x, y, radius, seg )
 	local cir = {}
 
@@ -115,6 +111,53 @@ function draw.FramedBox( x, y, w, h, outline, gap, color, frame_color )
 	draw.RoundedBox( 0, x+outline+gap, y+outline+gap, w-(outline+gap)*2, h-(outline+gap)*2, color or color_white )
 end
 
+local animLines = {}
+function draw.HAnimatedLines( id, interval, speed )
+	animLines[id] = animLines[id] or {}
+	local lid = animLines[id]
+	lid.interval = lid.interval or interval
+	lid.startpos = lid.startpos or 0
+	lid.curpos = lid.curpos or 0
+
+	local s = FrameTime() * speed
+	local lines = math.ceil( ScrW() / lid.interval )
+	for i = 1, lines do
+		local x = lid.startpos + lid.curpos
+		surface.DrawLine( x, 0, x, ScrH() )
+		lid.curpos = lid.curpos + lid.interval
+	end
+	lid.curpos = 0
+
+	lid.startpos = lid.startpos + s
+
+	if lid.startpos >= lid.interval then
+		lid.startpos = lid.startpos - lid.interval
+	end
+end
+
+function draw.VAnimatedLines( id, interval, speed )
+	animLines[id] = animLines[id] or {}
+	local lid = animLines[id]
+	lid.interval = lid.interval or interval
+	lid.startpos = lid.startpos or 0
+	lid.curpos = lid.curpos or 0
+
+	local s = FrameTime() * speed
+	local lines = math.ceil( ScrH() / lid.interval )
+	for i = 1, lines do
+		local y = lid.startpos + lid.curpos
+		surface.DrawLine( 0, y, ScrW(), y )
+		lid.curpos = lid.curpos + lid.interval
+	end
+	lid.curpos = 0
+
+	lid.startpos = lid.startpos + s
+
+	if lid.startpos >= lid.interval then
+		lid.startpos = lid.startpos - lid.interval
+	end
+end
+
 function draw.MultiColorText( Font, x, y, xAlign, yAlign, outlinewidth, outlinecolor, ... )
 	surface.SetFont( Font )
 	local CurX = x
@@ -165,77 +208,98 @@ function draw.MultiColorText( Font, x, y, xAlign, yAlign, outlinewidth, outlinec
 	return AllText
 end
 
-DRAWN_PARTICLES.SPARKLES = DRAWN_PARTICLES.SPARKLES or {}
-local SPARKLES = DRAWN_PARTICLES.SPARKLES
-function DrawSparkles( id, material, x, y, w, h, dist, cooldown, lifetime, size )
-	SPARKLES[id] = SPARKLES[id] or {
-		cd = 0,
-		sp = {}
-	}
+local SHADER_MATERIAL = CreateMaterial("fp_circle_"..SysTime(), "screenspace_general", {
+	["$pixshader"] = "fp_circle_shader_ps30",
+	["$vertexshader"] = "fp_circle_shader_vs30",
 
-	local clr = surface.GetDrawColor()
+	["$basetexture"] = "",
+	["$texture1"] = "",
+	["$texture2"] = "",
+	["$texture3"] = "",
 
-    for _, v in pairs( SPARKLES[id].sp ) do
-    	v.lt = v.lt or 0
-    	v.et = v.et or 0
-    	v.kt = v.kt or CurTime() + 1
+	["$ignorez"] = "1",
+	["$vertexcolor"] = "1",
+	["$vertextransform"] = "1",
 
-    	if ( not isnumber( v.lt ) or v.lt <= 0 ) or ( not isnumber( v.et ) or v.et <= 0 ) or v.kt <= CurTime() then
-    		SPARKLES[id].sp[_] = nil
-    	end
+	["$copyalpha"] = "0",
+	["$alpha_blend_color_overlay"] = "0",
+	["$alphablend"] = "1",
 
-    	local lerp = 1 - math.max( 0, ( v.lt / v.et ) )
-    	local eased = math.ease.InCubic( lerp )
+	["$linearwrite"] = "1",
+	["$linearread_basetexture"] = "1",
+	["$linearread_texture1"] = "1",
+	["$linearread_texture2"] = "1",
+	["$linearread_texture3"] = "1",
+})
 
-    	v.lt = v.lt - FrameTime()
-    	v.kt = CurTime() + 1
+local SHADER_MATRIX = Matrix()
 
-    	surface.SetDrawColor( clr.r, clr.g, clr.b, Lerp( eased, clr.a, 0 ) )
-    	surface.SetMaterial( material )
-    	surface.DrawTexturedRect( v.x - size/2, Lerp( eased, v.y, v.y - v.d ) - size/2, size, size )
-    end
+local function draw_circle_shader(
+	x, 			y, 				size,
+	radius, 	inner_radius, 	cap_radius,
+	fill, 		rotation, 		outline,
+	outline_r,	outline_g, 		outline_b,
+	texture
+)
+	local angle = fill * math.pi
+	local mid_r = ( radius + inner_radius ) * 0.5
 
-    surface.SetDrawColor( clr )
+	local h = ( radius - inner_radius ) * 0.5
+	if cap_radius > h then cap_radius = h end
 
-    if SPARKLES[id].cd < CurTime() then
-    	SPARKLES[id].cd = CurTime() + cooldown
+	local maxcap = angle * mid_r
+	if cap_radius > maxcap then cap_radius = maxcap end
 
-    	local width, height = x + w, y + h
+	local ratio = cap_radius / mid_r
+	if ratio > 1 then ratio = 1 end
 
-    	table.insert( SPARKLES[id].sp, {
-    		et = lifetime,
-    		lt = lifetime,
-    		kt = CurTime() + 1,
-    		x = math.random( x, width ),
-    		y = math.random( y, height ),
-    		d = dist,
-    	} )
-    end
+	local cap_angle = math.asin( ratio );
+
+	local corrected_angle = angle - cap_angle * ( 1 - fill )
+	if corrected_angle < 0 then corrected_angle = 0 end
+
+	local rotation_rad = math.rad( rotation ) - math.pi - corrected_angle - cap_angle
+
+	local r_eff = radius - cap_radius
+	local i_eff = inner_radius + cap_radius
+	local h_eff = (r_eff - i_eff) * 0.5
+
+	SHADER_MATRIX:SetUnpacked(
+		radius, 		cap_radius,	math.sin( rotation_rad ),		outline_r / 255,
+		inner_radius, 	r_eff,		math.cos( rotation_rad ),		outline_g / 255,
+		outline, 		i_eff,		math.sin( corrected_angle ), 	outline_b / 255,
+		angle,			h_eff,		math.cos( corrected_angle ),	texture and 1 or 0
+	)
+
+	SHADER_MATERIAL:SetMatrix( "$viewprojmat", SHADER_MATRIX )
+
+	surface.SetMaterial( SHADER_MATERIAL )
+	surface.DrawTexturedRectUV( x, y, size, size, -0.015625, -0.015625, 1.015625, 1.015625 )
 end
 
-hook.Add( "HUDPaint", "SparklesThink", function()
-	for k, v in pairs( SPARKLES ) do
-		for _, spark in pairs( SPARKLES[k].sp ) do
-			if spark.kt <= CurTime() then
-				SPARKLES[k].sp[_] = nil
-			end
-	    end
+function FPDrawRing( x, y, radius, thickness, fill, rotation, cap_radius, outline, outline_r, outline_g, outline_b )
+	if radius <= 0 or thickness <= 0 then return end
+
+	if !cap_radius or cap_radius < 0 then cap_radius = 0 end
+	if !outline or outline < 0 then outline = 0 end
+
+	if thickness > radius then
+		thickness = radius
+		cap_radius = 0
 	end
 
-	if not PARTICLE_DEBUG then return end
+	fill = fill and math.Clamp( fill, 0, 1 ) or 1
 
-	local pc = 0
-	for k, v in pairs( SPARKLES ) do
-		for _, spark in pairs( SPARKLES[k].sp ) do
-			local lerp = 1 - math.max( 0, ( spark.lt / spark.et ) )
-    		local eased = math.ease.InCubic( lerp )
-
-	    	surface.SetDrawColor( color_white )
-	    	surface.DrawOutlinedRect( spark.x - 4, Lerp( eased, spark.y, spark.y - spark.d ) - 4, 8, 8 )
-
-	    	pc = pc + 1
-	    end
+	if istable(outline_r) then
+		outline_g = outline_r.g
+		outline_b = outline_r.b
+		outline_r = outline_r.r
 	end
 
-	draw.SimpleTextOutlined( "Particles in total: "..pc, "DebugFixed", ScreenScale( 4 ), ScreenScale( 4 ), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 1, color_black )
-end )
+	draw_circle_shader(
+		x - radius, 	y - radius, 		radius * 2,
+		radius, 		radius - thickness, cap_radius * thickness,
+		fill, 			rotation or 0, 		outline,
+		outline_r or 0, outline_g or 0, 	outline_b or 0
+	)
+end

@@ -1,3 +1,4 @@
+CLIENT_SETTINGS = {}
 CL_SETTINGS = {
 	REG = {}
 }
@@ -49,6 +50,8 @@ CL_SETTINGS.Register( "fp_settings_button", "95", "bind" )
 CL_SETTINGS.Register( "fp_inventory_button", "27", "bind" )
 
 CL_SETTINGS.Register( "fp_scp_upgrades_button", "12", "bind" )
+
+CL_SETTINGS.Register( "fp_drop_weapon", "17", "bind" )
 
 CL_SETTINGS.Register( "fp_language", "english", "list" )
 
@@ -210,19 +213,15 @@ local convertTypes = {
 
 		cb.OnSelect = function( self, index, value )
 			CL_SETTINGS.Set( tbl.name, value )
+
+			CLIENT_SETTINGS.Rebuild()
 		end
 	end,
 }
 
-function OpenSettings()
-	if IsValid( CLIENT_SETTINGS ) then
-		CLIENT_SETTINGS:Remove()
-
-		return
-	end
-
+function CLIENT_SETTINGS.Open()
 	local frame = vgui.Create( "DFrame" )
-	CLIENT_SETTINGS = frame
+	CLIENT_SETTINGS.MENU = frame
 
 	frame:SetSize( ScreenScale( 170 ), ScreenScale( 170 ) )
 	frame:Center()
@@ -259,13 +258,33 @@ function OpenSettings()
 	end
 end
 
+function CLIENT_SETTINGS.Close()
+	CLIENT_SETTINGS.MENU:Remove()
+end
+
+function CLIENT_SETTINGS.Rebuild()
+	if IsValid( CLIENT_SETTINGS.MENU ) then
+		CLIENT_SETTINGS.MENU:Remove()
+	end
+
+	CLIENT_SETTINGS.Open()
+end
+
+local function _settingsDecide()
+	if IsValid( CLIENT_SETTINGS.MENU ) then
+		CLIENT_SETTINGS.MENU:Remove()
+	else
+		CLIENT_SETTINGS.Open()
+	end
+end
+
 hook.Add( "OnPlayerChat", "HelloCommand", function( ply, strText, bTeam, bDead ) 
     if ( ply != LocalPlayer() ) then return end
 
 	strText = string.lower( strText )
 
 	if ( strText == "!settings" ) then
-		OpenSettings()
+		_settingsDecide()
 
 		return true
 	end
@@ -278,5 +297,5 @@ hook.Add( "PlayerButtonDown", "FPSettingsOpen", function( ply, button )
         return
     end
 
-    OpenSettings()
+    _settingsDecide()
 end)

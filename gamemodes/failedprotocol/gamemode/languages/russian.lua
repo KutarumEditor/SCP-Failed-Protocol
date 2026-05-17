@@ -4,6 +4,7 @@ local MISC = {}
 lang.MISC = MISC
 
 MISC.class = "Класс"
+MISC.persona = "Личность"
 MISC.said_persona = "Вы сказали своё имя"
 MISC.heard_persona = " сказал своё имя"
 MISC.unknown_person = "Неизвестный"
@@ -12,6 +13,9 @@ MISC.grubackup = "Подкрепление в пути"
 MISC.shmobilized = "Цель обращена"
 MISC.shnotmobilized = "Цель не может быть обращена"
 MISC.converted = "Вы были обращены"
+MISC.cuffed = "Вы связаны"
+MISC.escaping = "Вы сбегаете через"
+MISC.inventory = "Инвентарь"
 
 local MENU = {}
 lang.MENU = MENU
@@ -31,6 +35,7 @@ SETTINGS.fp_disable_support = "Отключить спавн за поддерж
 SETTINGS.fp_disable_scp = "Отключить спавн за SCP"
 SETTINGS.fp_inventory_button = "Открыть инвентарь"
 SETTINGS.fp_settings_button = "Открыть настройки"
+SETTINGS.fp_drop_weapon = "Выбросить оружие из рук"
 SETTINGS.fp_scp_upgrades_button = "Открыть улучшения SCP"
 
 local KEYCARDS = {}
@@ -38,6 +43,7 @@ lang.KEYCARDS = KEYCARDS
 
 KEYCARDS.janitor = "Уборщик"
 KEYCARDS.medic = "Медик"
+KEYCARDS.logist = "Логист"
 KEYCARDS.zone_manager = "Менеджер Зоны"
 KEYCARDS.it_spec = "Специалист IT"
 KEYCARDS.engineer = "Инженер"
@@ -128,17 +134,41 @@ DESC.cbgsoldier = "Описание йоу"
 DESC.SCP008 = "Описание йоу"
 DESC.SCP035 = "Описание йоу"
 
+local LOOT = {}
+lang.LOOT = LOOT
+
+LOOT.locker_lcz = "Шкаф"
+
+local EXITS = {}
+lang.EXITS = EXITS
+
+EXITS.main = "Основной выход"
+
 local ARMOR = {}
 lang.ARMOR = ARMOR
 
-ARMOR.test_vest = "Тестовый бронежилет"
 ARMOR.security_light_vest = "Лёгкий жилет СБ"
 ARMOR.security_medium_vest = "Средний жилет СБ"
 ARMOR.security_heavy_vest = "Тяжёлый жилет СБ"
-ARMOR.test_helmet = "Тестовый шлем"
+ARMOR.ntf_vest = "Бронежилет ДХЛ"
+ARMOR.goc_vest = "Бронежилет ГОК"
+ARMOR.gru_vest = "Бронежилет ГРУ"
+ARMOR.gru_heavy_vest = "Тяжёлый бронежилет ГРУ"
+ARMOR.spear_vest = "Бронежилет SPEAR"
+ARMOR.ci_vest = "Бронежилет ПХ"
+ARMOR.sh_vest = "Бронежилет ДЗ"
+ARMOR.cbg_plate_holder = "Плитник ЦРБ"
 ARMOR.security_cap = "Кепка охраны"
 ARMOR.security_light_helmet = "Лёгкий шлем СБ"
 ARMOR.security_heavy_helmet = "Тяжёлый шлем СБ"
+ARMOR.ntf_helmet = "Шлем ДХЛ"
+ARMOR.goc_helmet = "Шлем ГОК"
+ARMOR.gru_helmet = "Шлем ГРУ"
+ARMOR.spear_helmet = "Шлем SPEAR"
+ARMOR.ci_helmet = "Шлем ПХ"
+ARMOR.sh_helmet = "Шлем ДЗ"
+ARMOR.sh_heavy_helmet = "Тяжёлый шлем ДЗ"
+ARMOR.cbg_mask = "Маска ЦРБ"
 
 local TASK = {}
 lang.TASK = TASK
@@ -147,6 +177,8 @@ TASK.fail = "Провал"
 TASK.body_check = "Осмотр тела"
 TASK.armor_equip = "Экипировка брони"
 TASK.weapon_equip = "Поднятие предмета"
+TASK.detaining = "Связывание цели"
+TASK.undetaining = "Развязывание цели"
 
 local BODY = {}
 lang.BODY = BODY
@@ -201,8 +233,9 @@ ACTIONS.prop_ragdoll = {
 	check = "Осмотреть",
 }
 
-ACTIONS.fp_box = {
-	open = "Открыть",
+ACTIONS.player = {
+	detain = "Связать",
+	undetain = "Развязать",
 }
 
 local PHRASES = {}

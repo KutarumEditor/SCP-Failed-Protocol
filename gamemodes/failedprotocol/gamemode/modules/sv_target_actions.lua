@@ -18,7 +18,9 @@ net.Receive( "FPEntityActions", function( len, ply )
 	local ent = net.ReadEntity()
 	local action = net.ReadString()
 
-	if not IsValid( ent ) or not IsEntity( ent ) or ply:EyePos():Distance( ent:GetPos() ) > 105 then return end
+	local tr = ply:GetEyeTrace()
+
+	if not IsValid( ent ) or not IsEntity( ent ) or ply:EyePos():Distance( tr.HitPos ) > 200 then return end
 
 	local actionNum = nil
 	local actions = istable( ent.Actions ) and ent.Actions or ENTITY_ACTIONS_OVERRIDE[ent:GetClass()] or {}

@@ -29,7 +29,7 @@ function SWEP:Deploy()
 end
 
 function SWEP:PrimaryAttack()
-	self:GetOwner():EmitSound( "crimeville/bandage/apply.mp3" )
+	self:GetOwner():EmitSound( "scpfp/bandage/apply.mp3" )
 
 	if SERVER then
 		self:GetOwner():Heal( 15, { "bleeding" } )

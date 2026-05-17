@@ -68,11 +68,10 @@ function MTFCutscene()
 	RunConsoleCommand( "stopsound" )
 	AMBIENT.Ban( 1 )
 
-	timer.Simple( .1, function()
-		AMBIENT.Restart( "sound/scpfp/support_themes/mtf.wav" )
+	timer.Simple( .01, function()
+		AMBIENT.Restart( "sound/scpfp/support_themes/mtf.mp3" )
+		ClearInfoPopup()
 	end )
-
-	ClearInfoPopup()
 
 	HideHUD( true, true )
 
@@ -113,10 +112,72 @@ function MTFCutscene()
 	end )
 end
 
+local gru_mat = Material( "failedprotocol/emblems/gru.png" )
+function GRUCutscene()
+	local ply = LocalPlayer()
+
+	RunConsoleCommand( "stopsound" )
+	AMBIENT.Ban( 1 )
+
+	timer.Simple( .1, function()
+		AMBIENT.Restart( "sound/scpfp/support_themes/gru.mp3" )
+	end )
+
+	ClearInfoPopup()
+
+	HideHUD( true, true )
+
+	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 9 )
+
+	TIMERS.Create( "GRULogo", 8.4, function()
+		DrawSprite( {
+            mat = gru_mat,
+            clr = color_white,
+            time = 4,
+            fade = 3,
+            x = ( ScrW() - logo_scale ) / 2,
+            y = ( ScrH() - logo_scale ) / 2,
+            w = logo_scale,
+            h = logo_scale
+        } )
+
+		TIMERS.Create( "GetMyHUDBack", 5, function()
+			PopupInfo( 15, {
+				{
+					text = { LANG.Get( "CLASSES", ply:GetFPClass() ) },
+					font = "RoundStartInfoBig",
+					color = FPTeams.GetColor( ply:FPTeam() ),
+					ugap = -8,
+					lgap = 4
+				},
+				{
+					text = { LANG.Get( "DESC", ply:GetFPClass() ) },
+					font = "RoundStartInfoExtraSmall",
+					color = color_white,
+					ugap = -8,
+					lgap = 4
+				},
+			} )
+
+			HideHUD( false )
+		end )
+	end )
+end
+
 net.ReceivePing( "MTFSpawn", function()
 	MTFCutscene()
 end )
 
 concommand.Add( "ntf_test", MTFCutscene )
 
+concommand.Add( "gru_test", GRUCutscene )
+
 concommand.Add( "breach_test", BreachAction )
+
+hook.Add( "PlayerButtonDown", "FPThrowWeapon", function( ply, button )
+    if CLIENT and button == CL_SETTINGS.Get( "fp_drop_weapon" ) and IsFirstTimePredicted() then
+        net.Start( "FPDrop" )
+        	net.WriteEntity( ply:GetActiveWeapon() )
+       	net.SendToServer()
+    end
+end )

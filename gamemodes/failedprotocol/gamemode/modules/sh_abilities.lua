@@ -51,6 +51,10 @@ ABILITIES = {
 					} )
 
 					ent:RevealRussian( ply )
+
+					SpawnSupport( "gru" )
+
+					SetNextSupport( "spear" )
 				else
 					ply:PopupInfo( 5, {
 						{

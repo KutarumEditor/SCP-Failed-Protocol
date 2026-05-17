@@ -48,7 +48,7 @@ end
 function SWEP:PrimaryAttack()
 	local ply = self:GetOwner()
 
-	self:EmitSound( "crimeville/knife/swing"..math.random( 1, 3 )..".wav", 45, math.random( 95, 105 ), 1, CHAN_WEAPON, 0, 1, nil )
+	self:EmitSound( "scpfp/knife/swing"..math.random( 1, 3 )..".wav", 45, math.random( 95, 105 ), 1, CHAN_WEAPON, 0, 1, nil )
 
 	ply:SetAnimation( PLAYER_ATTACK1 )
 
@@ -79,7 +79,7 @@ function SWEP:PrimaryAttack()
 
 			if tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:GetClass() == "prop_ragdoll" then
 				if SERVER then
-					EmitSound( "crimeville/knife/hitflesh"..math.random( 1, 2 )..".wav", self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 45, 0, math.random( 95, 105 ) )
+					EmitSound( "scpfp/knife/hitflesh"..math.random( 1, 2 )..".wav", self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 45, 0, math.random( 95, 105 ) )
 				end
 
 				if SERVER and tr.Entity:IsPlayer() then
@@ -103,7 +103,7 @@ function SWEP:PrimaryAttack()
 				self:SetSkin( 1 )
 			else
 				if SERVER then
-					EmitSound( "crimeville/knife/hitworld"..math.random( 1, 3 )..".wav", self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 45, 0, math.random( 95, 105 ) )
+					EmitSound( "scpfp/knife/hitworld"..math.random( 1, 3 )..".wav", self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 45, 0, math.random( 95, 105 ) )
 				end
 			end
 
@@ -118,7 +118,7 @@ function SWEP:PrimaryAttack()
 			end
 		else
 			if SERVER then
-				EmitSound( "crimeville/knife/hitworld"..math.random( 1, 3 )..".wav", self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 45, 0, math.random( 95, 105 ) )
+				EmitSound( "scpfp/knife/hitworld"..math.random( 1, 3 )..".wav", self:GetPos(), self:EntIndex(), CHAN_AUTO, 1, 45, 0, math.random( 95, 105 ) )
 			end
 		end
 	end

@@ -7,26 +7,17 @@ local ACCESS = ACCESS or {}
 
 function GM:PlayerUse( ply, ent )
 	ply.useRealBan = ply.useRealBan or 0
+	local plyEyeTrace = ply:GetEyeTrace()
 
 	if istable( ENTITY_ACTIONS_OVERRIDE[ent:GetClass()] ) then return false end
 
-	if ent:IsWeapon() and ply:EyePos():Distance( ply:GetEyeTrace().HitPos ) < 100 and ply:GetEyeTrace().Entity == ent and PickUpCheck( ply, ent ) then
+	if ent:IsWeapon() and ply:EyePos():Distance( plyEyeTrace.HitPos ) < 100 and plyEyeTrace.Entity == ent and ply:CanPickup( ent ) then
 		ply:TimedTask( "weapon_equip", 1, Color( 200, 155, 0 ),
 	    function()
 	        return IsValid( ent ) and IsValid( ply ) and
-	            ply:EyePos():Distance( ent:GetPos() ) < 100 and ply:GetEyeTrace().Entity == ent
+	            ply:EyePos():Distance( ent:GetPos() ) < 100 and plyEyeTrace.Entity == ent
 	    end, function()
 	        ply:PickupWeapon( ent )
-	    end )
-	end
-
-	if ent:GetClass() == "prop_ragdoll" and ply:EyePos():Distance( ply:GetEyeTrace().HitPos ) < 100 and ply:GetEyeTrace().Entity == ent then
-		ply:TimedTask( "body_check", 1, Color( 180, 175, 0 ),
-	    function()
-	        return IsValid( ent ) and IsValid( ply ) and
-	            ply:EyePos():Distance( ply:GetEyeTrace().HitPos ) < 100 and ply:GetEyeTrace().Entity == ent
-	    end, function()
-	        ply:CheckBody( ent )
 	    end )
 	end
 
@@ -69,12 +60,12 @@ end )
 local dmgCallback = {
 	[DMG_BULLET] = function( ent, dmginfo )
 		timer.Simple( 0, function()
-			ent:EmitSound( "crimeville/humans/hit_sounds/hit"..FPRandom( 1, 3 )..".wav" )
+			ent:EmitSound( "scpfp/humans/hit_sounds/hit"..FPRandom( 1, 3 )..".wav" )
 		end )
 	end,
 	[DMG_NERVEGAS] = function( ent, dmginfo )
 		timer.Simple( 0, function()
-			ent:EmitSound( "crimeville/humans/cough/cough"..FPRandom( 1, 4 )..".wav" )
+			ent:EmitSound( "scpfp/humans/cough/cough"..FPRandom( 1, 4 )..".wav" )
 		end )
 	end,
 }

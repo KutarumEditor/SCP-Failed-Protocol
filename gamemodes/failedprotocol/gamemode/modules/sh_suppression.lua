@@ -19,6 +19,12 @@ end
 
 if not CLIENT then return end
 
+local surface = surface
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_SetMaterial = surface.SetMaterial
+local surface_DrawTexturedRect = surface.DrawTexturedRect
+local Material = Material
+
 SUPPRESSION = 0
 
 function Suppress( num )
@@ -38,10 +44,13 @@ net.Receive( "SuppressionSync", function()
 	end
 end )
 
-hook.Add( "HUDPaint", "DrawSuppression", function()
+local vignette_mat = Material( "crimeville/misc/suppression.png" )
+hook.Add( "FPHUD", "DrawSuppression", function()
+	if SUPPRESSION == 0 then return end
+
 	surface.SetDrawColor( 0, 0, 0, 215 * SUPPRESSION )
-	surface.SetMaterial( Material( "crimeville/misc/suppression.png" ) )
+	surface.SetMaterial( vignette_mat )
 	surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
 
-	SUPPRESSION = SUPPRESSION - .001
+	SUPPRESSION = math.max( 0, SUPPRESSION - .001 )
 end )

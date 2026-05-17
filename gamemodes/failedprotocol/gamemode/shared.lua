@@ -33,10 +33,7 @@ end
 local function includeByPath( path )
 	local files, dirs = file.Find( path.."/*.lua", "LUA" )
 
-	if SERVER then
-		print( "" )
-		print( "|||||||||||||||||||||| SCP:FP | AUTOINCLUDE - "..path )
-	end
+	print( "\n|||||||||||||||||||||| SCP:FP | AUTOINCLUDE - "..path.."\n" )
 
 	for k, v in pairs( files ) do
 		if v == "sv_module.lua" or v == "sh_module.lua" or v == "cl_module.lua" then continue end
@@ -51,24 +48,20 @@ local function includeByPath( path )
 		elseif string.StartsWith( v, "cl_" ) then
 			if SERVER then
 				AddCSLuaFile( filepath )
-				print( "||||| LOADED CLIENT MODULE: "..filepath )
 			else
 				include( filepath )
 			end
+			print( "||||| LOADED CLIENT MODULE: "..filepath )
 		else
 			if SERVER then
 				AddCSLuaFile( filepath )
-				print( "||||| LOADED SHARED MODULE: "..filepath )
 			end
-
+			print( "||||| LOADED SHARED MODULE: "..filepath )
 			include( filepath )
 		end
 	end
 
-	if SERVER then
-		print( "|||||||||||||||||||||| SCP:FP | AUTOINCLUDE - "..path )
-		print( "" )
-	end
+	print( "\n|||||||||||||||||||||| SCP:FP | AUTOINCLUDE - "..path.."\n" )
 end
 
 function GetAllLanguages()

@@ -8,7 +8,7 @@ function CLASS:SetupDataTables()
 	local ply = self.Player
 
 	ply:NetworkVar( "Int", 0, "_FPTeam" )
-	ply:NetworkVar( "Int", 1, "InvSlots" )
+	ply:NetworkVar( "Int", 1, "_InvSlots" )
 
 	ply:NetworkVar( "Float", 0, "Stamina" )
 	ply:NetworkVar( "Float", 1, "MaxStamina" )
@@ -22,7 +22,7 @@ function CLASS:SetupDataTables()
 
 	if SERVER then
 		ply:Set_FPTeam( 0 )
-		ply:SetInvSlots( 0 )
+		ply:Set_InvSlots( 0 )
 
 		ply:SetMaxStamina( 100 )
 		ply:SetStamina( 100 )
@@ -102,6 +102,26 @@ function PLAYER:GetPlayerRagdoll()
 	return self:GetNWEntity( "CorpseEnt" )
 end
 
+function PLAYER:LookupBonemerges()
+	return ents.FindByClassAndParent( "fp_bonemerge", self ) or {}
+end
+
+function PLAYER:CanPickup( ent )
+    if ent:IsDerived( "fp_hands" ) then
+		return true
+	end
+
+	local tbl = self:GetWeapons()
+
+	for _, v in pairs( tbl ) do
+		if v:IsDerived( "fp_hands" ) then
+			table.remove( tbl, _ )
+		end
+	end
+
+	return #tbl < self:GetInvSlots() and not self:HasWeapon( ent:GetClass() )
+end
+
 function PLAYER:IsReady()
 	local ready = self:GetReady()
 
@@ -127,6 +147,14 @@ end
 
 function PLAYER:IsSCP()
 	return self:FPTeam() == TEAM_SCP
+end
+
+function PLAYER:IsSentient()
+	return FPTeams.HasInfo( self:FPTeam(), FPTeams.INFO_HUMAN ) or self:IsSCP() and SCPS[self:GetFPClass()].sentient == true
+end
+
+function PLAYER:IsHuman()
+	return FPTeams.HasInfo( self:FPTeam(), FPTeams.INFO_HUMAN ) or self:IsSCP() and SCPS[self:GetFPClass()].human == true
 end
 
 -----------------------

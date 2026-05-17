@@ -361,7 +361,8 @@ FPTeams.Register( "GOC", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Colo
 FPTeams.Register( "SPEAR", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 0, 25, 48 ), 4, false )
 FPTeams.Register( "GRU", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 158, 145, 99 ), 4, false )
 FPTeams.Register( "CI", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 13, 59, 20 ), 4, false )
-FPTeams.Register( "CBG", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 59, 45, 105 ), 4, false )
+FPTeams.Register( "CBG", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 80, 52, 52 ), 4, false )
+FPTeams.Register( "MCD", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 59, 45, 105 ), 4, false )
 FPTeams.Register( "SH", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 0, 133, 77 ), 4, false )
 FPTeams.Register( "SCP", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_SCP ), Color( 52, 7, 7 ), 10, true )
 

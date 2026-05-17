@@ -39,7 +39,8 @@ POSSIBLE_SURNAMES = {
 	"Mann", "Zimmerman", "Dawson", "Lara", "Fletcher", "Page", "Mccarthy", "Love", "Robles", "Cervantes",
 	"Solis", "Erickson", "Reeves", "Chang", "Klein", "Salinas", "Fuentes", "Baldwin", "Daniel", "Simon",
 	"Velasquez", "Hardy", "Higgins", "Aguirre", "Lin", "Cummings", "Chandler", "Sharp", "Barber", "Bowen",
-	"Ochoa", "Dennis", "Rob", "Kupitman", "Kutarumov", "Artov", "Kasanov", "Rubikov", "Mamonov", "Putin"
+	"Ochoa", "Dennis", "Rob", "Kupitman", "Kutarumov", "Artov", "Kasanov", "Rubikov", "Mamonov", "Putin", "Sinn",
+	"Trump", "Lord", "Epstein", "Dubrovsky", "Samoilov"
 }
 
 POSSIBLE_MALE_NAMES = {
@@ -76,7 +77,8 @@ POSSIBLE_MALE_NAMES = {
 	"Myron", "Edmund", "Garrett", "Salvatore", "Cedric", "Lowell", "Gregg", "Sherman", "Wilson", "Devin", "Sylvester", "Kim",
 	"Roosevelt", "Israel", "Jermaine", "Forrest", "Wilbert", "Leland", "Simon", "Guadalupe", "Clark", "Irving", "Carroll", "Bryant",
 	"Owen", "Rufus", "Woodrow", "Sammy", "Kristopher", "Mack", "Levi", "Marcos", "Gustavo", "Jake", "Lionel", "Marty", "Taylor",
-	"Ellis", "Dallas", "Gilberto", "Clint", "Nicolas", "Laure", "Masya", "Svoford", "Ayden", "Kolian"
+	"Ellis", "Dallas", "Gilberto", "Clint", "Nicolas", "Laure", "Masya", "Svoford", "Ayden", "Kolian", "Bo", "Gay", "Shaky", "Walrus",
+	"Pailon"
 }
 
 POSSIBLE_FEMALE_NAMES = {

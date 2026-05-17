@@ -6,6 +6,7 @@ local util = util
 
 local highlightedEnts = { -- "true" for highlighted name and outline, "false" only for highlighted name
 	["fp_box"] = true,
+	["prop_ragdoll"] = false,
 }
 
 local curAction, actionsCount = 1, 1
@@ -55,43 +56,41 @@ local id_lerp = 0
 local id_target = "ERROR"
 local id_ent = nil
 function GM:HUDDrawTargetID()
-	if not LocalPlayer():Alive() then return end
+	local ply = LocalPlayer()
+	if not ply:Alive() then return end
 	
-	local tr = util.GetPlayerTrace( LocalPlayer() )
+	local tr = util.GetPlayerTrace( ply )
 	local trace = util.TraceLine( tr )
 	local ent = trace.Entity
-	if trace.Hit and ( ent:IsPlayer() and LocalPlayer():EyePos():Distance( trace.HitPos ) <= 200 and LocalPlayer():Alive() or ( highlightedEnts[ent:GetClass()] != nil or
-	( ent:GetClass() == "prop_ragdoll" and ent:GetNWString( "name" ) ) ) and LocalPlayer():EyePos():Distance( trace.HitPos ) <= 100 ) then
-		id_alpha = math.min( 1, id_alpha + .01 )
-		id_lerp = math.ease.OutCirc( id_alpha )
 
-		ent.Actions = ent.Actions or istable( ENTITY_ACTIONS_OVERRIDE[ent:GetClass()] ) and ENTITY_ACTIONS_OVERRIDE[ent:GetClass()] or ent:GetClass() == "prop_ragdoll" and isstring( ent:GetNWString( "name" ) ) and {
-			[1] = {
-		        name = "check",
-		        func = function( ply )
+	if trace.Hit then
+		local class = ent:GetClass()
+		local trDist = ply:EyePos():Distance( trace.HitPos )
+		if ( ent:IsPlayer() and trDist <= 200 and ply:Alive() ) or highlightedEnts[class] != nil and trDist <= 100 then
+			id_alpha = math.min( 1, id_alpha + .01 )
+			id_lerp = math.ease.OutCirc( id_alpha )
 
-		        end
-		    },
-		} or {}
+			ent.Actions = istable( ENTITY_ACTIONS_OVERRIDE[class] ) and ENTITY_ACTIONS_OVERRIDE[class] or {}
 
-		actTbl = {}
-		for i, v in ipairs( ent.Actions ) do
-			if not isfunction( v.check ) or v.check( LocalPlayer(), ent ) == true then
-				local tbl = v
-				tbl.origNum = i
+			actTbl = {}
+			for i, v in ipairs( ent.Actions ) do
+				if not isfunction( v.check ) or v.check( ply, ent ) == true then
+					local tbl = v
+					tbl.origNum = i
 
-				table.insert( actTbl, tbl )
+					table.insert( actTbl, tbl )
+				end
 			end
+
+			actionsCount = #actTbl
+		else
+			id_alpha = 0
+			id_lerp = 0
+
+			curAction, actionsCount = 1, 1
+
+			actTbl = {}
 		end
-
-		actionsCount = #actTbl
-	else
-		id_alpha = 0
-		id_lerp = 0
-
-		curAction, actionsCount = 1, 1
-
-		actTbl = {}
 	end
 
 	if id_alpha == 0 then return end
@@ -103,19 +102,7 @@ function GM:HUDDrawTargetID()
 		if ent:IsPlayer() then
 			id_target = ent.known and ( ent:FPName().." "..ent:FPSurname() ) or LANG.Get( "MISC", "unknown_person" )
 			id_ent = ent
-
-			if ( LocalPlayer():FPTeam() == TEAM_CRIM and ( ent:FPTeam() == TEAM_CRIM or ent:GetFPClass() == "informator" ) )
-				or ( LocalPlayer():FPTeam() == TEAM_LAW and ent:FPTeam() == TEAM_LAW ) then
-				clr = Color( 0, 255, 0 )
-				ent.known = true
-			elseif LocalPlayer():GetFPClass() == "informator" and ent:FPTeam() == TEAM_CRIM then
-				clr = Color( 255, 0, 0 )
-				ent.known = true
-			end
-		elseif ent:GetClass() == "prop_ragdoll" and ent:GetNWString( "name" ) then
-			id_target = LANG.Get( "ENT", ent:GetClass() )
-			id_ent = ent
-		elseif highlightedEnts[ent:GetClass()] != nil then
+		elseif ENTITY_ACTIONS_OVERRIDE[ent:GetClass()] != nil then
 			id_target = LANG.Get( "ENT", ent:GetClass() )
 			id_ent = ent
 		end
@@ -195,6 +182,8 @@ function GM:HUDDrawTargetID()
 		end
 
 		for i, v in ipairs( actTbl ) do
+			if not ent:IsValid() then continue end
+
 			draw.SimpleText( LANG.Get( "ACTIONS", ent:GetClass(), v.name ), font, Lerp( id_lerp, ent_sprite_pos.x, end_x + tw/2 + ScreenScale( 4 ) ), Lerp( id_lerp, ent_sprite_pos.y, end_y + actPosY + smoothActY ), Color( clr.r, clr.g, clr.b, 255 * id_alpha ), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM )
 			actPosY = actPosY + th
 		end
@@ -202,13 +191,14 @@ function GM:HUDDrawTargetID()
 end
 
 hook.Add( "PostDrawEffects", "OutlinedItem", function()
-	local item = LocalPlayer():GetEyeTrace().Entity
+	local ply = LocalPlayer()
+	local item = ply:GetEyeTrace().Entity
 
-	local tr = util.GetPlayerTrace( LocalPlayer() )
+	local tr = util.GetPlayerTrace( ply )
 	local trace = util.TraceLine( tr )
 
 	local function basicCheck()
-		return IsValid( LocalPlayer() ) and LocalPlayer():Alive() and IsValid( item ) and LocalPlayer():EyePos():Distance( trace.HitPos ) <= 100
+		return IsValid( ply ) and ply:Alive() and IsValid( item ) and ply:EyePos():Distance( trace.HitPos ) <= 100
 	end
 
 	if basicCheck() and ( item:IsWeapon() or highlightedEnts[item:GetClass()] ) then

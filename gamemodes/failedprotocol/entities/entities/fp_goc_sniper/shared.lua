@@ -1,6 +1,6 @@
 ENT.Type = "anim"
 ENT.PrintName = "GOC Sniper"
-ENT.Radius = 2400
+ENT.Radius = 3200
 
 function ENT:SetupDataTables()
 	self:NetworkVar( "Bool", 0, "Triggered" )

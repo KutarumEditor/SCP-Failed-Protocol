@@ -34,10 +34,18 @@ SWEP.CantBeCarried = {
 	["cv_fading_bag"] = true,
 	["fp_tesla_gate"] = true,
 	["fp_tesla_killer"] = true,
+	["fp_lootable"] = true,
 }
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Bool", 0, "IsCarrying" )
+	self:NetworkVar( "Bool", 1, "Cuffed" )
+	self:NetworkVar( "Float", 0, "UncuffTime" )
+	self:NetworkVar( "Entity", 0, "Cuffer" )
+
+	self:SetCuffed( false )
+	self:SetUncuffTime( 0 )
+	self:SetCuffer( nil )
 end
 
 function SWEP:Initialize()
@@ -76,6 +84,12 @@ function SWEP:SecondaryAttack()
 
 	local ent = tr.Entity
 	if IsValid( ent ) then
+		if ent:IsPlayer() then
+			print( ent:Health().." HP\n" )
+			print( tostring( ent:GetWeapon( CLASSES[ent:GetFPClass()].hands_override or "fp_hands" ):GetCuffed() ) )
+			return
+		end
+
 		ply:ChatPrint( tostring( ent:GetPos() ).." "..tostring( ent:GetAngles() ) )
 
 		ply:ChatPrint( ent:MapCreationID(), ent:GetClass() )
@@ -122,6 +136,7 @@ function SWEP:SetCarrying( ent, bone, pos, dist )
 end
 
 function SWEP:CanPickup( ent )
+	if self:GetCuffed() then return false end
 	if ent:IsNPC() then return false end
 	if ent:IsWorld() then return false end
 	local class = ent:GetClass()
@@ -187,28 +202,41 @@ function SWEP:ApplyForce()
 end
 
 function SWEP:Think()
-	local owner = self:GetOwner()
-
-	if IsValid( owner ) and owner:KeyDown( IN_ATTACK ) then
-		if IsValid( self.CarryEnt ) then
-			self:ApplyForce()
+	local owner = self.Owner
+	if not self:GetCuffed() then
+		if IsValid( owner ) and owner:KeyDown( IN_ATTACK ) then
+			if IsValid( self.CarryEnt ) then
+				self:ApplyForce()
+			end
+		elseif self.CarryEnt then
+			self:SetCarrying()
 		end
-	elseif self.CarryEnt then
-		self:SetCarrying()
 	end
 
 	local holdType = "normal"
-
-	if IsValid( self.CarryEnt ) or self.CarryEnt then
+	if self.CarryEnt then
 		holdType = "pistol"
-	else
-		holdType = "normal"
 	end
 
 	if SERVER then
 		self:SetHoldType( holdType )
+
+		local cuffer = self:GetCuffer()
+		if CurTime() > self:GetUncuffTime() and ( not cuffer:IsValid() or cuffer == owner or owner:GetPos():Distance( cuffer:GetPos() ) ) then
+			owner:Undetain()
+		end
 	end
 end
+
+function SWEP:Holster( wep )
+	if self:GetCuffed() then return end
+
+	return true
+end
+
+if not CLIENT then return end
+
+local ScreenScale = ScreenScale
 
 local hand_default_mat = Material( "crimeville/misc/hand_default.png", "smooth" )
 local hand_grab_mat = Material( "crimeville/misc/hand_grab.png", "smooth" )
@@ -228,7 +256,11 @@ function SWEP:DrawHUD()
 			end
 
 			surface.SetDrawColor( color_white )
-			surface.DrawTexturedRect( ScrW()/2 - ScreenScale( 5 ), ScrH()/2 - ScreenScale( 5 ), ScreenScale( 10 ), ScreenScale( 10 ) )
+			surface.DrawTexturedRect( ScrW() / 2 - ScreenScale( 5 ), ScrH() / 2 - ScreenScale( 5 ), ScreenScale( 10 ), ScreenScale( 10 ) )
 		end
+	end
+
+	if self:GetCuffed() then
+		draw.SimpleTextOutlined( LANG.Get( "MISC", "cuffed" ), "HUDBig", ScrW() / 2, ScrH() * 4 / 7, Color( 125, 0, 0 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
 	end
 end

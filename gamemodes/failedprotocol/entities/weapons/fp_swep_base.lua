@@ -1,7 +1,7 @@
 SWEP.Base = "weapon_base"
 SWEP.Author = "KUTARUM"
 
-SWEP.CV_SWEP = true
+SWEP.FP_SWEP = true
 
 SWEP.ViewModel = "models/hunter/blocks/cube025x025x025.mdl"
 SWEP.ShouldDrawVM = true

@@ -1,26 +1,4 @@
 REGISTERED_ARMOR = {
-	["test_vest"] = {
-		type = "vest",
-		floor_model = "models/kutarum/scpfp/vests/security_vest_heavy.mdl",
-		model = "models/kutarum/scpfp/vests/security_vest_heavy.mdl",
-		durability = 200,
-		resistance = {
-			[HITGROUP_CHEST] = .65,
-			[HITGROUP_STOMACH] = .65,
-			[HITGROUP_GENERIC] = 1,
-		},
-		class = 2,
-	},
-	["test_helmet"] = {
-		type = "helmet",
-		floor_model = "models/kutarum/scpfp/helmets/security_helmet_heavy.mdl",
-		model = "models/kutarum/scpfp/helmets/security_helmet_heavy.mdl",
-		durability = 100,
-		resistance = {
-			[HITGROUP_HEAD] = .35,
-		},
-		class = 2,
-	},
 	["security_cap"] = {
 		type = "helmet",
 		floor_model = "models/kutarum/scpfp/helmets/security_cap.mdl",
@@ -119,6 +97,16 @@ REGISTERED_ARMOR = {
 		},
 		class = 3,
 	},
+	["spear_helmet"] = {
+		type = "helmet",
+		floor_model = "models/kutarum/scpfp/helmets/spear_helmet.mdl",
+		model = "models/kutarum/scpfp/helmets/spear_helmet.mdl",
+		durability = 80,
+		resistance = {
+			[HITGROUP_HEAD] = .4,
+		},
+		class = 3,
+	},
 	["security_light_vest"] = {
 		type = "vest",
 		floor_model = "models/kutarum/scpfp/vests/security_vest_light.mdl",
@@ -169,10 +157,10 @@ REGISTERED_ARMOR = {
 		resistance = {
 			[HITGROUP_CHEST] = .5,
 			[HITGROUP_STOMACH] = .6,
-			[HITGROUP_RIGHTARM] = .5,
-			[HITGROUP_LEFTARM] = .5,
-			[HITGROUP_RIGHTLEG] = .5,
-			[HITGROUP_LEFTLEG] = .5,
+			[HITGROUP_RIGHTARM] = .35,
+			[HITGROUP_LEFTARM] = .35,
+			[HITGROUP_RIGHTLEG] = .15,
+			[HITGROUP_LEFTLEG] = .15,
 			[HITGROUP_GENERIC] = 1,
 		},
 		class = 4,
@@ -240,6 +228,18 @@ REGISTERED_ARMOR = {
 		},
 		class = 4,
 	},
+	["spear_vest"] = {
+		type = "vest",
+		floor_model = "models/kutarum/scpfp/vests/spear_vest.mdl",
+		model = "models/kutarum/scpfp/vests/spear_vest.mdl",
+		durability = 250,
+		resistance = {
+			[HITGROUP_CHEST] = .5,
+			[HITGROUP_STOMACH] = .5,
+			[HITGROUP_GENERIC] = 1,
+		},
+		class = 4,
+	},
 	["cbg_plate_holder"] = {
 		type = "vest",
 		floor_model = "models/kutarum/scpfp/vests/cbg_vest.mdl",
@@ -301,7 +301,7 @@ function PLAYER:DropArmor( type, silent )
 	end
 
 	if not silent then
-		self:EmitSound( "crimeville/armor/armor_drop.wav" )
+		self:EmitSound( "scpfp/armor/armor_drop.wav" )
 	end
 
 	local armor = ents.Create( "fp_armor" )

@@ -63,7 +63,7 @@ function ENT:DrawArmorInfo()
 
     if alpha <= 0 then return end
 
-    local text = ( lang.ARMOR[self:GetType()] or "nil" ).." | "..math.Round( self:GetDurability() / REGISTERED_ARMOR[self:GetType()].durability * 100, 1 ).."%"
+    local text = LANG.Get( "ARMOR", self:GetType() ).." | "..math.Round( self:GetDurability() / REGISTERED_ARMOR[self:GetType()].durability * 100, 1 ).."%"
 
     local ang = ( pos - EyePos() ):GetNormalized():Angle()
     ang = Angle( 0, ang.y, 0 )

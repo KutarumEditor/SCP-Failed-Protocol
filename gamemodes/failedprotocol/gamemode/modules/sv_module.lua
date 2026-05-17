@@ -13,6 +13,7 @@ function GM:HandlePlayerArmorReduction( ply, dmginfo )
 
 	if pntr > 0 then
 		dmginfo:SetDamage( pntr )
+		ply:EmitSound( "scpfp/scp/shield_break.wav" )
 	else
 		dmginfo:SetDamage( 0 )
 	end
@@ -47,7 +48,7 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	local wep = ply:GetActiveWeapon()
 
 	if wep.Droppable then
-        ply:DropWeapon( wep )
+        ply:DropWep( wep )
     end
 
 	ply:RemoveEffect()
@@ -173,8 +174,8 @@ function PickUpCheck( ply, item )
 	local tbl = ply:GetWeapons()
 
 	for _, v in pairs( tbl ) do
-		if item:IsDerived( "fp_hands" ) then
-			tbl[_] = nil
+		if v:IsDerived( "fp_hands" ) then
+			table.remove( tbl, _ )
 		end
 	end
 
@@ -281,4 +282,12 @@ end )
 
 concommand.Add( "fp_become_serpent", function( ply, cmd, args, argStr )
 	ply:SerpentMobilize()
+end )
+
+concommand.Add( "fp_detain", function( ply, cmd, args, argStr )
+	ply:Detain( ply )
+end )
+
+concommand.Add( "fp_undetain", function( ply, cmd, args, argStr )
+	ply:Undetain()
 end )

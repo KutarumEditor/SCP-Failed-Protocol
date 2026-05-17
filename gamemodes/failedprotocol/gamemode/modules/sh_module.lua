@@ -8,56 +8,6 @@ function GM:Initialize()
 	end
 end
 
-/*hook.Add( "StartCommand", "BotTDM (Funny AF)", function( ply, cmd )
-	if !ply:IsBot() then return end
-
-	cmd:ClearMovement() 
-	cmd:ClearButtons()
-
-	if !IsValid( ply.CustomEnemy ) then
-		for id, pl in ipairs( player.GetAll() ) do
-			if !pl:Alive() or pl == ply or FPTeams.IsAlly( pl:FPTeam(), ply:FPTeam() ) then continue end
-			ply.CustomEnemy = pl
-		end
-	end
-
-	if !IsValid( ply.CustomEnemy ) then return end
-
-	cmd:SetForwardMove( ply:GetRunSpeed() )
-
-	if ply.CustomEnemy:IsPlayer() then
-		cmd:SetViewAngles( ( ply.CustomEnemy:GetShootPos() - ply:GetShootPos() ):GetNormalized():Angle() )
-		ply:SetEyeAngles( ( ply.CustomEnemy:GetShootPos() - ply:GetShootPos() ):GetNormalized():Angle() )
-	else
-		cmd:SetViewAngles( ( ply.CustomEnemy:GetPos() - ply:GetShootPos() ):GetNormalized():Angle() )
-		ply:SetEyeAngles( ( ply.CustomEnemy:GetPos() - ply:GetShootPos() ):GetNormalized():Angle() )
-	end
-
-	if SERVER then
-		if ply:Alive() and !ply:HasWeapon( "weapon_crowbar" ) then
-			ply:Give( "weapon_crowbar" )
-		elseif !ply:Alive() then
-			ply:StripWeapon( "weapon_crowbar" )
-		end
-	end
-
-	if ply:HasWeapon( "weapon_crowbar" ) then
-		cmd:SelectWeapon( ply:GetWeapon( "weapon_crowbar" ) )
-	end
-
-	local buttons = { IN_SPEED }
-
-	local tr = ply:GetEyeTrace()
-	if tr.HitPos:Distance( ply:EyePos() ) < 90 and tr.Entity == ply.CustomEnemy then table.insert( buttons, IN_ATTACK ) end
-
-	cmd:SetButtons( bit.bor( unpack( buttons ) ) )
-
-	if !ply.CustomEnemy:Alive() then
-		ply.CustomEnemy = nil
-	end
-
-end )*/
-
 local headGibbingAmmoTypes = {
 	["SniperPenetratedRound"] = true,
 	["buckshot"] = true,
@@ -80,16 +30,6 @@ local hitGroupDamage = {
 	[HITGROUP_RIGHTLEG] = .6,
 }
 
-local ammoPenetration = {
-	[3] = 2, --pistol
-	[7] = 1, --buckshot
-	[5] = 3, --smg1
-	[1] = 4, --ar2
-	[5] = 4, --357
-	[13] = 5, --SniperRound
-	[14] = 5, --SniperPenetratedRound
-}
-
 local function GetPartArmor( ply, hg )
 	local armorTbl = {}
 	
@@ -107,8 +47,6 @@ end
 function DoImpactEffect( hitpos, attacker )
 	local normal = hitpos - attacker:GetPos()
 	normal:Normalize()
-	print( normal )
-	print( hitpos )
 
 	local effectdata = EffectData()
 	effectdata:SetOrigin( hitpos )
@@ -121,7 +59,7 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 	if FPTeams.HasInfo( ply:FPTeam(), FPTeams.INFO_HUMAN ) then
 		local armortbl = GetPartArmor( ply, hitgroup )
-		local armorClass, bulletClass = 0, ammoPenetration[dmginfo:GetAmmoType()]
+		local armorClass, bulletClass = 0, GetFPAmmoPiercing( game.GetAmmoName( dmginfo:GetAmmoType() ) )
 		local defendedAtLeastBySomeShit = false
 
 		for i, armor in ipairs( armortbl ) do
@@ -129,8 +67,9 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 				local regTbl = REGISTERED_ARMOR[armor.name]
 				armorClass = regTbl.class
 				local start_dmg = dmginfo:GetDamage()
-
-				dmginfo:ScaleDamage( ( 1 - regTbl.resistance[hitgroup] ) * math.min( 1, bulletClass / armorClass )  )
+				if bulletClass <= armorClass then
+					dmginfo:ScaleDamage( ( 1 - regTbl.resistance[hitgroup] ) * math.min( 1, bulletClass / armorClass )  )
+				end
 
 				if armor.durability != -1 then
 					armor.durability = armor.durability - ( start_dmg - dmginfo:GetDamage() )
@@ -156,14 +95,12 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 		dmginfo:SetDamage( math.ceil( dmginfo:GetDamage() ) )
 
-		print( dmginfo:GetDamage() )
-
 		net.Start( "FPArmor" )
 			net.WritePlayer( ply )
 			net.WriteTable( ply.FPArmor )
 		net.Broadcast()
 	else
-		dmginfo:ScaleDamage( .4 )
+		dmginfo:ScaleDamage( .5 )
 	end
 end
 
@@ -171,9 +108,9 @@ function GM:ShouldCollide( ent1, ent2 )
 	return true
 end
 
-local function ArmorRegenCheck( ply )
+hook.Add( "CanArmorRegen", "SCPArmorRegen", function( ply )
 	return ply:FPTeam() == TEAM_SCP
-end
+end )
 
 function GM:PlayerPostThink( ply )
 	if SERVER then
@@ -186,7 +123,7 @@ function GM:PlayerPostThink( ply )
 			end
 		end
 
-		if ArmorRegenCheck( ply ) then
+		if hook.Run( "CanArmorRegen", ply ) then
 			ply.nextArmorRegen = ply.nextArmorRegen or 0
 
 			local ct, arm, maxarm = CurTime(), ply:Armor(), ply:GetMaxArmor()

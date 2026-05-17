@@ -197,6 +197,47 @@ function PLAYER:Heal( hp, effs )
 	end
 end
 
+function PLAYER:DropWep( wep )
+	if wep.Droppable == false then return end
+
+	self:DropWeapon( wep, nil, Vector() )
+end
+
+function PLAYER:ThrowWep( wep )
+	if wep.Droppable == false then return end
+
+	self:DropWeapon( wep, nil, self:EyeAngles():Forward() * 400 )
+end
+
+function PLAYER:Detain( detainer )
+	if self:FPTeam() == TEAM_SCP then return end
+
+	local hands = self:GetWeapon( CLASSES[self:GetFPClass()].hands_override or "fp_hands" )
+
+	if IsValid( hands ) then
+		self:SelectWeapon( hands )
+
+		hands:SetCuffer( detainer )
+		hands:SetUncuffTime( CurTime() + 15 )
+		hands:SetCuffed( true )
+
+		print( self:Nick().." was detained by "..detainer:Nick() )
+	end
+end
+
+function PLAYER:Undetain()
+	if self:FPTeam() == TEAM_SCP then return end
+
+	local classdata = CLASSES[self:GetFPClass()] or {}
+	local override = classdata.hands_override
+
+	local hands = self:GetWeapon( override != nil and override or "fp_hands" )
+
+	if IsValid( hands ) then
+		hands:SetCuffed( false )
+	end
+end
+
 function PLAYER:PopupInfo( time, data )
 	if not IsValid( self ) or not self:IsPlayer() then return end
 
@@ -320,7 +361,7 @@ function PLAYER:Setup( class, spawn_override, instant )
 
 	self:StripWeapons()
 
-	self:SetInvSlots( class_tab.inv_slots or 8 )
+	self:SetInvSlots( class_tab.inv_slots or 6 )
 
 	self:Give( "fp_hands" )
 
@@ -446,4 +487,12 @@ end
 
 net.ReceivePing( "FPPassedMenu", function( data, ply )
 	ply:SetReady( true )
+end )
+
+net.Receive( "FPDrop", function( len, ply )
+	local wep = net.ReadEntity()
+
+	if IsValid( wep ) then
+		ply:ThrowWep( wep )
+	end
 end )

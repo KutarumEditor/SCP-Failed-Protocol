@@ -4,6 +4,7 @@ local MISC = {}
 lang.MISC = MISC
 
 MISC.class = "Class"
+MISC.persona = "Persona"
 MISC.said_persona = "You said your name"
 MISC.heard_persona = " said their name"
 MISC.unknown_person = "Unknown"
@@ -12,6 +13,9 @@ MISC.grubackup = "Backup is on the way"
 MISC.shmobilized = "Target converted"
 MISC.shnotmobilized = "Target can't be converted"
 MISC.converted = "You were converted"
+MISC.cuffed = "You are detained"
+MISC.escaping = "You are escaping through"
+MISC.inventory = "Inventory"
 
 local MENU = {}
 lang.MENU = MENU
@@ -31,6 +35,7 @@ SETTINGS.fp_disable_support = "Disable spawning as support"
 SETTINGS.fp_disable_scp = "Disable spawning as SCP"
 SETTINGS.fp_inventory_button = "Open inventory"
 SETTINGS.fp_settings_button = "Open settings"
+SETTINGS.fp_drop_weapon = "Drop current weapon"
 SETTINGS.fp_scp_upgrades_button = "Open SCP upgrades"
 
 local KEYCARDS = {}
@@ -38,6 +43,7 @@ lang.KEYCARDS = KEYCARDS
 
 KEYCARDS.janitor = "Janitor"
 KEYCARDS.medic = "Medic"
+KEYCARDS.logist = "Logist"
 KEYCARDS.zone_manager = "Zone Manager"
 KEYCARDS.it_spec = "IT Specialist"
 KEYCARDS.engineer = "Engineer"
@@ -128,10 +134,19 @@ DESC.cbgsoldier = "Deez nuts"
 DESC.SCP008 = "Deez nuts"
 DESC.SCP035 = "Deez nuts"
 
+local LOOT = {}
+lang.LOOT = LOOT
+
+LOOT.locker_lcz = "Locker"
+
+local EXITS = {}
+lang.EXITS = EXITS
+
+EXITS.main = "Main exit"
+
 local ARMOR = {}
 lang.ARMOR = ARMOR
 
-ARMOR.test_vest = "Test vest"
 ARMOR.security_light_vest = "Light SD vest"
 ARMOR.security_medium_vest = "Medium SD vest"
 ARMOR.security_heavy_vest = "Heavy SD vest"
@@ -143,9 +158,6 @@ ARMOR.spear_vest = "SPEAR vest"
 ARMOR.ci_vest = "CI vest"
 ARMOR.sh_vest = "SH vest"
 ARMOR.cbg_plate_holder = "CBG plate holder"
-ARMOR.security_medium_vest = "Medium SD vest"
-ARMOR.security_heavy_vest = "Heavy SD vest"
-ARMOR.test_helmet = "Test helmet"
 ARMOR.security_cap = "SD cap"
 ARMOR.security_light_helmet = "Light SD helmet"
 ARMOR.security_heavy_helmet = "Heavy SD helmet"
@@ -165,6 +177,8 @@ TASK.fail = "Failure"
 TASK.body_check = "Checking body"
 TASK.armor_equip = "Equipping armor"
 TASK.weapon_equip = "Picking item up"
+TASK.detaining = "Detaining"
+TASK.undetaining = "Undetaining"
 
 local BODY = {}
 lang.BODY = BODY
@@ -219,8 +233,9 @@ ACTIONS.prop_ragdoll = {
 	check = "Check",
 }
 
-ACTIONS.fp_box = {
-	open = "Открыть",
+ACTIONS.player = {
+	detain = "Detain",
+	undetain = "Undetain",
 }
 
 local PHRASES = {}
@@ -246,7 +261,7 @@ PHRASES.pa_name = " Announcements system"
 PHRASES.pa = {
 	malfunction = "We've received reports of multiple electrical and door control issues. \nPlease remain calm and...",
 	breach = "We've got multiple site-wide containment breaches. \nAll military personnel are ordered to head to the light, organic and heavy containment zones to localize the threat. \nOther staff are advised to stay in any safe area until site is secured.",
-	epsilon11 = "Mobile Task Force unit Epsilon-11 designated 'Nine-Tailed Fox' has entered the facility. All remaining personnel are advised to proceed with standart evacuation protocols.",
+	epsilon11 = "Mobile Task Force unit Epsilon-11 designated 'Nine-Tailed Fox' has entered the facility. \nAll remaining personnel are advised to proceed with standart evacuation protocols.",
 	scp1 = "Awaiting recontainment of 1 SCP subject.",
 	scp2 = "Awaiting recontainment of 2 SCP subjects.",
 	scp3 = "Awaiting recontainment of 3 SCP subjects.",
