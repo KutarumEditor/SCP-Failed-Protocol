@@ -35,6 +35,8 @@ SWEP.CantBeCarried = {
 	["fp_tesla_gate"] = true,
 	["fp_tesla_killer"] = true,
 	["fp_lootable"] = true,
+	["fp_terminal"] = true,
+	["fp_info_monitor"] = true,
 }
 
 function SWEP:SetupDataTables()

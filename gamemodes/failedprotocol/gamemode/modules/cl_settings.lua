@@ -293,9 +293,7 @@ end )
 hook.Add( "PlayerButtonDown", "FPSettingsOpen", function( ply, button )
     if button != CL_SETTINGS.Get( "fp_settings_button" ) then return end
 
-    if CLIENT and not IsFirstTimePredicted() then
-        return
+    if CLIENT and IsFirstTimePredicted() then
+        _settingsDecide()
     end
-
-    _settingsDecide()
 end)

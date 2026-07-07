@@ -184,8 +184,11 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 235,
 		jumppower = 175,
+		callback = function( ply )
+			ply:GeneratePersona( "classd" )
+		end,
 	},
 	["mosind"] = {
 		spawngroup = "classd",
@@ -200,8 +203,11 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 235,
 		jumppower = 175,
+		callback = function( ply )
+			ply:GeneratePersona( "classd" )
+		end,
 	},
 	["guard_pacificator"] = {
 		spawngroup = "security",
@@ -218,7 +224,7 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 230,
 		jumppower = 175,
 	},
 	["cispy"] = {
@@ -237,7 +243,7 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 230,
 		jumppower = 175,
 	},
 	["guard"] = {
@@ -253,7 +259,7 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 230,
 		jumppower = 175,
 		callback = function( ply )
 			ply:GiveKeycard( "sec" )
@@ -272,7 +278,7 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 230,
 		jumppower = 175,
 		callback = function( ply )
 			ply:GiveKeycard( "sec" )
@@ -291,7 +297,7 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 230,
 		jumppower = 175,
 		callback = function( ply )
 			ply:GiveKeycard( "res" )
@@ -312,7 +318,7 @@ CLASSES = {
 		walkspeed = 125,
 		crouchspeed = 0.5,
 		slowwalkspeed = 85,
-		runspeed = 225,
+		runspeed = 235,
 		jumppower = 175,
 		callback = function( ply )
 			ABILITIES.Setup( ply, "gruspycheck" )

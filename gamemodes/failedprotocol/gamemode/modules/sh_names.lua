@@ -78,7 +78,7 @@ POSSIBLE_MALE_NAMES = {
 	"Roosevelt", "Israel", "Jermaine", "Forrest", "Wilbert", "Leland", "Simon", "Guadalupe", "Clark", "Irving", "Carroll", "Bryant",
 	"Owen", "Rufus", "Woodrow", "Sammy", "Kristopher", "Mack", "Levi", "Marcos", "Gustavo", "Jake", "Lionel", "Marty", "Taylor",
 	"Ellis", "Dallas", "Gilberto", "Clint", "Nicolas", "Laure", "Masya", "Svoford", "Ayden", "Kolian", "Bo", "Gay", "Shaky", "Walrus",
-	"Pailon"
+	"Pailon", "Hutep"
 }
 
 POSSIBLE_FEMALE_NAMES = {
@@ -193,26 +193,54 @@ function PLAYER:SetFPSurname( surname )
 	self:Set_Surname( surname )
 end
 
-function PLAYER:GeneratePersona()
-	local n, sn
+local name_gen_overrides = {
+	["classd"] = function( ply )
+		local d, code = "D -", ""
 
-	repeat
-		n, sn = POSSIBLE_MALE_NAMES[FPRandom( 1, #POSSIBLE_MALE_NAMES )], POSSIBLE_SURNAMES[FPRandom( 1, #POSSIBLE_SURNAMES )]
-	until IsPersonaUnique( n, sn )
+		repeat
+			code = FPRandom( 1000, 9999 )
+		until IsPersonaUnique( d, code )
 
-	self:SetFPName( n )
-	self:SetFPSurname( sn )
+		ply:SetFPName( d )
+		ply:SetFPSurname( code )
 
-	table.insert( USED_PERSONAS, {
-		name = n,
-		surname = sn
-	} )
+		table.insert( USED_PERSONAS, {
+			name = d,
+			surname = code
+		} )
 
-	net.Start( "PersonaSync" )
-		net.WriteTable( USED_PERSONAS )
-	net.Broadcast()
+		net.Start( "PersonaSync" )
+			net.WriteTable( USED_PERSONAS )
+		net.Broadcast()
 
-	return self:FPName(), self:FPSurname()
+		return d, code
+	end
+}
+
+function PLAYER:GeneratePersona( override )
+	if override != nil and name_gen_overrides[override] != nil then
+		return name_gen_overrides[override]( self )
+	else
+		local n, sn
+
+		repeat
+			n, sn = POSSIBLE_MALE_NAMES[FPRandom( 1, #POSSIBLE_MALE_NAMES )], POSSIBLE_SURNAMES[FPRandom( 1, #POSSIBLE_SURNAMES )]
+		until IsPersonaUnique( n, sn )
+
+		self:SetFPName( n )
+		self:SetFPSurname( sn )
+
+		table.insert( USED_PERSONAS, {
+			name = n,
+			surname = sn
+		} )
+
+		net.Start( "PersonaSync" )
+			net.WriteTable( USED_PERSONAS )
+		net.Broadcast()
+
+		return n, sn
+	end
 end
 
 function PLAYER:ChangePersonaManually( name, surname )

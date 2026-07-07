@@ -169,12 +169,14 @@ function draw.MultiColorText( Font, x, y, xAlign, yAlign, outlinewidth, outlinec
 		end
 	end
 
-	local steps = ( outlinewidth * 2 ) / 3
-	if ( steps < 1 ) then steps = 1 end
+	if outlinewidth > 0 then
+		local steps = ( outlinewidth * 2 ) / 3
+		if ( steps < 1 ) then steps = 1 end
 
-	for _x = -outlinewidth, outlinewidth, steps do
-		for _y = -outlinewidth, outlinewidth, steps do
-			draw.SimpleText( AllText, Font, x + _x, y + _y, outlinecolor, xAlign, yAlign )
+		for _x = -outlinewidth, outlinewidth, steps do
+			for _y = -outlinewidth, outlinewidth, steps do
+				draw.SimpleText( AllText, Font, x + _x, y + _y, outlinecolor, xAlign, yAlign )
+			end
 		end
 	end
 

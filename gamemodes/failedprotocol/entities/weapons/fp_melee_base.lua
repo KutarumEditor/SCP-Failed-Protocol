@@ -6,7 +6,6 @@ SWEP.ShouldDrawVM = true
 SWEP.WorldModel = "models/weapons/w_357.mdl"
 SWEP.ShouldDrawWM = false
 SWEP.SwayScale = 2
-SWEP.BobScale = 2
 
 SWEP.AutoSwitchTo = true
 SWEP.Weight = 1

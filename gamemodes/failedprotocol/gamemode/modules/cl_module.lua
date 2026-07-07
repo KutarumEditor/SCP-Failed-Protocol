@@ -456,7 +456,7 @@ function GM:HUDPaint()
 	ft = FrameTime()
 
 	if not CL_SETTINGS.Get( "fp_disable_vignette", "bool" ) then
-		surface.SetDrawColor( 0, 0, 0, 240 )
+		surface.SetDrawColor( 0, 0, 0, 75 )
 		surface.SetMaterial( vignette_mat )
 		surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
 	end
@@ -623,12 +623,20 @@ function DoViewbob( ply, pos, ang, time, intensity, moveType )
 end
 
 function GM:CalcView( ply, origin, angles, fov, znear, zfar )
+	local lply = lply or LocalPlayer()
 	local ct = CurTime()
 	ft = FrameTime()
 	lrag = ply:GetPlayerRagdoll()
 
 	if not MENU_CLOSED then
 		return CalcMenuView( ply, origin, angles, fov, znear, zfar )
+	end
+
+	if lply.Terminal != nil and lply:Alive() then
+		return CalcTerminalView( ply, origin, angles, fov, znear, zfar )
+	elseif lply.Terminal != nil and not lply:Alive() then
+		lply.Terminal = nil
+		gui.EnableScreenClicker( false )
 	end
 
 	local view = {}
@@ -665,7 +673,8 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 
 	player_manager.RunClass( ply, "CalcView", view )
 
-	--=======================================================================================================--
+	local velocity = ply:GetVelocity()
+	--[[--=======================================================================================================--
 	--============================================ cBobbing code ============================================-- Thanks to TFA and this guy (https://steamcommunity.com/id/laboratorymember001)
 	--=======================================================================================================--
 
@@ -683,7 +692,6 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 
     local runSpeed = ply:GetRunSpeed()
 
-    local velocity = ply:GetVelocity()
     local velocityFrac = math.max( velocity:Length2D() * airWalkScale - velocity.z * 0.5, 0 )
     local rate = math.Clamp( math.sqrt( velocityFrac / runSpeed ) * 1.75, 0.15, 2 )
 
@@ -693,7 +701,7 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
     DoViewbob( ply, origin, angles, CL_VIEW.viewBobTime, CL_VIEW.viewBobIntensity, moveType, ft )
     CL_VIEW.ISCALC = true
 
-    --=======================================================================================================--
+    --=======================================================================================================--]]
 
 	CL_VIEW.narcosis_mult = math.Clamp( CL_VIEW.narcosis_mult + ( CL_VIEW.narcosis and .001 or -.001 ), 0, 1 )
 
@@ -711,7 +719,7 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
 
 	view.angles	= view.angles + Angle( 0, 0, math.cos( ct / 2 ) * CL_VIEW.narcosis_mult ) + Angle( 0, 0, 1 * CL_VIEW.moveroll_mult )
 
-	local fov_add = math.Clamp( Lerp( ft * 10, ply.LastFOV or 0, velocity:Length() / math.max( 225, ply:GetRunSpeed() ) * 2.5 ), 0, 10 )
+	local fov_add = math.Clamp( Lerp( ft * 10, ply.LastFOV or 0, velocity:Length() / math.max( 205, ply:GetRunSpeed() ) * 2.5 ), 0, 20 )
 	ply.LastFOV = fov_add
 	view.fov = ( view.fov or fov ) - 5 + fov_add + math.sin( ct ) * 3 * CL_VIEW.narcosis_mult
 
@@ -739,7 +747,7 @@ function GM:CalcViewModelView( wep, vm, oldEyePos, oldEyeAng, eyePos, eyeAng )
 
 	local vm_origin, vm_angles = eyePos, eyeAng
 
-	local pos, ang
+	local pos, ang = Vector(), Angle()
 	local func = wep.GetViewModelPosition
 	if func then
 		pos, ang = func( wep, eyePos * 1, eyeAng * 1 )

@@ -9,6 +9,10 @@ function PLAYER:RevealRussian( ply )
 	self:SetFPTeam( TEAM_GRU )
 end
 
+concommand.Add( "fp_become_russian", function( ply )
+	ply:RevealRussian( ply )
+end )
+
 else
 
 UncheckedD = UncheckedD or {}
@@ -47,7 +51,7 @@ function RussianEffect()
 	surface.PlaySound( "scpfp/gruspy/mnestic.wav" )
 end
 
-concommand.Add( "fp_become_russian", function()
+concommand.Add( "fp_mnestic_effect", function()
 	RussianEffect()
 end )
 

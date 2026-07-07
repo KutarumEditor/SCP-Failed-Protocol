@@ -27,21 +27,6 @@ function GM:PlayerDeathSound( ply )
 	return true
 end
 
-local kill_overrides = {
-	["maniac"] = function( killer, victim, mult )
-		return 250 * mult
-	end,
-	["privinvest"] = function( killer, victim, mult )
-		return -250 * mult
-	end,
-	["vigilante"] = function( killer, victim, mult )
-		return ( victim:FPTeam() == TEAM_CRIM or victim:GetFPClass() == "maniac" ) and 250 * mult or -400 * mult
-	end,
-	["syndicalist"] = function( killer, victim, mult )
-		return victim:FPTeam() == TEAM_CIV and -200 or ply:FPTeam() == TEAM_LAW and 400 * mult or ply:IsAlly( attacker ) and -400 * mult or 250 * mult
-	end,
-}
-
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	ply:ScreenFade( SCREENFADE.IN, color_white, .25, 0 )
 	ply:ScreenFade( SCREENFADE.OUT, color_black, 4, 1.1 )
@@ -98,34 +83,24 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	ply:SetFPSurname( "Doe" )
 
 	net.Ping( "ClientDeath", nil, ply )
-
-	if ( attacker:IsValid() && attacker:IsPlayer() ) then
-		local mult = FPTeams.GetReward( ply:FPTeam() )
-		local score = isfunction( kill_overrides[attacker:GetFPClass()] ) and kill_overrides[attacker:GetFPClass()]( attacker, ply, mult ) or ply:IsAlly( attacker ) and -400 * mult or 250 * mult
-
-		local scoreTeam = attacker:GetScoreTeam()
-		if attacker == ply then
-			if attacker:Frags() > 0 then
-				attacker:AddFrags( -1 )
-			end
-
-			AddScore( scoreTeam, attacker, -250 )
-		else
-			attacker:AddFrags( 1 )
-
-			AddScore( scoreTeam, attacker, score )
-
-			if not ply:IsAlly( attacker ) then
-				AddScore( ply:GetScoreTeam(), ply, -( score / 2 ) )
-			end
-		end
-	end
 end
 
 function GM:PlayerDeath( ply, inf, att )
+	local reason = "suicide"
+	if att != nil and att != ply then
+		reason = "default"
+	end
+
+	net.Start( "FPKillfeed" )
+		net.WritePlayer( att )
+		net.WritePlayer( ply )
+		net.WriteEntity( inf )
+		net.WriteString( reason )
+	net.Broadcast()
+
 	if ply:FPTeam() == TEAM_SCP then return end
 
-	if inf:GetClass() == "fp_melee_034" then
+	if inf:IsValid() and inf:GetClass() == "fp_melee_034" then
 		att:Disguise( ply:GetModel(), 180 )
 	end
 end

@@ -28,7 +28,8 @@ function SyncInv()
     end
 
     for _, v in ipairs( tbl ) do
-        if not IsValid( v ) or table.HasValue( LocalInv.ITEMS, v ) or ply:FPTeam() != TEAM_SCP and ( v:GetClass() == CLASSES[ply:GetFPClass()].hands_override or v:GetClass() == "fp_hands" ) or ply:FPTeam() == TEAM_SCP and v:GetClass() == SCPS[ply:GetFPClass()].swep then continue end
+        local classdata = CLASSES[ply:GetFPClass()] != nil and CLASSES[ply:GetFPClass()] or {}
+        if not IsValid( v ) or table.HasValue( LocalInv.ITEMS, v ) or ply:FPTeam() != TEAM_SCP and ( v:GetClass() == classdata.hands_override or v:GetClass() == "fp_hands" ) or ply:FPTeam() == TEAM_SCP and v:GetClass() == SCPS[ply:GetFPClass()].swep then continue end
 
         for i = 1, slots do
             if LocalInv.ITEMS[i] == nil then
@@ -101,7 +102,8 @@ local main_buttons = {
         inact_icon = Material( "failedprotocol/inventory/main/hand_outline.png", "smooth" ),
         check = function( self ) return true end,
         lmb = function( self )
-            local wep = LocalPlayer():FPTeam() == TEAM_SCP and LocalPlayer():GetWeapon( SCPS[LocalPlayer():GetFPClass()].swep ) or LocalPlayer():GetWeapon( CLASSES[LocalPlayer():GetFPClass()].hands_override or "fp_hands" )
+            local classdata = CLASSES[LocalPlayer():GetFPClass()] != nil and CLASSES[LocalPlayer():GetFPClass()] or {}
+            local wep = LocalPlayer():FPTeam() == TEAM_SCP and LocalPlayer():GetWeapon( SCPS[LocalPlayer():GetFPClass()].swep ) or LocalPlayer():GetWeapon( classdata.hands_override or "fp_hands" )
             input.SelectWeapon( wep )
         end,
     },
@@ -214,6 +216,9 @@ function CreateInventoryUI()
     mdl:SetLookAt( Vector( 0, 0, height ) )
     mdl:SetFOV( 20 )
 
+    mdl:SetDirectionalLight( BOX_TOP, Color( 75, 75, 75 ) )
+    mdl:SetDirectionalLight( BOX_FRONT, Color( 175, 175, 175 ) )
+
     local openTime = CurTime()
     local clBMerges = {}
     function mdl:DrawModel()
@@ -254,6 +259,7 @@ function CreateInventoryUI()
             end
 
             self.Entity:DrawModel()
+            self.Entity:SetSkin( ply:GetSkin() )
             for i, mdl in ipairs( clBMerges ) do
                 mdl:DrawModel()
                 mdl:Remove()
@@ -274,6 +280,7 @@ function CreateInventoryUI()
     local mdlLerp = 0
     local look_ratio = 0
     function mdl:LayoutEntity( ent )
+        local lp = LocalPlayer()
         self:SetCursor( "sizewe" )
 
         if not self:IsDown() then
@@ -297,19 +304,20 @@ function CreateInventoryUI()
             ent:SetAngles( mdlAng )
         end
 
-        if self:GetModel() != LocalPlayer():GetModel() then
-            self:SetModel( LocalPlayer():GetModel() )
+        if self:GetModel() != lp:GetModel() then
+            self:SetModel( lp:GetModel() )
         end
 
-        self:SetAmbientLight( LocalPlayer():Alive() and FPTeams.GetColor( LocalPlayer():FPTeam() ) or color_black )
+        local amb_clr = lp:Alive() and FPTeams.GetColor( lp:FPTeam() ) or color_black
+        self:SetAmbientLight( LerpColor( .5, amb_clr, color_black ) )
 
-        ent:SetSequence( LocalPlayer():SelectWeightedSequence( ACT_HL2MP_IDLE_SUITCASE ) )
+        ent:SetSequence( lp:SelectWeightedSequence( ACT_HL2MP_IDLE_SUITCASE ) )
 
         local look_on_left = math.cos( ( CurTime() - openTime ) / 3 ) > 0
         if look_on_left then
-            look_ratio = math.min( 1, look_ratio + .005 )
+            look_ratio = math.min( 1, look_ratio + FrameTime() / 1.5 )
         else
-            look_ratio = math.max( 0, look_ratio - .005 )
+            look_ratio = math.max( 0, look_ratio - FrameTime() / 1.5 )
         end
 
         if isnumber( ent:LookupBone( "ValveBiped.Bip01_Head1" ) ) then
@@ -342,7 +350,7 @@ function CreateInventoryUI()
         bt:SetText( "" )
 
         if i == 4 then
-            bt.SWEP = CLASSES[LocalPlayer():GetFPClass()].hands_override or "fp_hands"
+            bt.SWEP = CLASSES[LocalPlayer():GetFPClass()] != nil and CLASSES[LocalPlayer():GetFPClass()].hands_override or "fp_hands"
         end
         bt.HoveredTime = 0
 

@@ -5,8 +5,6 @@ SWEP.ViewModel = "models/kutarum/scpfp/c_034.mdl"
 SWEP.ShouldDrawVM = true
 SWEP.WorldModel = "models/kutarum/scpfp/w_034.mdl"
 SWEP.ShouldDrawWM = false
-SWEP.SwayScale = 2
-SWEP.BobScale = 2
 
 SWEP.AutoSwitchTo = true
 SWEP.Weight = 1

@@ -10,7 +10,9 @@ SWEP.AutoSwitchTo = true
 SWEP.Weight = 1
 
 SWEP.HoldType = "slam"
--- SWEP.TPIKForce = true
+SWEP.TPIKForce = true
+SWEP.TPIKPos = Vector( 0, 5, 0 )
+SWEP.TPIK_DisableLeftHand = true
 
 KEYCARD_CALM = 0
 KEYCARD_USED = 1
@@ -37,6 +39,8 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
+	self:SetHoldType( self.HoldType )
+	
 	local vm = self.Owner:GetViewModel()
 
 	vm:SetSkin( ACCESS.KEYCARDS_CACHE[self:GetKeycard()].skin )

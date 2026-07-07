@@ -33,31 +33,3 @@ function string.Wrap( font, text, width )
 
 	return ret
 end
-
-function string.PhoneWrap( font, text, width )
-	local txt = text
-	local tbl = {}
-	
-	local i = 1
-	local cl = 1
-
-	surface.SetFont( font )
-	repeat
-		local tt = string.Left( txt, i )
-		local tw, th = surface.GetTextSize( tt.."A" )
-
-		if tw >= width then
-			tbl[cl] = tt
-			cl = cl + 1
-			txt = string.Right( txt, #txt - i )
-			i = 1
-		elseif tt == txt then
-			tbl[cl] = tt
-			txt = ""
-		else
-			i = i + 1
-		end
-	until #txt == 0
-
-	return tbl
-end

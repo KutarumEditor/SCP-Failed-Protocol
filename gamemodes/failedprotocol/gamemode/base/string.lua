@@ -19,9 +19,3 @@ function string.upperPlus( s )
 
     return str
 end
-
-function FormattedMoney( amount )
-    amount = tostring( amount )
-
-    return amount:reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "").."$"
-end

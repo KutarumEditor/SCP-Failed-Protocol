@@ -17,6 +17,8 @@ SWEP.IronSightsPos = Vector( 0, 0, 0 )
 SWEP.IronSightsAng = Vector( 0, 0, 0 )
 
 SWEP.HoldType = "normal"
+SWEP.BobScale = 0
+SWEP.SwayScale = 1
 
 SWEP.AutoSwitchFrom = false
 SWEP.AutoSwitchTo = false
@@ -132,6 +134,58 @@ if CLIENT then
 		return self.ShouldDrawVM
 	end
 
+	local function Lerp( t, a, b )
+		if ( t <= 0 ) then return a end
+		if ( t >= 1 ) then return b end
+		return a + ( b - a ) * t
+	end
+
+	function SWEP:ApplyCustomBob( pos, ang )
+		if ( !IsValid( self.Owner ) or !self.Owner:IsPlayer() ) then return pos, ang end
+
+		local owner = self.Owner
+		local velocity = owner:GetVelocity()
+		local speed = velocity:Length2D()
+		local walkSpeed = math.max( owner:GetWalkSpeed(), 100 )
+		local moveIntensity = math.Clamp( speed / walkSpeed, 0, 1.2 )
+		local isMoving = speed > 8 and owner:OnGround()
+		local bobScale = .5
+		local swayScale = self.SwayScale or 1
+		local flip = self.ViewModelFlip and -1 or 1
+		local sprinting = owner:KeyDown( IN_SPEED ) and speed > walkSpeed * 0.85 and owner:OnGround()
+
+		if ( !isMoving ) then
+			moveIntensity = 0
+		end
+
+		self._fpBobTime = ( self._fpBobTime or 0 ) + FrameTime() * ( isMoving and 1 or 0.4 )
+		local ti = self._fpBobTime
+		local walkRate = 6.5
+		local breathIntensity = 0.12 + math.sin( CurTime() * 1.6 ) * 0.03
+		local idleBob = breathIntensity * ( 1 - math.min( moveIntensity, 1 ) ) * bobScale * 0.05
+
+		local walkBob = math.sin( ti * walkRate ) * moveIntensity * bobScale * 0.14
+		local sideBob = math.cos( ti * walkRate * 0.5 ) * moveIntensity * bobScale * 0.08
+		local forwardBob = math.sin( ti * walkRate * 0.25 ) * moveIntensity * bobScale * 0.02
+
+		pos:Add( ang:Right() * ( sideBob * flip + idleBob * flip * 0.5 ) )
+		pos:Add( ang:Up() * ( walkBob + idleBob * 0.6 ) )
+		pos:Add( ang:Forward() * forwardBob )
+
+		ang:RotateAroundAxis( ang:Right(), math.sin( ti * walkRate * 0.75 ) * moveIntensity * swayScale * 0.55 )
+		ang:RotateAroundAxis( ang:Up(), math.cos( ti * walkRate * 0.5 ) * moveIntensity * swayScale * 0.35 * flip )
+		ang:RotateAroundAxis( ang:Forward(), math.sin( ti * walkRate ) * moveIntensity * swayScale * 0.25 )
+
+		if ( sprinting ) then
+			local runBob = math.abs( math.sin( ti * walkRate * 1.4 ) ) * bobScale * 0.12
+			pos:Add( ang:Up() * runBob )
+			pos:Add( ang:Right() * math.sin( ti * walkRate * 1.2 ) * bobScale * 0.06 * flip )
+			ang:RotateAroundAxis( ang:Forward(), math.sin( ti * walkRate * 0.8 ) * swayScale * -0.4 )
+		end
+
+		return pos, ang
+	end
+
 	function SWEP:GetViewModelPosition( eyePos, eyeAng )
 		local mul = 1.0
 
@@ -153,7 +207,7 @@ if CLIENT then
 		eyePos = eyePos + offset.y * Forward * mul
 		eyePos = eyePos + offset.z * Up * mul
 
-		return eyePos, eyeAng
+		return self:ApplyCustomBob( eyePos, eyeAng )
 	end
 
 	SWEP.vRenderOrder = nil

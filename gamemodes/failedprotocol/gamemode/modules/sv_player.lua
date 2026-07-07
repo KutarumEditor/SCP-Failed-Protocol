@@ -167,17 +167,29 @@ function PLAYER:SetDeathReason( reason, pro_only )
 end
 
 function PLAYER:SerpentMobilize()
-	self:SetFPTeam( TEAM_SH )
+	if self:GetFPClass() != "gruagent" then
+		self:SetFPTeam( TEAM_SH )
 
-	self:PopupInfo( 5, {
-		{
-			text = { { "MISC", "converted" } },
-			font = "RoundStartInfoExtraSmall",
-			color = FPTeams.GetColor( self:FPTeam() ),
-			ugap = 0,
-			lgap = 0
-		}
-	} )
+		self:PopupInfo( 5, {
+			{
+				text = { { "MISC", "converted" } },
+				font = "RoundStartInfoExtraSmall",
+				color = FPTeams.GetColor( self:FPTeam() ),
+				ugap = 0,
+				lgap = 0
+			}
+		} )
+	else
+		self:PopupInfo( 5, {
+			{
+				text = { { "MISC", "falseconverted" } },
+				font = "RoundStartInfoExtraSmall",
+				color = FPTeams.GetColor( self:FPTeam() ),
+				ugap = 0,
+				lgap = 0
+			}
+		} )
+	end
 
 	local mask = ents.Create( "fp_bonemerge" )
 	mask:SetParent( self )
