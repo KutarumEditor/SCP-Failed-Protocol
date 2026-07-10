@@ -41,4 +41,17 @@ SCPS = {
 		slowwalkspeed = 85,
 		jumppower = 125,
 	},
+	["SCP457"] = {
+		model = "models/kutarum/scpfp/playermodels/scps/457.mdl",
+		swep = "fp_scp_swep_457",
+		maxhp = 1000,
+		hp = 1000,
+		maxarmor = 2000,
+		scary = true,
+		has_stamina = false,
+		walkspeed = 210,
+		crouchspeed = 0.5,
+		slowwalkspeed = 85,
+		jumppower = 175,
+	},
 }
