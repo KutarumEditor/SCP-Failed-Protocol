@@ -1,8 +1,11 @@
+local scan_mat = Material( "failedprotocol/abilities/scan.png" )
 local check_mat = Material( "failedprotocol/abilities/check.png" )
 
 local availableForMobilization = {
 	[TEAM_CLASSD] = true,
-	[TEAM_SCI] = true
+	[TEAM_SCI] = true,
+	["gruspy"] = true,
+	["gruagent"] = true
 }
 
 ABILITIES = {
@@ -71,7 +74,7 @@ ABILITIES = {
 			end
 		},
 		["gruspylocate"] = {
-			icon = check_mat,
+			icon = scan_mat,
 			color = Color( 215, 175, 0 ),
 			cooldown = 20,
 			button = KEY_N,
@@ -79,11 +82,28 @@ ABILITIES = {
 				return true
 			end,
 			callback = function( ply )
-				net.Ping( "RussianLocator", nil, ply )
+				for i, v in player.Iterator() do
+					if v.amnesicrussian then
+						net.Ping( "RussianLocator", nil, ply )
+					return end
+				end
+
+				ABILITIES.Remove( ply, "gruspycheck" )
+				ABILITIES.Remove( ply, "gruspylocate" )
+
+				ply:PopupInfo( 10, {
+					{
+						text = { { "MISC", "grufailed" } },
+						font = "RoundStartInfoExtraSmall",
+						color = Color( 80, 35, 35),
+						ugap = 0,
+						lgap = 0
+					}
+				} )
 			end
 		},
 		["shmobilize"] = {
-			icon = check_mat,
+			icon = scan_mat,
 			color = Color( 0, 215, 175 ),
 			cooldown = 5,
 			uses = 3,
@@ -107,20 +127,25 @@ ABILITIES = {
 				} )
 
 				local ent = tr.Entity
-				if availableForMobilization[ent:FPTeam()] == true then
-					ply:PopupInfo( 5, {
-						{
-							text = { { "MISC", "shmobilized" } },
-							font = "RoundStartInfoExtraSmall",
-							color = Color( 155, 255, 125 ),
-							ugap = 0,
-							lgap = 0
-						}
-					} )
 
-					ent:SerpentMobilize()
+				if availableForMobilization[ent:FPTeam()] == true or availableForMobilization[ent:GetFPClass()] == true then
+					ply:TimedTask( "sh_conversion", 5, Color( 200, 155, 0 ), function()
+						return IsValid( ply ) and IsValid( ent ) and ent:GetPos():Distance( ply:GetPos() ) < 200 and ent:Alive()
+					end, function()
+						ply:PopupInfo( 5, {
+							{
+								text = { { "MISC", "shmobilized" } },
+								font = "RoundStartInfoExtraSmall",
+								color = Color( 155, 255, 125 ),
+								ugap = 0,
+								lgap = 0
+							}
+						} )
 
-					ABILITIES.Spend( ply, "shmobilize", 1 )
+						ent:SerpentMobilize()
+
+						ABILITIES.Spend( ply, "shmobilize", 1 )
+					end )
 				else
 					ply:PopupInfo( 5, {
 						{
@@ -226,6 +251,67 @@ hook.Add( "PlayerButtonDown", "FPUseAbility", function( ply, button )
 end)
 
 else
+
+local size = ScreenScale( 20 )
+local gap = ScreenScale( 15 )
+hook.Add( "FPHUD", "AbilitiesHUD", function()
+	local lply = LocalPlayer()
+	local ct = CurTime()
+	local abs = lply.FPAbilities or {}
+	
+	local total_space = #abs * size + ( #abs - 1 ) * gap
+	local start_pos = ( ScrW() - total_space )/2
+
+	for k, v in pairs( abs ) do
+		local name = v.name
+
+		local ratio = math.min( 1, ( abs[k].next - ct ) / ABILITIES.REG[name].cooldown )
+
+		local time = math.max( 0, abs[k].next - ct )
+		if time > 0 then
+			draw.SimpleTextOutlined( math.Round( time, time < 10 and 1 or 0 ), "HUDSmall", start_pos + size/2, ScrH() - size - gap*6/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+		end
+
+		local uses = v.uses
+		if uses > -1 then
+			draw.SimpleTextOutlined( uses, "HUDSmall", start_pos + size/2, ScrH() - gap*4/5, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+		end
+
+		KMASKS.Start()
+            local clr = ABILITIES.REG[name].color
+			local lerpclr = LerpColor( .9, clr, Color( 15, 15, 15 ) )
+			lerpclr.a = 225
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, lerpclr )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size * ratio, Color( 5, 5, 5, 175 ) )
+
+			local lerpclr = LerpColor( ratio, clr, Color( 45, 45, 45 ) )
+			surface.SetDrawColor( lerpclr )
+			surface.SetMaterial( ABILITIES.REG[name].icon )
+			surface.DrawTexturedRect( start_pos + ScreenScale( 1 ), ScrH() - size - gap + ScreenScale( 1 ), size - ScreenScale( 2 ), size - ScreenScale( 2 ) )
+
+			draw.SimpleTextOutlined( string.upper( input.GetKeyName( ABILITIES.REG[name].button ) ), "HUDMedium", start_pos + size/2, ScrH() - size/2 - gap, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
+
+			--[[
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
+			draw.RoundedBox( 0, start_pos + size - ScreenScale( 5 ), ScrH() - ScreenScale( 1 ) - gap, ScreenScale( 5 ), ScreenScale( 1 ), lerpclr )
+			draw.RoundedBox( 0, start_pos, ScrH() - size - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
+			draw.RoundedBox( 0, start_pos + size - ScreenScale( 1 ), ScrH() - ScreenScale( 5 ) - gap, ScreenScale( 1 ), ScreenScale( 5 ), lerpclr )
+			]]
+
+			surface.SetDrawColor( lerpclr )
+			surface.DrawRect( start_pos, ScrH() - size - gap, ScreenScale( 2 ), 1 )
+			surface.DrawRect( start_pos + size - ScreenScale( 2 ), ScrH() - 1 - gap, ScreenScale( 2 ), 1 )
+			surface.DrawRect( start_pos, ScrH() - 1 - gap, ScreenScale( 2 ), 1 )
+			surface.DrawRect( start_pos + size - ScreenScale( 2 ), ScrH() - size - gap, ScreenScale( 2 ), 1 )
+			surface.DrawRect( start_pos, ScrH() - size - gap, 1, size )
+			surface.DrawRect( start_pos + size - 1, ScrH() - size - gap, 1, size )
+        KMASKS.Source()
+            draw.RoundedBox( 0, start_pos, ScrH() - size - gap, size, size, color_white )
+        KMASKS.End()
+
+		start_pos = start_pos + ( size + gap )
+	end
+end )
 
 net.Receive( "FPAbilities", function()
 	net.ReadPlayer().FPAbilities = net.ReadTable()

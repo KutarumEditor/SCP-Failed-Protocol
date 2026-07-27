@@ -1,5 +1,23 @@
 include( "shared.lua" )
 
+ENT.Data = {
+    {
+        title = "СОСТАВ ПЕРСОНАЛА",
+        sender = "gandon",
+        text = [[Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
+Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
+Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?]],
+    },
+    {
+        title = "СОСАЛ ПЕРСОНАЛА",
+        sender = "админ",
+        text = [[qwkdpfoq[fvinw[epvoinw[ovnw[onvwlknvq[oinv[oiqwnrvbqlknocd[lq][c;cs,mvds
+bheripovqwedSosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
+Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
+Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?]],
+    },
+}
+
 local TEX_WIDTH, TEX_HEIGHT = 1140, 640
 
 local Colors = {
@@ -120,7 +138,7 @@ function ENT:RenderScreen( w, h, pos, ang, scale )
 
     draw.RoundedBox( 0, -w/2, -h/2, w, h, Colors.back )
 
-    if self:GetActive() then
+    if self:GetActive() and self:GetUser() == lply then
         if TerminalUI.TexturedButton( TEX_WIDTH/2 - 50, -TEX_HEIGHT/2 + 5, 40, 40, power_mat, Colors.main, Colors.highlight, Colors.pressed ) then
             surface.PlaySound( "buttons/lightswitch2.wav" )
             lply.Terminal = nil
@@ -161,24 +179,6 @@ function ENT:RenderScreen( w, h, pos, ang, scale )
             surface.SetDrawColor( color_white )
             local linePos = -TEX_WIDTH/4
             surface.DrawLine( linePos, -270, linePos, 320 )
-
-            self.Data = {
-                {
-                    title = "СОСТАВ ПЕРСОНАЛА",
-                    sender = "gandon",
-                    text = [[Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?]],
-                },
-                {
-                    title = "СОСАЛ ПЕРСОНАЛА",
-                    sender = "админ",
-                    text = [[qwkdpfoq[fvinw[epvoinw[ovnw[onvwlknvq[oinv[oiqwnrvbqlknocd[lq][c;cs,mvds
-bheripovqwedSosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?]],
-                },
-            }
 
             for i = 1, #self.Data do
                 if TerminalUI.File( -TEX_WIDTH/2 + 10, -TEX_HEIGHT/2 + 58 + ( i - 1 ) * 55, 269, 50, self.Data[i].title, Colors.main, Colors.highlight, Colors.pressed ) then

@@ -56,9 +56,6 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 		rag:SetNWString( "helmetType", armor.helmet.name )
 		rag:SetNWFloat( "helmetDur", armor.helmet.durability )
 
-		ply:SetFPArmor( "vest", nil, 0 )
-		ply:SetFPArmor( "helmet", nil, 0 )
-
 		local bms = ents.FindByClassAndParent( "fp_bonemerge", ply )
 		if istable( bms ) then
 			for i, v in ipairs( bms ) do
@@ -74,6 +71,9 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 			end
 		end
 	end
+
+	ply:SetFPArmor( "vest", nil, 0 )
+	ply:SetFPArmor( "helmet", nil, 0 )
 
 	ply:SetDSP( FPRandom( 32, 34 ), false )
 
@@ -105,12 +105,30 @@ function GM:PlayerDeath( ply, inf, att )
 	end
 end
 
+function GM:PlayerSilentDeath( ply )
+	ply:RemoveEffect()
+	
+	ABILITIES.Clear( ply )
+
+	ply:SetupSpectator()
+
+	ply:SetFPArmor( "vest", nil, 0 )
+	ply:SetFPArmor( "helmet", nil, 0 )
+
+	ply:AddDeaths( 1 )
+
+	ply:SetFPName( "John" )
+	ply:SetFPSurname( "Doe" )
+end
+
 function GM:PlayerDeathThink( ply )
 
 end
 
 function GM:PostPlayerDeath( ply )
-	RoundEndCheck()
+	timer.Simple( 0, function()
+		RoundEndCheck()
+	end )
 end
 
 function GM:PlayerCanPickupWeapon( ply, wep ) -- OBSOLETE, cuz of other pickup system
@@ -155,6 +173,39 @@ function PickUpCheck( ply, item )
 	end
 
 	return #tbl < ply:GetInvSlots() and not ply:HasWeapon( item:GetClass() )
+end
+
+--TransmitSound( snd, status, player, volume or 1 )
+--TransmitSound( snd, status, vector, radius )
+--TransmitSound( snd, status, volume )
+function TransmitSound( snd, status, arg1, arg2 )
+	if isvector( arg1 ) then
+		for i, v in ipairs( player.GetAll() ) do
+			if IsValid( v ) then
+				local dist = v:GetPos():Distance( arg1 )
+
+				if dist <= arg2 then
+					net.Start( "PlaySound" )
+						net.WriteBool( status )
+						net.WriteFloat( 1 - dist / arg2 )
+						net.WriteString( snd )
+					net.Send( v )
+				end
+			end
+		end
+	elseif isentity( arg1 ) and IsValid( arg1 ) and arg1:IsPlayer() or istable( arg1 ) then
+		net.Start( "PlaySound" )
+			net.WriteBool( status )
+			net.WriteFloat( arg2 or 1 )
+			net.WriteString( snd )
+		net.Send( arg1 )
+	else
+		net.Start( "PlaySound" )
+			net.WriteBool( status or false )
+			net.WriteFloat( arg1 or 1 )
+			net.WriteString( snd )
+		net.Broadcast()
+	end
 end
 
 concommand.Add( "bot_full", function( ply, cmd, args, argStr )

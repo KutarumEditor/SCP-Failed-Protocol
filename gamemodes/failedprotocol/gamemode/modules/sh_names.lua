@@ -40,7 +40,7 @@ POSSIBLE_SURNAMES = {
 	"Solis", "Erickson", "Reeves", "Chang", "Klein", "Salinas", "Fuentes", "Baldwin", "Daniel", "Simon",
 	"Velasquez", "Hardy", "Higgins", "Aguirre", "Lin", "Cummings", "Chandler", "Sharp", "Barber", "Bowen",
 	"Ochoa", "Dennis", "Rob", "Kupitman", "Kutarumov", "Artov", "Kasanov", "Rubikov", "Mamonov", "Putin", "Sinn",
-	"Trump", "Lord", "Epstein", "Dubrovsky", "Samoilov"
+	"Trump", "Lord", "Epstein", "Dubrovsky", "Samoilov", "Marginalov", "Venediktov"
 }
 
 POSSIBLE_MALE_NAMES = {
@@ -78,7 +78,7 @@ POSSIBLE_MALE_NAMES = {
 	"Roosevelt", "Israel", "Jermaine", "Forrest", "Wilbert", "Leland", "Simon", "Guadalupe", "Clark", "Irving", "Carroll", "Bryant",
 	"Owen", "Rufus", "Woodrow", "Sammy", "Kristopher", "Mack", "Levi", "Marcos", "Gustavo", "Jake", "Lionel", "Marty", "Taylor",
 	"Ellis", "Dallas", "Gilberto", "Clint", "Nicolas", "Laure", "Masya", "Svoford", "Ayden", "Kolian", "Bo", "Gay", "Shaky", "Walrus",
-	"Pailon", "Hutep"
+	"Pailon", "Hutep", "Hurep"
 }
 
 POSSIBLE_FEMALE_NAMES = {

@@ -31,6 +31,9 @@ ENTITY_ACTIONS_OVERRIDE = { -- Overrides won't work on those entities that alrea
 		[1] = {
 			name = "detain",
 	        cooldown = 3,
+			check = function( ply, ent )
+				return false
+			end,
 	        func = function( ply, ent )
 	        	ply:TimedTask( "detaining", 2.5, Color( 200, 155, 0 ),
 			    function()

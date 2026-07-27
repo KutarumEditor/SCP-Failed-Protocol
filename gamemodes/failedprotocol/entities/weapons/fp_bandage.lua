@@ -36,6 +36,6 @@ function SWEP:PrimaryAttack()
 
 		self:Remove()
 	elseif CLIENT then
-		input.SelectWeapon( LocalPlayer():GetWeapon( CLASSES[LocalPlayer():GetCVClass()].hands_override or "cv_hands" ) )
+		input.SelectWeapon( LocalPlayer():GetWeapon( CLASSES[LocalPlayer():GetFPClass()].hands_override or "fp_hands" ) )
 	end
 end

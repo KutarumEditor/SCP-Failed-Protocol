@@ -97,3 +97,7 @@ FPRandom = xoshiro128()
 
 -- Loading languages
 loadLanguages()
+
+print( "\n|||||||||||||||||||||| SCP:FP | LOADING COMPLETED \n" )
+
+hook.Run( "FPFullyLoaded" )

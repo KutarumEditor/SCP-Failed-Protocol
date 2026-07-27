@@ -84,6 +84,11 @@ hook.Add( "Think", "FPTimersThink", function()
 	end
 end )
 
+concommand.Add( "fp_destroy_timers", function( ply, cmd, args )
+	print( "Destroying all timers..." )
+	TIMERS.DestroyAll()
+end )
+
 if not CLIENT then return end
 
 net.Receive( "FPTimerSync", function()

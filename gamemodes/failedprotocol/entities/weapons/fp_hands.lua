@@ -88,7 +88,6 @@ function SWEP:SecondaryAttack()
 	if IsValid( ent ) then
 		if ent:IsPlayer() then
 			print( ent:Health().." HP\n" )
-			print( tostring( ent:GetWeapon( CLASSES[ent:GetFPClass()].hands_override or "fp_hands" ):GetCuffed() ) )
 			return
 		end
 

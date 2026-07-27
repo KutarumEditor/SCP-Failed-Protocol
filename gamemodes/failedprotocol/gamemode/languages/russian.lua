@@ -10,12 +10,13 @@ MISC.heard_persona = " сказал своё имя"
 MISC.unknown_person = "Неизвестный"
 MISC.gruwrongtarget = "Неверная цель. Продолжайте поиски"
 MISC.grubackup = "Подкрепление в пути"
+MISC.grufailed = "Цель потеряна. Эвакуируйтесь с территории комплекса"
 MISC.shmobilized = "Цель обращена"
 MISC.shnotmobilized = "Цель не может быть обращена"
 MISC.converted = "Вы были обращены"
 MISC.falseconverted = "Вы замаскировались под Длань Змея"
 MISC.cuffed = "Вы связаны"
-MISC.escaping = "Вы сбегаете через"
+MISC.escaping = "Вы сбежите через"
 MISC.inventory = "Инвентарь"
 
 local MENU = {}
@@ -73,6 +74,7 @@ CLASSES.classd = "Класс-Д"
 CLASSES.gruagent = "Агент ГРУ"
 
 CLASSES.researcher = "Исследователь"
+CLASSES.researcher_head = "Глава Научного Отдела"
 CLASSES.medic = "Медик"
 CLASSES.gruspy = "Шпион ГРУ"
 
@@ -92,12 +94,14 @@ CLASSES.spearsoldier = "Солдат SPEAR"
 CLASSES.cisoldier = "Солдат ПХ"
 
 CLASSES.shsoldier = "Солдат ДЗ"
+CLASSES.shcom = "Командир ДЗ"
 
 CLASSES.cbgsoldier = "Солдат ЦРБ"
 
 CLASSES.SCP008 = "SCP-008-2"
 CLASSES.SCP035 = "SCP-035-2"
 CLASSES.SCP096 = "SCP-096"
+CLASSES.SCP457 = "SCP-457"
 
 local DESC = {}
 lang.DESC = DESC
@@ -110,6 +114,7 @@ DESC.classd = "Описание йоу"
 DESC.gruamnesiac = "Описание йоу"
 
 DESC.researcher = "Описание йоу"
+DESC.researcher_head = "Описание йоу"
 DESC.medic = "Описание йоу"
 DESC.gruspy = "Описание йоу"
 
@@ -129,11 +134,14 @@ DESC.spearsoldier = "Описание йоу"
 DESC.cisoldier = "Описание йоу"
 
 DESC.shsoldier = "Описание йоу"
+DESC.shcom = "Описание йоу"
 
 DESC.cbgsoldier = "Описание йоу"
 
 DESC.SCP008 = "Описание йоу"
 DESC.SCP035 = "Описание йоу"
+DESC.SCP096 = "Описание йоу"
+DESC.SCP457 = "Описание йоу"
 
 local LOOT = {}
 lang.LOOT = LOOT
@@ -151,24 +159,21 @@ lang.ARMOR = ARMOR
 ARMOR.security_light_vest = "Лёгкий жилет СБ"
 ARMOR.security_medium_vest = "Средний жилет СБ"
 ARMOR.security_heavy_vest = "Тяжёлый жилет СБ"
-ARMOR.ntf_vest = "Бронежилет ДХЛ"
+ARMOR.ntf_vest = "Бронежилет Э-11"
 ARMOR.goc_vest = "Бронежилет ГОК"
 ARMOR.gru_vest = "Бронежилет ГРУ"
 ARMOR.gru_heavy_vest = "Тяжёлый бронежилет ГРУ"
-ARMOR.spear_vest = "Бронежилет SPEAR"
 ARMOR.ci_vest = "Бронежилет ПХ"
 ARMOR.sh_vest = "Бронежилет ДЗ"
 ARMOR.cbg_plate_holder = "Плитник ЦРБ"
 ARMOR.security_cap = "Кепка охраны"
 ARMOR.security_light_helmet = "Лёгкий шлем СБ"
 ARMOR.security_heavy_helmet = "Тяжёлый шлем СБ"
-ARMOR.ntf_helmet = "Шлем ДХЛ"
+ARMOR.ntf_helmet = "Шлем Э-11"
 ARMOR.goc_helmet = "Шлем ГОК"
 ARMOR.gru_helmet = "Шлем ГРУ"
 ARMOR.spear_helmet = "Шлем SPEAR"
 ARMOR.ci_helmet = "Шлем ПХ"
-ARMOR.sh_helmet = "Шлем ДЗ"
-ARMOR.sh_heavy_helmet = "Тяжёлый шлем ДЗ"
 ARMOR.cbg_mask = "Маска ЦРБ"
 
 local TASK = {}
@@ -180,6 +185,7 @@ TASK.armor_equip = "Экипировка брони"
 TASK.weapon_equip = "Поднятие предмета"
 TASK.detaining = "Связывание цели"
 TASK.undetaining = "Развязывание цели"
+TASK.sh_conversion = "Обращение персоны"
 
 local BODY = {}
 lang.BODY = BODY

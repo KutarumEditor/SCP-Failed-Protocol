@@ -37,6 +37,7 @@ function FPTeams.Register( name, info, clr, reward, can_escape )
 		escort = {},
 		escorted_by = {},
 	} )
+	FPTeams.REG[n].relations[n] = true
 
 	_G["TEAM_"..name] = n
 	table.insert( FPTeams.ALL, n )
@@ -54,7 +55,10 @@ function FPTeams.AddInfo( team, info )
 end
 
 function FPTeams.SetupAllies( tab, ally )
-	if !istable( tab ) then
+	if ally == tab then 
+		FPTeams.REG[tab].relations[tab] = true
+		return
+	elseif !istable( tab ) then
 		tab = { tab }
 	end
 
@@ -68,17 +72,27 @@ function FPTeams.SetupAllies( tab, ally )
 
 	for k, v in pairs( tab ) do
 		local t = FPTeams.REG[v]
+		if not t then continue end
 
 		for _k, _v in pairs( ally ) do
 			if v != _v then
 				t.relations[_v] = true
+
+				local t2 = FPTeams.REG[_v]
+				if t2 then
+					if not t2.relations then t2.relations = {} end
+					t2.relations[v] = true
+				end
 			end
 		end
 	end
 end
 
 function FPTeams.SetupNeutral( tab, neutral )
-	if !istable( tab ) then
+	if neutral == tab then 
+		FPTeams.REG[tab].relations[tab] = false
+		return
+	elseif !istable( tab ) then
 		tab = { tab }
 	end
 
@@ -92,17 +106,27 @@ function FPTeams.SetupNeutral( tab, neutral )
 
 	for k, v in pairs( tab ) do
 		local t = FPTeams.REG[v]
+		if not t then continue end
 
 		for _k, _v in pairs( neutral ) do
 			if v != _v then
 				t.relations[_v] = false
+
+				local t2 = FPTeams.REG[_v]
+				if t2 then
+					if not t2.relations then t2.relations = {} end
+					t2.relations[v] = false
+				end
 			end
 		end
 	end
 end
 
 function FPTeams.SetupEnemy( tab, enemy )
-	if !istable( tab ) then
+	if enemy == tab then 
+		FPTeams.REG[tab].relations[tab] = nil
+		return
+	elseif !istable( tab ) then
 		tab = { tab }
 	end
 
@@ -110,16 +134,25 @@ function FPTeams.SetupEnemy( tab, enemy )
 		enemy = tab
 	elseif enemy == true then
 		enemy = FPTeams.ALL
+	elseif enemy == tab then
+		FPTeams.REG[tab].relations[tab] = nil
+		return
 	elseif !istable( enemy ) then
 		enemy = { enemy }
 	end
 
 	for k, v in pairs( tab ) do
 		local t = FPTeams.REG[v]
+		if not t then continue end
 
 		for _k, _v in pairs( enemy ) do
 			if v != _v then
 				t.relations[_v] = nil
+
+				local t2 = FPTeams.REG[_v]
+				if t2 and t2.relations then
+					t2.relations[v] = nil
+				end
 			end
 		end
 	end
@@ -142,8 +175,6 @@ function FPTeams.SetupEscort( team, tab )
 end
 
 function FPTeams.IsEnemy( team1, team2 )
-	if team1 == team2 then return false end
-
 	local t = FPTeams.REG[team1]
 	if t then
 		return t.relations[team2] == nil
@@ -153,8 +184,6 @@ function FPTeams.IsEnemy( team1, team2 )
 end
 
 function FPTeams.IsAlly( team1, team2 )
-	if team1 == team2 then return true end
-
 	local t = FPTeams.REG[team1]
 	if t then
 		return t.relations[team2] == true
@@ -164,8 +193,6 @@ function FPTeams.IsAlly( team1, team2 )
 end
 
 function FPTeams.IsNeutral( team1, team2 )
-	if team1 == team2 then return true end
-
 	local t = FPTeams.REG[team1]
 	if t then
 		return t.relations[team2] == false
@@ -366,21 +393,65 @@ FPTeams.Register( "MCD", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Colo
 FPTeams.Register( "SH", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 0, 133, 77 ), 4, false )
 FPTeams.Register( "SCP", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_SCP ), Color( 52, 7, 7 ), 10, true )
 
-FPTeams.SetupNeutral( { TEAM_CLASSD, TEAM_SCI, TEAM_SH } )
-FPTeams.SetupNeutral( TEAM_CLASSD, TEAM_CI )
 FPTeams.SetupNeutral( TEAM_GRU, true )
-
 FPTeams.SetupNeutral( TEAM_SPEAR, true )
-FPTeams.SetupEnemy( TEAM_SPEAR, TEAM_GRU )
-FPTeams.SetupEnemy( TEAM_SPEAR, TEAM_CLASSD )
-
-FPTeams.SetupAllies( { TEAM_SCI, TEAM_SD, TEAM_MTF } )
-
 FPTeams.SetupNeutral( TEAM_GOC, true )
+
+FPTeams.SetupEnemy( TEAM_SPEAR, TEAM_GRU )
+FPTeams.SetupEnemy( TEAM_SCP, true )
+FPTeams.SetupEnemy( TEAM_SH, true )
+FPTeams.SetupEnemy( TEAM_MCD, true )
+FPTeams.SetupEnemy( TEAM_CBG, true )
+FPTeams.SetupEnemy( TEAM_CI, true )
+
+FPTeams.SetupNeutral( TEAM_CLASSD, TEAM_CI )
+FPTeams.SetupNeutral( TEAM_CLASSD, TEAM_SD )
+
+FPTeams.SetupNeutral( { TEAM_CLASSD, TEAM_SCI, TEAM_MCD } )
+FPTeams.SetupNeutral( { TEAM_CLASSD, TEAM_SCI, TEAM_SH } )
+FPTeams.SetupAllies( TEAM_SCP, TEAM_SH )
+FPTeams.SetupAllies( { TEAM_SCI, TEAM_SD, TEAM_MTF } )
 FPTeams.SetupAllies( TEAM_GOC, TEAM_SCI )
 
-FPTeams.SetupEnemy( TEAM_SCP, true )
-FPTeams.SetupAllies( TEAM_SCP, TEAM_SH )
+FPTeams.SetupNeutral( TEAM_CLASSD, TEAM_CLASSD )
 
 FPTeams.SetupEscort( TEAM_MTF, TEAM_SCI )
 FPTeams.SetupEscort( TEAM_SD, TEAM_SCI )
+
+local function _devPrintAllRelations()
+	local convertNums = {
+		[1] = "Spectators",
+		[2] = "Class-D",
+		[3] = "Personnel",
+		[4] = "Security",
+		[5] = "MTF",
+		[6] = "GOC",
+		[7] = "SPEAR",
+		[8] = "GRU",
+		[9] = "CI",
+		[10] = "CBG",
+		[11] = "MCD",
+		[12] = "SH",
+		[13] = "SCP",
+	}
+
+	for i, v in ipairs( FPTeams.REG ) do
+		local name = convertNums[i] or "UNKNOWN_TEAM"
+		MsgC( color_white, "### ", FPTeams.GetColor( i ), name, color_white, " / Relations:\n" )
+
+		for _, t in pairs( convertNums ) do
+			local clr = Color( 104, 36, 36)
+			if FPTeams.IsAlly( i, _ ) then
+				clr = Color( 63, 128, 63)
+			elseif FPTeams.IsNeutral( i, _ ) then
+				clr = Color( 124, 124, 124)
+			end
+
+			MsgC( clr, t.."\n" )
+		end
+	end
+end
+
+concommand.Add( "fp_print_team_relations", function()
+	_devPrintAllRelations()
+end )

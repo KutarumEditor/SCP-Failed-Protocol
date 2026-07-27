@@ -25,12 +25,16 @@ local sndDurTbl = {
 	["scpfp/public_announcements/1_scp.wav"] = 3.5,
 	["scpfp/public_announcements/2_scp.wav"] = 3.5,
 	["scpfp/public_announcements/3_scp.wav"] = 3.5,
+	["scpfp/public_announcements/warheads.wav"] = 9.45,
+	["scpfp/warheads/phrase1.wav"] = 4.55,
+	["scpfp/warheads/phrase2.wav"] = 2.75,
 }
 
 local senderColor = {
 	pa = Color( 93, 122, 184 ),
 	gocsniper = Color( 97, 132, 149 ),
 	gruspy = Color( 158, 145, 99 ),
+	unkoper = Color( 34, 36, 197),
 }
 
 local function castPhraseInternal( sound, sender, text )
@@ -77,7 +81,7 @@ function PHRASES.Clear( sync )
 end
 
 local line = 0
-hook.Add( "RenderScreenspaceEffects", "PhrasesDisplay", function()
+function DisplayPhrases()
 	if #PHRASES.CUR == 0 then return end
 
 	line = 0
@@ -105,7 +109,7 @@ hook.Add( "RenderScreenspaceEffects", "PhrasesDisplay", function()
 			table.remove( PHRASES.CUR, k )
 		end
 	end
-end )
+end
 
 net.Receive( "FPPhrases", function()
 	castPhraseInternal( net.ReadString(), net.ReadString(), net.ReadString() )

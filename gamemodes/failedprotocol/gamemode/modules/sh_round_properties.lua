@@ -1,4 +1,4 @@
-ROUNDPROP = {
+ROUNDPROP = ROUNDPROP or {
 	CUR = {}
 }
 

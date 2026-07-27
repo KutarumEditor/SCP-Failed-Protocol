@@ -1,4 +1,4 @@
-SWEP.Base = "fp_swep_base"
+DEFINE_BASECLASS( "fp_swep_base" )
 
 SWEP.ViewModelFOV = 70
 SWEP.ViewModel = "models/hunter/blocks/cube025x025x025.mdl"
@@ -8,6 +8,7 @@ SWEP.ShouldDrawWM = false
 SWEP.SwayScale = 2
 SWEP.BobScale = 2
 
+SWEP.SCP_SWEP = true
 SWEP.Droppable = false
 
 SWEP.AutoSwitchTo = true
@@ -20,4 +21,12 @@ SWEP.HoldType = "melee"
 
 function SWEP:Animator()
 	return true
+end
+
+-- Upgrade system
+
+function SWEP:Initialize()
+	BaseClass.Initialize( self )
+
+	self.ActiveUpgrades = {}
 end

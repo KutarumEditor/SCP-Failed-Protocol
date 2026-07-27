@@ -50,8 +50,10 @@ function ENT:SyncData()
 end
 
 net.ReceivePing( "FPStopTerminalUsage", function( data, ply )
-    ply.Terminal:SetUser( nil )
-    ply:SetTerminal( nil )
+    if ply.Terminal != nil and ply.Terminal:IsValid() then
+        ply.Terminal:SetUser( nil )
+        ply:SetTerminal( nil )
+    end
 end )
 
 net.ReceivePing( "FPEnterTerminalPassword", function( data, ply )

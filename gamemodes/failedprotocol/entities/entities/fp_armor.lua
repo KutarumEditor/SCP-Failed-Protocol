@@ -33,6 +33,17 @@ function ENT:Use( activator, caller )
         return
     end
 
+    local plyclass = activator:GetFPClass()
+    if CLASSES[plyclass] != nil then
+        if self.ArmorType == "helmet" and CLASSES[plyclass].blockhelmet == true then
+            return
+        end
+
+        if self.ArmorType == "vest" and CLASSES[plyclass].blockvest == true then
+            return
+        end
+    end
+
     activator:TimedTask( "armor_equip", 5, Color( 200, 155, 0 ),
     function()
         return IsValid( self ) and IsValid( activator ) and activator.FPArmor[self.ArmorType].name == nil and

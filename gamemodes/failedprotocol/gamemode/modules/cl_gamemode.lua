@@ -49,7 +49,8 @@ function RoundStartCutscene()
 
 	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
 	AMBIENT.Ban( 189 )
-	AMBIENT.Restart( "sound/scpfp/ambience/blue_feather.mp3" )
+	local track = ply:GetFPClass() == "SCP035" and "sound/scpfp/ambience/035_cutscene.wav" or ply:FPTeam() == TEAM_SCP and "sound/scpfp/ambience/scp_spawn.mp3" or "sound/scpfp/ambience/blue_feather.mp3"
+	AMBIENT.Restart( track )
 	TIMERS.Create( "ClientBreachStart", 46, function()
 		BreachAction()
 	end )

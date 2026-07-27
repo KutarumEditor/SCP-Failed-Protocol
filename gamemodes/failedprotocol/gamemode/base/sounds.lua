@@ -32,3 +32,31 @@ sound.Add({
 	volume = 1.0,
 	sound = "impact/flesh_blunt_hit.wav"
 })
+
+sound.Add({
+	name = "warhead.alarm",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	sound = "scpfp/warheads/alarm.wav"
+})
+
+sound.Add({
+	name = "warhead.siren",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	sound = "scpfp/warheads/siren.wav"
+})
+
+sound.Add({
+	name = "warhead.crank",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	sound = "scpfp/warheads/crank.wav"
+})
+
+sound.Add({
+	name = "warhead.nuke",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	sound = "scpfp/warheads/nuke.wav"
+})

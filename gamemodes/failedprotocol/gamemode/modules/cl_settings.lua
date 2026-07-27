@@ -45,13 +45,15 @@ CL_SETTINGS.Register( "fp_disable_support", "0", "bool" )
 
 CL_SETTINGS.Register( "fp_disable_scp", "0", "bool" )
 
-CL_SETTINGS.Register( "fp_settings_button", "95", "bind" )
+CL_SETTINGS.Register( "fp_settings_button", KEY_F4, "bind" )
 
-CL_SETTINGS.Register( "fp_inventory_button", "27", "bind" )
+CL_SETTINGS.Register( "fp_inventory_button", KEY_Q, "bind" )
 
-CL_SETTINGS.Register( "fp_scp_upgrades_button", "12", "bind" )
+CL_SETTINGS.Register( "fp_scp_upgrades_button", KEY_B, "bind" )
 
-CL_SETTINGS.Register( "fp_drop_weapon", "17", "bind" )
+CL_SETTINGS.Register( "fp_drop_weapon", KEY_G, "bind" )
+
+CL_SETTINGS.Register( "fp_upgrade_menu", KEY_B, "bind" )
 
 CL_SETTINGS.Register( "fp_language", "english", "list" )
 

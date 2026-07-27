@@ -70,7 +70,13 @@ local main_buttons = {
     {
         icon = Material( "failedprotocol/inventory/main/helmet_outline.png", "smooth" ),
         inact_icon = Material( "failedprotocol/inventory/main/helmet_outline.png", "smooth" ),
-        check = function( self ) return LocalPlayer().FPArmor.helmet.name != nil end,
+        check = function( self )
+            if LocalPlayer().FPArmor.helmet.name == nil or ( CLASSES[LocalPlayer():GetFPClass()] != nil and CLASSES[LocalPlayer():GetFPClass()].noarmordrop == true ) then
+                return false
+            end
+
+            return true
+        end,
         lmb = function( self )
             net.Start( "FPInvArmor" )
                 net.WriteString( "helmet" )
@@ -80,7 +86,13 @@ local main_buttons = {
     {
         icon = Material( "failedprotocol/inventory/main/vest_outline.png", "smooth" ),
         inact_icon = Material( "failedprotocol/inventory/main/vest_outline.png", "smooth" ),
-        check = function( self ) return LocalPlayer().FPArmor.vest.name != nil end,
+        check = function( self )
+            if LocalPlayer().FPArmor.vest.name == nil or ( CLASSES[LocalPlayer():GetFPClass()] != nil and CLASSES[LocalPlayer():GetFPClass()].noarmordrop == true ) then
+                return false
+            end
+
+            return true
+        end,
         lmb = function( self )
             net.Start( "FPInvArmor" )
                 net.WriteString( "vest" )
@@ -208,7 +220,7 @@ function CreateInventoryUI()
     local mdl_height = v2.z - v1.z
 
     local mdl = vgui.Create( "DModelPanel", mdl_frame )
-    mdl:SetPos( 1, 1 )    
+    mdl:SetPos( 1, 1 )
     mdl:SetSize( mdlW-2, mdlH-2 )
     mdl:SetModel( LocalPlayer():GetModel() )
     local height = mdl_height*.6
@@ -249,20 +261,25 @@ function CreateInventoryUI()
             for i, bm in ipairs( ply:GetChildren() ) do
                 if not bm:IsDerived( "fp_bonemerge" ) then continue end
 
-                local mdl = ClientsideModel( bm:GetModel(), RENDERGROUP_OPAQUE )
-                if IsValid( mdl ) then
-                    mdl:SetNoDraw( true )
-                    mdl:AddEffects( EF_BONEMERGE )
-                    mdl:SetParent( self.Entity )
+                local mdl_ent = ClientsideModel( bm:GetModel(), RENDERGROUP_OPAQUE )
+                if IsValid( mdl_ent ) then
+                    mdl_ent:SetNoDraw( true )
+                    mdl_ent:AddEffects( EF_BONEMERGE )
+                    mdl_ent:SetParent( self.Entity )
                 end
-                clBMerges[#clBMerges + 1] = mdl
+                clBMerges[#clBMerges + 1] = mdl_ent
             end
 
             self.Entity:DrawModel()
             self.Entity:SetSkin( ply:GetSkin() )
-            for i, mdl in ipairs( clBMerges ) do
-                mdl:DrawModel()
-                mdl:Remove()
+            
+            if IsValid( self.WeaponModel ) then
+                self.WeaponModel:DrawModel()
+            end
+
+            for i, mdl_ent in ipairs( clBMerges ) do
+                mdl_ent:DrawModel()
+                mdl_ent:Remove()
             end
 
             clBMerges = {}
@@ -311,18 +328,7 @@ function CreateInventoryUI()
         local amb_clr = lp:Alive() and FPTeams.GetColor( lp:FPTeam() ) or color_black
         self:SetAmbientLight( LerpColor( .5, amb_clr, color_black ) )
 
-        ent:SetSequence( lp:SelectWeightedSequence( ACT_HL2MP_IDLE_SUITCASE ) )
-
-        local look_on_left = math.cos( ( CurTime() - openTime ) / 3 ) > 0
-        if look_on_left then
-            look_ratio = math.min( 1, look_ratio + FrameTime() / 1.5 )
-        else
-            look_ratio = math.max( 0, look_ratio - FrameTime() / 1.5 )
-        end
-
-        if isnumber( ent:LookupBone( "ValveBiped.Bip01_Head1" ) ) then
-            ent:ManipulateBoneAngles( ent:LookupBone( "ValveBiped.Bip01_Head1" ), Angle( 0, 0, math.ease.InOutQuart( look_ratio ) * -30 ) )
-        end
+        ent:SetSequence( lp:SelectWeightedSequence( ACT_HL2MP_IDLE ) )
 
         self:RunAnimation()
     end
@@ -336,6 +342,12 @@ function CreateInventoryUI()
         if helmet_mdl != nil then
             helmet_mdl:Remove()
             helmet_mdl = nil
+        end
+        
+        -- Обязательно очищаем модель оружия при закрытии панели
+        if IsValid( self.WeaponModel ) then
+            self.WeaponModel:Remove()
+            self.WeaponModel = nil
         end
     end
 

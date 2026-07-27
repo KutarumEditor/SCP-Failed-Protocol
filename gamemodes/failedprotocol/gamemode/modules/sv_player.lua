@@ -97,6 +97,18 @@ function player.GetReady()
 	return plys
 end
 
+function player.GetAlive()
+	local plys = {}
+
+	for i, ply in player.Iterator() do
+		if not ply:Alive() then continue end
+
+		plys[#plys + 1] = ply
+	end
+
+	return plys
+end
+
 local PLAYER = FindMetaTable( "Player" )
 
 function PLAYER:CreatePlayerRagdoll()
@@ -167,12 +179,10 @@ function PLAYER:SetDeathReason( reason, pro_only )
 end
 
 function PLAYER:SerpentMobilize()
-	if self:GetFPClass() != "gruagent" then
-		self:SetFPTeam( TEAM_SH )
-
+	if self:GetFPClass() == "gruagent" or self:GetFPClass() == "gruspy" then
 		self:PopupInfo( 5, {
 			{
-				text = { { "MISC", "converted" } },
+				text = { { "MISC", "falseconverted" } },
 				font = "RoundStartInfoExtraSmall",
 				color = FPTeams.GetColor( self:FPTeam() ),
 				ugap = 0,
@@ -180,9 +190,11 @@ function PLAYER:SerpentMobilize()
 			}
 		} )
 	else
+		self:SetFPTeam( TEAM_SH )
+
 		self:PopupInfo( 5, {
 			{
-				text = { { "MISC", "falseconverted" } },
+				text = { { "MISC", "converted" } },
 				font = "RoundStartInfoExtraSmall",
 				color = FPTeams.GetColor( self:FPTeam() ),
 				ugap = 0,

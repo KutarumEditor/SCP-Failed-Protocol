@@ -13,7 +13,7 @@ local info_mult = 0
 
 local info_tbl = {}
 
-hook.Add( "FPHUD", "InfoPopup", function()
+hook.Add( "PreFPHUD", "InfoPopup", function()
 	if CurTime() >= info_end then
 		info_active = false
 	end

@@ -10,9 +10,11 @@ MISC.heard_persona = " said their name"
 MISC.unknown_person = "Unknown"
 MISC.gruwrongtarget = "Invalid target. Continue searching"
 MISC.grubackup = "Backup is on the way"
+MISC.grufailed = "Target lost. Withdraw from the facility"
 MISC.shmobilized = "Target converted"
 MISC.shnotmobilized = "Target can't be converted"
 MISC.converted = "You were converted"
+MISC.falseconverted = "You disguised yourself as the Serpent's Hand"
 MISC.cuffed = "You are detained"
 MISC.escaping = "You are escaping through"
 MISC.inventory = "Inventory"
@@ -72,6 +74,7 @@ CLASSES.classd = "Class-D"
 CLASSES.gruagent = "GRU Agent"
 
 CLASSES.researcher = "Researcher"
+CLASSES.researcher_head = "Head of Research Department"
 CLASSES.medic = "Medic"
 CLASSES.gruspy = "GRU Spy"
 
@@ -91,12 +94,14 @@ CLASSES.spearsoldier = "SPEAR Soldier"
 CLASSES.cisoldier = "CI Soldier"
 
 CLASSES.shsoldier = "SH Soldier"
+CLASSES.shcom = "SH Commander"
 
 CLASSES.cbgsoldier = "CBG Soldier"
 
 CLASSES.SCP008 = "SCP-008-2"
 CLASSES.SCP035 = "SCP-035-2"
 CLASSES.SCP096 = "SCP-096"
+CLASSES.SCP457 = "SCP-457"
 
 local DESC = {}
 lang.DESC = DESC
@@ -109,6 +114,7 @@ DESC.classd = "Deez nuts"
 DESC.gruamnesiac = "Deez nuts"
 
 DESC.researcher = "Deez nuts"
+DESC.researcher_head = "Deez nuts"
 DESC.medic = "Deez nuts"
 DESC.gruspy = "Deez nuts"
 
@@ -128,6 +134,7 @@ DESC.spearsoldier = "Deez nuts"
 DESC.cisoldier = "Deez nuts"
 
 DESC.shsoldier = "Deez nuts"
+DESC.shcom = "Deez nuts"
 
 DESC.cbgsoldier = "Deez nuts"
 
@@ -150,7 +157,7 @@ lang.ARMOR = ARMOR
 ARMOR.security_light_vest = "Light SD vest"
 ARMOR.security_medium_vest = "Medium SD vest"
 ARMOR.security_heavy_vest = "Heavy SD vest"
-ARMOR.ntf_vest = "NTF vest"
+ARMOR.ntf_vest = "E-11 vest"
 ARMOR.goc_vest = "GOC vest"
 ARMOR.gru_vest = "GRU vest"
 ARMOR.gru_heavy_vest = "GRU heavy vest"
@@ -161,7 +168,7 @@ ARMOR.cbg_plate_holder = "CBG plate holder"
 ARMOR.security_cap = "SD cap"
 ARMOR.security_light_helmet = "Light SD helmet"
 ARMOR.security_heavy_helmet = "Heavy SD helmet"
-ARMOR.ntf_helmet = "NTF helmet"
+ARMOR.ntf_helmet = "E-11 helmet"
 ARMOR.goc_helmet = "GOC helmet"
 ARMOR.gru_helmet = "GRU helmet"
 ARMOR.spear_helmet = "SPEAR helmet"
@@ -179,6 +186,7 @@ TASK.armor_equip = "Equipping armor"
 TASK.weapon_equip = "Picking item up"
 TASK.detaining = "Detaining"
 TASK.undetaining = "Undetaining"
+TASK.sh_conversion = "Converting person"
 
 local BODY = {}
 lang.BODY = BODY
@@ -238,6 +246,87 @@ ACTIONS.player = {
 	undetain = "Undetain",
 }
 
+local KILLFEED = {}
+lang.KILLFEED = KILLFEED
+
+KILLFEED.suicide = "%v died."
+KILLFEED.default = "%a killed %v with %i."
+
+local DEATHQUOTES = {}
+lang.DEATHQUOTES = DEATHQUOTES
+
+DEATHQUOTES[TEAM_CLASSD] = {
+	"The last prisoner has fallen.",
+	"Dreams about freedom were shattered.",
+	"Convicts have found eternal rest.",
+	"Their punishment was death.",
+}
+
+DEATHQUOTES[TEAM_SCI] = {
+	"Experiment turned into a catastrophe.",
+	"They sacrificed their lives for their position.",
+	"Lab rats and doctors switched places.",
+}
+
+DEATHQUOTES[TEAM_SD] = {
+	"Security is put at risk.",
+	"Order is disrupted.",
+	"Zone shield has been compromised.",
+	"Situation is unstable.",
+}
+
+DEATHQUOTES[TEAM_MTF] = {
+	"They met with death... and lost.",
+	"Darkness swallowed them.",
+	"The last Foundation operative has fallen.",
+}
+
+DEATHQUOTES[TEAM_GOC] = {
+	"No peaceleepers left.",
+	"Peacekeeping mission failed.",
+}
+
+DEATHQUOTES[TEAM_SPEAR] = {
+	"Johny won't be coming home.",
+	"Last eagle has fallen.",
+	"American professionals have fallen.",
+	"PENTAGRAM lost their squad.",
+}
+
+DEATHQUOTES[TEAM_GRU] = {
+	"They didn't abandon their own.",
+	"The last bear has fallen.",
+	"Russian professionals have fallen.",
+	"GRU lost their squad.",
+}
+
+DEATHQUOTES[TEAM_CI] = {
+	"Anomalous rush ended.",
+	"Foundation main opposers have fallen.",
+	"Terror ended.",
+}
+
+DEATHQUOTES[TEAM_CBG] = {
+	"Cyberpsychosis ended.",
+	"'Hummers' have fallen.",
+}
+
+DEATHQUOTES[TEAM_MCD] = {
+	"Mercenaries have fallen.",
+	"Money won't be able to get into the grave.",
+}
+
+DEATHQUOTES[TEAM_SH] = {
+	"Defenders of anomalies have fallen.",
+	"Paranormal altruism was crushed.",
+}
+
+DEATHQUOTES[TEAM_SCP] = {
+	"The box has opened. The cat has left superposition.",
+	"Containment conditions have been restored.",
+	"Objects have been neutralized.",
+}
+
 local PHRASES = {}
 lang.PHRASES = PHRASES
 
@@ -255,6 +344,12 @@ PHRASES.gruspy = {
 	found1 = "Copy. Target found, escorting...",
 	found2 = "Copy. Object found...",
 	found3 = "Copy. Target found...",
+}
+
+PHRASES.unkoper_name = "Unknown Operator"
+PHRASES.unkoper = {
+	first = "This is CH-1 to OH-6, have you located the target, over?",
+	second = "CH-1 to OH-6, do you copy?",
 }
 
 PHRASES.pa_name = " Announcements system"

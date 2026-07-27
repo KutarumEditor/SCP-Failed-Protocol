@@ -47,26 +47,6 @@ REGISTERED_ARMOR = {
 		},
 		class = 3,
 	},
-	["sh_helmet"] = {
-		type = "helmet",
-		floor_model = "models/kutarum/scpfp/helmets/sh_helmet.mdl",
-		model = "models/kutarum/scpfp/helmets/sh_helmet.mdl",
-		durability = 90,
-		resistance = {
-			[HITGROUP_HEAD] = .3,
-		},
-		class = 3,
-	},
-	["sh_heavy_helmet"] = {
-		type = "helmet",
-		floor_model = "models/kutarum/scpfp/helmets/sh_heavy_helmet.mdl",
-		model = "models/kutarum/scpfp/helmets/sh_heavy_helmet.mdl",
-		durability = 100,
-		resistance = {
-			[HITGROUP_HEAD] = .4,
-		},
-		class = 3,
-	},
 	["goc_helmet"] = {
 		type = "helmet",
 		floor_model = "models/kutarum/scpfp/helmets/goc_helmet.mdl",
@@ -224,18 +204,6 @@ REGISTERED_ARMOR = {
 			[HITGROUP_STOMACH] = .6,
 			[HITGROUP_RIGHTARM] = .55,
 			[HITGROUP_LEFTARM] = .55,
-			[HITGROUP_GENERIC] = 1,
-		},
-		class = 4,
-	},
-	["spear_vest"] = {
-		type = "vest",
-		floor_model = "models/kutarum/scpfp/vests/spear_vest.mdl",
-		model = "models/kutarum/scpfp/vests/spear_vest.mdl",
-		durability = 250,
-		resistance = {
-			[HITGROUP_CHEST] = .5,
-			[HITGROUP_STOMACH] = .5,
 			[HITGROUP_GENERIC] = 1,
 		},
 		class = 4,

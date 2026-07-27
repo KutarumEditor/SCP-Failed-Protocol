@@ -21,25 +21,25 @@ function AMBIENT.Restart( name )
 end
 
 function AMBIENT.Pause()
-	if AMBIENT.CHANNEL != nil then
+	if AMBIENT.CHANNEL != nil and AMBIENT.CHANNEL:IsValid() then
 		AMBIENT.CHANNEL:Pause()
 	end
 end
 
 function AMBIENT.Start()
-	if AMBIENT.CHANNEL != nil then
+	if AMBIENT.CHANNEL != nil and AMBIENT.CHANNEL:IsValid() then
 		AMBIENT.CHANNEL:Play()
 	end
 end
 
 function AMBIENT.Stop()
-	if AMBIENT.CHANNEL != nil then
+	if AMBIENT.CHANNEL != nil and AMBIENT.CHANNEL:IsValid() then
 		AMBIENT.CHANNEL:Stop()
 	end
 end
 
 function AMBIENT.Remove()
-	if AMBIENT.CHANNEL != nil then
+	if AMBIENT.CHANNEL != nil and AMBIENT.CHANNEL:IsValid() then
 		AMBIENT.CHANNEL:Stop()
 		AMBIENT.CHANNEL = nil
 	end
@@ -49,13 +49,16 @@ function AMBIENT.Ban( time )
 	AMBIENT.BAN = CurTime() + time
 end
 
+function AMBIENT.SetVolume( volume )
+	AMBIENT.VOLUME = volume
+end
 
 local checkTime = 0
 local ambThinkDelay = 1
 hook.Add( "Think", "FPAmbience", function()
 	if checkTime <= CurTime() then
-		if AMBIENT.CHANNEL == nil or AMBIENT.CHANNEL:GetState() == 0 then
-			if AMBIENT.CHANNEL != nil and math.floor( AMBIENT.CHANNEL:GetLength() ) <= math.ceil( AMBIENT.TIME ) then
+		if AMBIENT.CHANNEL == nil or not AMBIENT.CHANNEL:IsValid() or AMBIENT.CHANNEL:GetState() == 0 then
+			if AMBIENT.CHANNEL != nil and AMBIENT.CHANNEL:IsValid() and math.floor( AMBIENT.CHANNEL:GetLength() ) <= math.ceil( AMBIENT.TIME ) then
 				AMBIENT.SOUND = nil
 			end
 
@@ -65,6 +68,7 @@ hook.Add( "Think", "FPAmbience", function()
 
 			checkTime = CurTime() + ambThinkDelay
 		elseif AMBIENT.CHANNEL:IsValid() and AMBIENT.CHANNEL:GetState() != 0 then
+			AMBIENT.CHANNEL:SetVolume( AMBIENT.VOLUME )
 			AMBIENT.TIME = AMBIENT.CHANNEL:GetTime()
 		end
 	end

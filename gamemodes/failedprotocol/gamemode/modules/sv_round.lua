@@ -50,7 +50,7 @@ REGISTERED_ROUND_TYPES = {
 			net.Ping( "ClearCSData", "" )
 
 			ClearPersonas()
-			SetupPlayers( "default" )	
+			SetupPlayers( "default" )
 		end,
 		endcheck = function()
 			return RoundFinishCheck()
@@ -117,7 +117,7 @@ end
 function FinishRound()
 	local alivePlys = {}
 
-	for _, ply in player.Iterator() do
+	for _, ply in ipairs( player.GetAll() ) do
 		if ply:Alive() then
 			table.insert( alivePlys, ply )
 		end
@@ -142,7 +142,7 @@ function FinishRound()
 			ply:ScreenFade( SCREENFADE.OUT, color_black, 10, .1)
 		end
 
-		TIMERS.Create( "RoundEnd", 10, function()
+		TIMERS.Create( "RoundEndRestart", 10, function()
 			RestartRound()
 		end, true )
 	end, true )
@@ -298,8 +298,6 @@ end
 function SetupPlayers( type )
 	local all_players = player.GetReady()
 
-	--if all_players == 0 then
-
 	local scps = 0
 
 	--Assigning SCP's
@@ -323,7 +321,6 @@ function SetupPlayers( type )
 			selected_ply:SetupSCP( selected_scp, false )
 			selected_ply:PopupStartInfo()
 			selected_ply:ScreenFade( SCREENFADE.IN, color_black, 2, 3 )
-			net.Ping( "RoundStart", "", selected_ply )
 		end
 	end
 
@@ -355,13 +352,19 @@ function SetupPlayers( type )
 						pl:Setup( selected_class, istable( unique_spawns[selected_class] ) and table.remove( unique_spawns[selected_class], FPRandom( 1, #unique_spawns[selected_class] ) ) or isvector( unique_spawns[selected_class] ) and unique_spawns[selected_class] or table.remove( available_spawns, FPRandom( 1, #available_spawns ) ), false )
 						pl:PopupStartInfo()
 						pl:ScreenFade( SCREENFADE.IN, color_black, 2, 3 )
-						net.Ping( "RoundStart", "", pl )
 					end
 				end )
 			end
 		end
 
-		AsyncFunc( function() hook.Run( "PostPlayerClassAssignation" ) end )
+		AsyncFunc( function()
+			hook.Run( "PostPlayerClassAssignation" )
+		
+
+			for _, ply in ipairs( player.GetAlive() ) do
+				net.Ping( "RoundStart", "", ply )
+			end
+		end )
 	end )
 end
 

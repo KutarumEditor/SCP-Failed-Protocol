@@ -1,3 +1,5 @@
+local PLAYER = FindMetaTable( "Player" )
+
 ------------------------
 -- Class registration --
 ------------------------
@@ -9,6 +11,11 @@ function CLASS:SetupDataTables()
 
 	ply:NetworkVar( "Int", 0, "_FPTeam" )
 	ply:NetworkVar( "Int", 1, "_InvSlots" )
+
+	ply:NetworkVar( "Int", 2, "_PlayerLevel" )
+	ply:NetworkVar( "Int", 3, "_PlayerXP" )
+	ply:NetworkVar( "Int", 4, "_PlayerKarma" )
+	ply:NetworkVar( "Int", 5, "_ClassPoints" )
 
 	ply:NetworkVar( "Float", 0, "Stamina" )
 	ply:NetworkVar( "Float", 1, "MaxStamina" )
@@ -34,10 +41,76 @@ function CLASS:SetupDataTables()
 		ply:Set_FPClass( "spectator" )
 		ply:Set_Name( "John" )
 		ply:Set_Surname( "Doe" )
+
+		FPPromiseJoin(
+			ply:GetFPData( "level", 0 ),
+			ply:GetFPData( "xp", 0 ),
+			ply:GetFPData( "class_points", 0 ),
+			ply:GetFPData( "scp_karma", 100 )
+		):Then( function( data )
+			ply:Set_PlayerLevel( tonumber( data[1] ) )
+			ply:Set_PlayerXP( tonumber( data[2] ) )
+			ply:Set_ClassPoints( tonumber( data[3] ) )
+			ply:Set_PlayerKarma( tonumber( data[4] ) )
+		end )
 	end
 end
 
 player_manager.RegisterClass( "fp_player", CLASS, "player_default" )
+
+--[[-------------------------------------------------------------------------
+Accessors
+---------------------------------------------------------------------------]]
+
+function FPAccessor( func, data )
+	data = data or {}
+
+	local getter = "Get"..(data.internal or "_"..func)
+	local setter = "Set"..(data.internal or "_"..func)
+	local db_key = data.db_key
+	local db_client = data.db_client
+	local ignore_dt = data.ignore_dt
+
+	PLAYER[data.getter or "Get"..func] = function( self )
+		if !ignore_dt and !self[getter] then
+			self:DataTables()
+		end
+
+		return self[getter]( self )
+	end
+
+	PLAYER[data.setter or "Set"..func] = function( self, val )
+		if !ignore_dt and !self[setter] then
+			self:DataTables()
+		end
+
+		self[setter]( self, val )
+
+		if db_key and ( db_client or SERVER ) then
+			self:SetFPData( db_key, val )
+		end
+	end
+end
+
+FPDatabaseProperties = FPDatabaseProperties or {}
+
+function FPDatabaseProperty( func, key, def, db, sync )
+	local db_key = db or key
+
+	FPDatabaseProperties[key] = { db_key = db_key, def = def, sync = sync }
+
+	BindPlayerProperty( "_"..func, key, def, { sync = sync, keep = PROPERTY_KEEP_ALWAYS } )
+	FPAccessor( func, { db_key = db_key, ignore_dt = true } )
+end
+
+hook.Add( "PlayerInitialSpawn", "FPDatabaseProperties", function( ply )
+	for key, data in pairs( FPDatabaseProperties ) do
+		ply:GetFPData( data.db_key, data.def ):Then( function( val )
+			if !IsValid( ply ) then return end
+			ply:SetProperty( key, val, data.sync )
+		end )
+	end
+end )
 
 ------------------
 -- Player funcs --
@@ -64,8 +137,6 @@ function GM:KeyPress( ply, key )
 		end
 	end
 end
-
-local PLAYER = FindMetaTable( "Player" )
 
 function PLAYER:DataTables()
 	if !IsValid( self ) then return end
@@ -158,7 +229,7 @@ function PLAYER:IsHuman()
 end
 
 -----------------------
--- Player properties -- ( thx Danx )
+-- Player properties --
 -----------------------
 
 function PLAYER:ResetProperties()
@@ -196,3 +267,9 @@ if CLIENT then
 		net.ReadPlayer():SetProperty( net.ReadString(), net.ReadTable() )
 	end )
 end
+
+FPAccessor( "PlayerLevel", { db_key = "level", getter = "PlayerLevel" } )
+FPAccessor( "PlayerXP", { db_key = "xp", getter = "PlayerXP" } )
+FPAccessor( "ClassPoints", { db_key = "class_points", getter = "ClassPoints" } )
+FPAccessor( "SCPPenalty", { db_key = "scp_penalty" } )
+FPAccessor( "PlayerKarma", { db_key = "scp_karma" } )

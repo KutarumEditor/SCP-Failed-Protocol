@@ -10,6 +10,35 @@ SWEP.BobScale = 2
 
 SWEP.HoldType = "knife"
 
+SWEP.FPUpgrades = {
+	-- Health Aspect
+	["hpaspect1"] = {
+		price = 1,
+		x = -2,
+		y = -7,
+		exc = { "apaspect1" },
+	},
+	["hpaspect2"] = {
+		price = 1,
+		x = -2,
+		y = -4,
+		req = { "hpaspect1" },
+	},
+	-- Armor Aspect
+	["apaspect1"] = {
+		price = 1,
+		x = 2,
+		y = -7,
+		exc = { "hpaspect1" },
+	},
+	["apaspect2"] = {
+		price = 1,
+		x = 2,
+		y = -4,
+		req = { "apaspect1" },
+	},
+}
+
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Int", 0, "Hits" )
 	self:NetworkVar( "Float", 0, "NextLoop" )
@@ -19,8 +48,14 @@ function SWEP:SetupDataTables()
 end
 
 function SWEP:Initialize()
-	self:SetHoldType( self.HoldType )
+	self.ActiveUpgrades = {}
 end
+
+local IgnitePhrases = {
+	"scpfp/scp/457/ignite1.wav",
+	"scpfp/scp/457/ignite2.wav",
+	"scpfp/scp/457/ignite3.wav",
+}
 
 function SWEP:Think()
 	local ft, ct = FrameTime(), CurTime()
@@ -38,7 +73,7 @@ function SWEP:Think()
 
 		if ct > self.nextIgnite then
 			for i, ply in ipairs( ents.FindInSphere( owner:GetPos() + owner:OBBCenter(), 128 ) ) do
-				if !ply:IsPlayer() or ply == owner then continue end
+				if !ply:IsPlayer() or ply == owner or not ply:Alive() then continue end
 
 				self.nextIgnite = ct + 1
 
@@ -50,7 +85,12 @@ function SWEP:Think()
 				ply:TakeDamageInfo( dmg )
 
 				ply:Burn( 3, 64, owner, 1, false, false )
-				--print( ply:Nick().." BURNED!" )
+
+				if self.nextPhrase < ct then
+					self.nextPhrase = ct + 10
+
+					owner:EmitSound( IgnitePhrases[ FPRandom( 1, #IgnitePhrases ) ], 60 )
+				end
 			end
 		end
 	else
@@ -75,6 +115,12 @@ hook.Add( "CanArmorRegen", "457PreventNaturalArmorRegen", function( ply )
 end )
 
 hook.Add( "FPPlayerFootstep", "457PreventFootsteps", function( ply )
+	if ply:GetFPClass() == "SCP457" then
+		return true
+	end
+end )
+
+hook.Add( "FPShouldDisableBobbing", "457PreventBobbing", function( ply )
 	if ply:GetFPClass() == "SCP457" then
 		return true
 	end
