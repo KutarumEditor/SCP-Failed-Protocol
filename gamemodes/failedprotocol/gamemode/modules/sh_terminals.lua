@@ -50,7 +50,7 @@ function GeneratePassword()
     local keys = table.GetKeys( AVAILABLE_CHARS )
 
     for i = 1, MAX_PASSWORD_LENGHT do
-        password = password .. keys[math.random( #keys )]
+        password = password .. keys[FPRandom( #keys )]
     end
 
     return password

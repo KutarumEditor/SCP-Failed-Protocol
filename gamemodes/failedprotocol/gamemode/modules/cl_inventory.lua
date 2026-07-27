@@ -133,7 +133,6 @@ hook.Add( "DrawOverlay", "FPItemInfo", function()
     hovPan.DrawInfo()
 end )
 
-local moving_item = nil
 hook.Add( "DrawOverlay", "FPItemMove", function()
     local hovPan = vgui.GetHoveredPanel()
 
@@ -184,8 +183,6 @@ function CreateInventoryUI()
             self:Remove()
         end
 
-        local eased = math.ease.OutCirc( self:GetAlpha()/245 )
-
         draw.RoundedBox( 0, 0, 0, w, h, Color( 5, 5, 5, 240 ) )
         surface.SetDrawColor( 45, 45, 45, 25 )
 
@@ -231,11 +228,9 @@ function CreateInventoryUI()
     mdl:SetDirectionalLight( BOX_TOP, Color( 75, 75, 75 ) )
     mdl:SetDirectionalLight( BOX_FRONT, Color( 175, 175, 175 ) )
 
-    local openTime = CurTime()
     local clBMerges = {}
     function mdl:DrawModel()
         local ply = LocalPlayer()
-        local eased = math.ease.OutCirc( frame:GetAlpha() / 245 )
         local curparent = self
         local leftx, topy = self:LocalToScreen( 0, 0 )
         local rightx, bottomy = self:LocalToScreen( self:GetWide(), self:GetTall() )
@@ -261,7 +256,6 @@ function CreateInventoryUI()
             for i, bm in ipairs( ply:GetChildren() ) do
                 if not bm:IsDerived( "fp_bonemerge" ) then continue end
 
-                local mdl_ent = ClientsideModel( bm:GetModel(), RENDERGROUP_OPAQUE )
                 if IsValid( mdl_ent ) then
                     mdl_ent:SetNoDraw( true )
                     mdl_ent:AddEffects( EF_BONEMERGE )
@@ -295,7 +289,6 @@ function CreateInventoryUI()
     local lastCurPos = input.GetCursorPos()
     local doneOnce = false
     local mdlLerp = 0
-    local look_ratio = 0
     function mdl:LayoutEntity( ent )
         local lp = LocalPlayer()
         self:SetCursor( "sizewe" )

@@ -24,11 +24,11 @@ hook.Add( "Think", "Horror", function()
                 darken = true
                 timer.Simple( 1, function() darken = false end )
 
-                surface.PlaySound( table.Random( horror_tbl ) )
+                surface.PlaySound( horror_tbl[FPRandom( #horror_tbl )] )
 
-                NextSeeSCPs = CurTime() + math.random( 30, 40 )
+                NextSeeSCPs = CurTime() + FPRandom( 30, 40 )
                 AMBIENT.Ban(3)
-                AMBIENT.Restart( table.Random( horror_ambient_tbl ) )
+                AMBIENT.Restart( horror_ambient_tbl[FPRandom( #horror_ambient_tbl )] )
                 break
             end
         end

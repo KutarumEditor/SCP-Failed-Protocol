@@ -305,3 +305,7 @@ function FPDrawRing( x, y, radius, thickness, fill, rotation, cap_radius, outlin
 		outline_r or 0, outline_g or 0, 	outline_b or 0
 	)
 end
+
+function UndoScreenScale( w )
+    return w * ( 640 / ScrW() )
+end

@@ -69,7 +69,7 @@ function SWEP:PrimaryAttack()
 		local Dist = ( owner:GetShootPos() - tr.HitPos ):Length()
 
 		if Dist < self.ReachDistance then
-			sound.Play( "Flesh.ImpactSoft", owner:GetShootPos(), 65, math.random( 90, 110 ) )
+			sound.Play( "Flesh.ImpactSoft", owner:GetShootPos(), 65, FPRandom( 90, 110 ) )
 
 			self:SetCarrying( tr.Entity, tr.PhysicsBone, tr.HitPos, Dist )
 

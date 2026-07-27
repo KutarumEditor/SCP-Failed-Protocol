@@ -89,7 +89,7 @@ function SWEP:Think()
 				if self.nextPhrase < ct then
 					self.nextPhrase = ct + 10
 
-					owner:EmitSound( IgnitePhrases[ FPRandom( 1, #IgnitePhrases ) ], 60 )
+					owner:EmitSound( IgnitePhrases[FPRandom( #IgnitePhrases ) ], 60 )
 				end
 			end
 		end

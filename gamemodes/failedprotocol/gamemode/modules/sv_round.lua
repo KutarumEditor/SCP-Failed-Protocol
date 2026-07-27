@@ -315,8 +315,8 @@ function SetupPlayers( type )
 		local possible_scps = table.GetKeys( SCPS )
 
 		for i = 1, scps do
-			local selected_ply = table.remove( all_players, math.random( 1, #all_players ) )
-			local selected_scp = table.remove( possible_scps, math.random( 1, #possible_scps ) )
+			local selected_ply = table.remove( all_players, FPRandom( #all_players ) )
+			local selected_scp = table.remove( possible_scps, FPRandom( #possible_scps ) )
 			selected_ply:SetFrags( 0 )
 			selected_ply:SetupSCP( selected_scp, false )
 			selected_ply:PopupStartInfo()

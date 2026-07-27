@@ -88,7 +88,7 @@ function SWEP:CalcHit()
 		if IsValid( victim ) then
 			local oldvel = victim:GetVelocity()
 
-			local dmg = math.random( self.Damage[1], self.Damage[2] )
+			local dmg = FPRandom( self.Damage[1], self.Damage[2] )
 
 			local d = DamageInfo()
 			d:SetDamage( dmg )
@@ -123,7 +123,7 @@ function SWEP:PrimaryAttack()
 	local ply = self.Owner
 	local vm = ply:GetViewModel()
 
-	vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( math.random( 1, 100 ) > 50 and ACT_VM_PRIMARYATTACK_2 or ACT_VM_PRIMARYATTACK_1 ) )
+	vm:SendViewModelMatchingSequence( vm:SelectWeightedSequence( FPRandom( 1, 100 ) > 50 and ACT_VM_PRIMARYATTACK_2 or ACT_VM_PRIMARYATTACK_1 ) )
 	vm:SetPlaybackRate( self.AnimSpeed.Attack )
 
 	self.Owner:SetAnimation( PLAYER_ATTACK1 )

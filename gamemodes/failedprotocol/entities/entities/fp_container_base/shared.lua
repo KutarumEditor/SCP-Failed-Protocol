@@ -54,7 +54,7 @@ function ENT:Store( ent, force )
     if ( self:CheckTotalVolume() + ent:InitVolume() > self.Volume or ent.IsBeingDragged != true or ent:IsDerived( "cv_container_base" ) ) and ( force == nil or force == false ) then return end
 
     ent:Remove()
-    self:EmitSound( istable( self.StoreSounds ) and table.Random( self.StoreSounds ) or self.StoreSounds )
+    self:EmitSound( istable( self.StoreSounds ) and self.StoreSounds[FPRandom( #self.StoreSounds )] or self.StoreSounds )
 
     table.insert( self.Items, tab )
 
@@ -82,7 +82,7 @@ function ENT:TakeOut( num, ply )
         ent:SetClip1( tbl.clip )
     end
 
-    self:EmitSound( istable( self.TakeOutSounds ) and table.Random( self.TakeOutSounds ) or self.TakeOutSounds )
+    self:EmitSound( istable( self.TakeOutSounds ) and self.TakeOutSounds[FPRandom( #self.TakeOutSounds )] or self.TakeOutSounds )
 
     self:SyncStorage()
 end
