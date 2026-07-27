@@ -1,8 +1,8 @@
 "failedprotocol"
 {
-	"base"		"base"
-	"title"		"SCP: Failed Protocol"
-	"maps"		"^fp_"
+	"base"			"base"
+	"title"			"SCP: Failed Protocol"
+	"maps"			"^fp_"
 	"menusystem"	"1"
 	"category"		"roleplay"
 }

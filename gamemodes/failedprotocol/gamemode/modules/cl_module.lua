@@ -30,6 +30,13 @@ local hide = {
 	["CHudWeaponSelection"] = true,
 	["CHUDQuickInfo"] = true,
 	["CHudHistoryResource"] = true,
+	["CHUDAutoAim"] = true,
+	["CHudPoisonDamageIndicator"] = true,
+	["CHudSquadStatus"] = true,
+	["CHudTrain"] = true,
+	["CHudVehicle"] = true,
+	["CHudCloseCaption"] = true,
+	["CHudGeiger"] = true,
 	--[""] = true,
 }
 
