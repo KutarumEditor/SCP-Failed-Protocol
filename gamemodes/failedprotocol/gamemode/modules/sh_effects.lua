@@ -78,7 +78,8 @@ end
 if SERVER then
 
 hook.Add( "Tick", "FPEffectsCalc", function()
-	for i, ply in ipairs( player.GetAll() ) do
+	// for _, ply in ipairs( player.GetAll() ) do
+	for _, ply in player.Iterator() do
 		ply.FPProperties = ply.FPProperties or {}
 		ply.FPProperties.Effects = ply.FPProperties.Effects or {}
 

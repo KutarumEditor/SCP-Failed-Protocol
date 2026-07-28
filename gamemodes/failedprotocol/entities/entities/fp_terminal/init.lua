@@ -2,7 +2,7 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
-ENT.Password = 1234
+ENT.Password = 1488
 
 function ENT:Think()
     local user = self:GetUser()

@@ -83,7 +83,7 @@ net.ReceivePing( "WarheadStart", function()
 end )
 
 net.ReceivePing( "WarheadCrank", function()
-    print( "Pizdets..." )
+    print( "Pizdets Vam..." )
     local ply = LocalPlayer()
 
     WARHEAD_SIREN = false

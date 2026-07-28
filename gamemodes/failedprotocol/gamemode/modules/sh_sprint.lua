@@ -49,9 +49,7 @@ local function CalcStamina( ply )
 	if !ply.Stamina then
 		ply.Stamina = true
 		ply.StaminaRegen = 0
-	end
-
-	if !ply.Stamina then return end
+	return end
 
 	local ct = CurTime()
 	local exhausted = ply:GetExhausted()
@@ -76,7 +74,7 @@ end
 
 hook.Add( "Tick", "FPStaminaCalc", function()
 	if SERVER then
-		for i, v in ipairs( player.GetAll() ) do
+		for i, v in player.Iterator() do
 			CalcStamina( v )
 		end
 	else

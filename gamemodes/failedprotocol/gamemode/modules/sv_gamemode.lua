@@ -51,7 +51,7 @@ function GM:PlayerUse( ply, ent )
 	return true
 end
 
-hook.Add( "KeyRelease", "UseExample", function( ply, key )
+hook.Add( "KeyRelease", "UseDepresser", function( ply, key )
     if key == IN_USE then
         ply.depressedUse = true
     end
