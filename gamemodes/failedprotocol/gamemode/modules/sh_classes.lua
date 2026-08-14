@@ -61,6 +61,21 @@ SPAWNGROUPS = {
 			return next_mtf != nil and next_mtf > 0
 		end,
 		callback = function( plys )
+			--[[TIMERS.Create( "GOCAnnounce", 7, function()
+				PA.Play( "scpfp/public_announcements/goc.wav", "epsilon11" )
+
+				local scps = SCPCount()
+				if scps > 0 and scps < 4 then
+					PA.Play( "scpfp/public_announcements/"..scps.."_scp.wav", "scp"..scps )
+				else
+					PA.Play( "scpfp/public_announcements/intercom_end.wav" )
+				end
+			end )]]
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "GOCSpawn", nil, ply )
+			end
+
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -79,7 +94,16 @@ SPAWNGROUPS = {
 				ROUNDPROP.Set( "next_mtf", 0 )
 			end
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			ROUNDPROP.Set( "gru_arrived", true )
 			SetNextSupport( "spear" )
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "GRUSpawn", nil, ply )
+			end
+
+			TIMERS.Create( "GRUAnnounce", 9, function()
+				PA.Play( "scpfp/public_announcements/goi.wav", "goi" )
+			end )
 		end
 	},
 	["spear"] = {
@@ -90,11 +114,17 @@ SPAWNGROUPS = {
 		maxplayers = 4,
 		max = 1,
 		check = function()
-			local next_mtf = ROUNDPROP.Get( "next_mtf" )
-
-			return next_mtf != nil and next_mtf > 0
+			return ROUNDPROP.Set( "gru_arrived" ) == true
 		end,
 		callback = function( plys )
+			TIMERS.Create( "SPEARAnnounce", 7, function()
+				PA.Play( "scpfp/public_announcements/goi.wav", "goi" )
+			end )
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "SPEARSpawn", nil, ply )
+			end
+
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -111,6 +141,14 @@ SPAWNGROUPS = {
 			return next_mtf != nil and next_mtf > 0
 		end,
 		callback = function( plys )
+			TIMERS.Create( "CIAnnounce", 11.53, function()
+				PA.Play( "scpfp/public_announcements/goi.wav", "goi" )
+			end )
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "CISpawn", nil, ply )
+			end
+
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -127,6 +165,14 @@ SPAWNGROUPS = {
 			return next_mtf != nil and next_mtf > 0
 		end,
 		callback = function( plys )
+			TIMERS.Create( "SHAnnounce", 6.4, function()
+				PA.Play( "scpfp/public_announcements/goi.wav", "goi" )
+			end )
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "SHSpawn", nil, ply )
+			end
+
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},
@@ -143,6 +189,14 @@ SPAWNGROUPS = {
 			return next_mtf != nil and next_mtf > 0
 		end,
 		callback = function( plys )
+			TIMERS.Create( "CBGAnnounce", 19.38, function()
+				PA.Play( "scpfp/public_announcements/goi.wav", "goi" )
+			end )
+
+			for i, ply in ipairs( plys ) do
+				net.Ping( "CBGSpawn", nil, ply )
+			end
+
 			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
 		end
 	},

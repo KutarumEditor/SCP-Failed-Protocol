@@ -7,6 +7,7 @@ local sound_duration_override = {
 	["scpfp/public_announcements/epsilon11_arrival.wav"] = 12.2,
 	["scpfp/public_announcements/beta7_arrival.wav"] = 14.7,
 	["scpfp/public_announcements/nu7_arrival.wav"] = 14.7,
+	["scpfp/public_announcements/goi.wav"] = 11,
 }
 
 function PA.Play( snd, subs )

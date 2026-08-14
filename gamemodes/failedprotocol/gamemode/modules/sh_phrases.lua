@@ -22,6 +22,7 @@ local sndDurTbl = {
 	["scpfp/public_announcements/malfunction.wav"] = 6.5,
 	["scpfp/public_announcements/breach.wav"] = 14.6,
 	["scpfp/public_announcements/epsilon11_arrival.wav"] = 12,
+	["scpfp/public_announcements/goi.wav"] = 10.3,
 	["scpfp/public_announcements/1_scp.wav"] = 3.5,
 	["scpfp/public_announcements/2_scp.wav"] = 3.5,
 	["scpfp/public_announcements/3_scp.wav"] = 3.5,

@@ -169,6 +169,10 @@ net.ReceivePing( "MTFSpawn", function()
 	MTFCutscene()
 end )
 
+net.ReceivePing( "GRUSpawn", function()
+	GRUCutscene()
+end )
+
 concommand.Add( "ntf_test", MTFCutscene )
 
 concommand.Add( "gru_test", GRUCutscene )

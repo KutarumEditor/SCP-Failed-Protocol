@@ -357,6 +357,7 @@ PHRASES.pa = {
 	malfunction = "We've received reports of multiple electrical and door control issues. \nPlease remain calm and...",
 	breach = "We've got multiple site-wide containment breaches. \nAll military personnel are ordered to head to the light, organic and heavy containment zones to localize the threat. \nOther staff are advised to stay in any safe area until site is secured.",
 	epsilon11 = "Mobile Task Force unit Epsilon-11 designated 'Nine-Tailed Fox' has entered the facility. \nAll remaining personnel are advised to proceed with standart evacuation protocols.",
+	goi = "Unknown subjects have entered the facility. \nAll remaining personnel are advised to stay in one of many shelters or any other safe area until threat is neutralized.",
 	scp1 = "Awaiting recontainment of 1 SCP subject.",
 	scp2 = "Awaiting recontainment of 2 SCP subjects.",
 	scp3 = "Awaiting recontainment of 3 SCP subjects.",
