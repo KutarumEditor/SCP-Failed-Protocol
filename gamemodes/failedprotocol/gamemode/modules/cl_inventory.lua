@@ -256,6 +256,7 @@ function CreateInventoryUI()
             for i, bm in ipairs( ply:GetChildren() ) do
                 if not bm:IsDerived( "fp_bonemerge" ) then continue end
 
+                local mdl_ent = ClientsideModel( bm:GetModel(), RENDERGROUP_OPAQUE )
                 if IsValid( mdl_ent ) then
                     mdl_ent:SetNoDraw( true )
                     mdl_ent:AddEffects( EF_BONEMERGE )
@@ -337,7 +338,6 @@ function CreateInventoryUI()
             helmet_mdl = nil
         end
         
-        -- Обязательно очищаем модель оружия при закрытии панели
         if IsValid( self.WeaponModel ) then
             self.WeaponModel:Remove()
             self.WeaponModel = nil
