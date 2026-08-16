@@ -56,6 +56,64 @@ function CLASS:SetupDataTables()
 	end
 end
 
+local MV_CFG = {}
+MV_CFG.Acceleration = 256
+MV_CFG.Decceleration = 128
+
+function CLASS:Move( mv )
+	local ply = self.Player
+
+	local velLength = ply:GetVelocity():Length2DSqr()
+    if mv:KeyReleased(IN_SPEED) or mv:KeyDown(IN_SPEED) and velLength < .25 then ply.Run_fading = true end
+    if mv:KeyDown(IN_MOVELEFT) or mv:KeyDown(IN_MOVERIGHT) then
+        ply.Run_fading = true
+        mv:SetSideSpeed(mv:GetSideSpeed() * .75)
+    end
+
+	local moveButtonsPressed = mv:KeyDown( bit.bor( IN_FORWARD, IN_BACK, IN_MOVELEFT, IN_MOVERIGHT ) )
+    if mv:KeyDown(IN_SPEED) and velLength > .25 or ply.SprintMove and not ply.Run_fading then
+        if not ply.SprintMove then
+            ply.Run_fading = nil
+            ply.SprintMove = true
+            ply.Sprint_Speed = ply:GetWalkSpeed()
+        end
+
+        ply.Sprint_Speed = math.Approach( ply.Sprint_Speed, ply:GetRunSpeed(), FrameTime() * MV_CFG.Acceleration )
+        mv:SetMaxClientSpeed(ply.Sprint_Speed)
+        mv:SetMaxSpeed(ply.Sprint_Speed)
+
+		if moveButtonsPressed then
+			ply.HardStopped = nil
+		end
+    elseif ply.SprintMove and ply.Run_fading then
+        local walk_Speed = ply:GetWalkSpeed()
+        ply.Sprint_Speed = math.Approach( ply.Sprint_Speed, walk_Speed, FrameTime() * MV_CFG.Decceleration )
+        mv:SetMaxClientSpeed(ply.Sprint_Speed)
+        mv:SetMaxSpeed(ply.Sprint_Speed)
+        if ply.Sprint_Speed == walk_Speed then
+            ply.SprintMove = nil
+            ply.Sprint_Speed = nil
+        end
+    end
+
+	
+	if SERVER and velLength > ply:GetWalkSpeed() / 2 and ( mv:KeyReleased(IN_SPEED) or mv:KeyDown(IN_SPEED) ) and not moveButtonsPressed and ply.HardStopped != true and ply:OnGround() then
+		ply.HardStopped = true
+		ply:EmitSound( "player/stop0"..FPRandom( 8 )..".ogg" )
+	end
+
+    if ply:Crouching() then
+        local walk_speed = ply:GetWalkSpeed()
+        mv:SetMaxClientSpeed(walk_speed * .5)
+        mv:SetMaxSpeed(walk_speed * .5)
+    end
+
+    if ply.SpeedMultiplier then
+        mv:SetMaxClientSpeed(mv:GetMaxClientSpeed() * ply.SpeedMultiplier)
+        mv:SetMaxSpeed(mv:GetMaxSpeed() * ply.SpeedMultiplier)
+    end
+end
+
 player_manager.RegisterClass( "fp_player", CLASS, "player_default" )
 
 --[[-------------------------------------------------------------------------
