@@ -60,6 +60,7 @@ local MV_CFG = {}
 MV_CFG.Acceleration = 256
 MV_CFG.Decceleration = 128
 
+--thanks to Mannytko
 function CLASS:Move( mv )
 	local ply = self.Player
 

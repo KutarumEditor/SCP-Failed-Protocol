@@ -1,7 +1,7 @@
 --[[-------------------------------------------------------------------------
 Database config
 ---------------------------------------------------------------------------]]
-local SLCDatabaseConfig = {
+local FPDatabaseConfig = {
 	ENGINE = "SQLite", //"MySQL" for MySQL, anything else for SQLite
 	HOST = "",
 	PORT = "3306",
@@ -10,12 +10,12 @@ local SLCDatabaseConfig = {
 	DATABASE = "",
 }
 
-if SLCDatabaseConfig.ENGINE == "MySQL" then
-	SLCDatabase:Connect( {
-		host = SLCDatabaseConfig.HOST,
-		port = SLCDatabaseConfig.PORT,
-		username = SLCDatabaseConfig.USER,
-		password = SLCDatabaseConfig.PASSWORD,
-		database = SLCDatabaseConfig.DATABASE,
+if FPDatabaseConfig.ENGINE == "MySQL" then
+	FPDatabase:Connect( {
+		host = FPDatabaseConfig.HOST,
+		port = FPDatabaseConfig.PORT,
+		username = FPDatabaseConfig.USER,
+		password = FPDatabaseConfig.PASSWORD,
+		database = FPDatabaseConfig.DATABASE,
 	} )
 end
