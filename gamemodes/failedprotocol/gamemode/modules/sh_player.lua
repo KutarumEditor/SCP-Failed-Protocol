@@ -64,14 +64,14 @@ function CLASS:Move( mv )
 	local ply = self.Player
 
 	local velLength = ply:GetVelocity():Length2DSqr()
-    if mv:KeyReleased(IN_SPEED) or mv:KeyDown(IN_SPEED) and velLength < .25 then ply.Run_fading = true end
-    if mv:KeyDown(IN_MOVELEFT) or mv:KeyDown(IN_MOVERIGHT) then
+    if mv:KeyReleased( IN_SPEED ) or mv:KeyDown( IN_SPEED ) and velLength < .25 then ply.Run_fading = true end
+    if mv:KeyDown( bit.bor( IN_MOVELEFT, IN_MOVERIGHT ) ) then
         ply.Run_fading = true
-        mv:SetSideSpeed(mv:GetSideSpeed() * .75)
+        mv:SetSideSpeed( mv:GetSideSpeed() * .75 )
     end
 
 	local moveButtonsPressed = mv:KeyDown( bit.bor( IN_FORWARD, IN_BACK, IN_MOVELEFT, IN_MOVERIGHT ) )
-    if mv:KeyDown(IN_SPEED) and velLength > .25 or ply.SprintMove and not ply.Run_fading then
+    if mv:KeyDown( IN_SPEED ) and velLength > .25 or ply.SprintMove and not ply.Run_fading then
         if not ply.SprintMove then
             ply.Run_fading = nil
             ply.SprintMove = true
@@ -79,8 +79,8 @@ function CLASS:Move( mv )
         end
 
         ply.Sprint_Speed = math.Approach( ply.Sprint_Speed, ply:GetRunSpeed(), FrameTime() * MV_CFG.Acceleration )
-        mv:SetMaxClientSpeed(ply.Sprint_Speed)
-        mv:SetMaxSpeed(ply.Sprint_Speed)
+        mv:SetMaxClientSpeed( ply.Sprint_Speed )
+        mv:SetMaxSpeed( ply.Sprint_Speed )
 
 		if moveButtonsPressed then
 			ply.HardStopped = nil
@@ -88,8 +88,8 @@ function CLASS:Move( mv )
     elseif ply.SprintMove and ply.Run_fading then
         local walk_Speed = ply:GetWalkSpeed()
         ply.Sprint_Speed = math.Approach( ply.Sprint_Speed, walk_Speed, FrameTime() * MV_CFG.Decceleration )
-        mv:SetMaxClientSpeed(ply.Sprint_Speed)
-        mv:SetMaxSpeed(ply.Sprint_Speed)
+        mv:SetMaxClientSpeed( ply.Sprint_Speed )
+        mv:SetMaxSpeed( ply.Sprint_Speed )
         if ply.Sprint_Speed == walk_Speed then
             ply.SprintMove = nil
             ply.Sprint_Speed = nil
