@@ -79,3 +79,19 @@ LOOTABLES = {
 	},
 	
 }
+
+EXITS = {
+	["main"] = {
+		bounds = {
+			Vector( 1684.8288574219, -2303.525390625, -143.96875 ),
+			Vector( 1855.96875, -2176.7062988281, -28.934730529785 ),
+		},
+		time = 10,
+		check = function( ply )
+			return true
+		end,
+		callback = function( ply )
+			print( ply:Nick() .. " escaped through the main exit!" )
+		end
+	},
+}

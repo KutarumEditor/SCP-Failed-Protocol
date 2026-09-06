@@ -14,7 +14,7 @@ function PLAYER:SyncTerminal()
     if not SERVER then return end
 
     local t = self.Terminal
-    net.Ping( "SyncTerminalUser", t == nil and "nil" or tostring( t:EntIndex() ) )
+    net.Ping( "SyncTerminalUser", t == nil and "nil" or tostring( t:EntIndex() ), self )
 end
 
 hook.Add( "StartCommand", "FPTerminalInput", function( ply, cmd )
@@ -31,7 +31,7 @@ hook.Add( "StartCommand", "FPTerminalInput", function( ply, cmd )
 
         if CLIENT and ply:KeyPressed( IN_USE ) and ct > ply.LastUseTime + .1 then
             ply.Terminal = nil
-            net.Ping( "FPStopTerminalUsage" )
+            net.Ping( "FPStopTerminalUsage", self )
         end
     else
         ply.LastUseTime = ct

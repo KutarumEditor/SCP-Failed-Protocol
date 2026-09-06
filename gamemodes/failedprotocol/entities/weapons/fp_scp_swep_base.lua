@@ -11,7 +11,7 @@ SWEP.BobScale = 2
 SWEP.SCP_SWEP = true
 SWEP.Droppable = false
 
-SWEP.AutoSwitchTo = true
+SWEP.AutoSwitchTo = false
 SWEP.Weight = 1
 
 SWEP.Damage = 45

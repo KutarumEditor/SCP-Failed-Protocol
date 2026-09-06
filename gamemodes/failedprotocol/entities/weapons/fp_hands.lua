@@ -6,7 +6,7 @@ SWEP.WorldModel = "models/hunter/blocks/cube025x025x025.mdl"
 SWEP.ShouldDrawWM = false
 
 SWEP.AutoSwitchTo = true
-SWEP.Weight = 999
+SWEP.Weight = 100
 
 SWEP.Droppable = false
 
@@ -27,16 +27,13 @@ SWEP.CantBeCarried = {
 	["func_door_rotating"] = true,
 	["prop_door_rotating"] = true,
 	["prop_dynamic"] = true,
-	["cv_blood"] = true,
-	["cv_armor"] = true,
-	["cv_delivery_point"] = true,
-	["cv_deliverer_locker"] = true,
-	["cv_fading_bag"] = true,
+	["fp_armor"] = true,
 	["fp_tesla_gate"] = true,
 	["fp_tesla_killer"] = true,
 	["fp_lootable"] = true,
 	["fp_terminal"] = true,
 	["fp_info_monitor"] = true,
+	["fp_exit"] = true,
 }
 
 function SWEP:SetupDataTables()
@@ -50,12 +47,8 @@ function SWEP:SetupDataTables()
 	self:SetCuffer( nil )
 end
 
-function SWEP:Initialize()
+function SWEP:CustomInit()
 	self:InitLang()
-
-	self:DrawShadow( false )
-
-	self:SetHoldType( self.HoldType )
 end
 
 function SWEP:PrimaryAttack()

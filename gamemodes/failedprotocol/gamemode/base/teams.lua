@@ -420,7 +420,6 @@ FPTeams.SetupEscort( TEAM_SD, TEAM_SCI )
 
 local function _devPrintAllRelations()
 	local convertNums = {
-		[1] = "Spectators",
 		[2] = "Class-D",
 		[3] = "Personnel",
 		[4] = "Security",
@@ -436,10 +435,14 @@ local function _devPrintAllRelations()
 	}
 
 	for i, v in ipairs( FPTeams.REG ) do
+		if i == 1 then continue end
+
 		local name = convertNums[i] or "UNKNOWN_TEAM"
 		MsgC( color_white, "### ", FPTeams.GetColor( i ), name, color_white, " / Relations:\n" )
 
 		for _, t in pairs( convertNums ) do
+			if _ == 1 then continue end
+
 			local clr = Color( 104, 36, 36)
 			if FPTeams.IsAlly( i, _ ) then
 				clr = Color( 63, 128, 63)

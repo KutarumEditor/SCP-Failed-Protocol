@@ -81,7 +81,7 @@ function OpenUpgradeMenu()
     local scale = ScreenScale( 14 ) 
 
     function frame:Paint( w, h )
-        if not ply:Alive() or not input.IsButtonDown( CL_SETTINGS.Get( "fp_upgrade_menu" ) ) or wep.SCP_SWEP != true or not wep.FPUpgrades then
+        if not ply:Alive() or not input.IsButtonDown( CL_SETTINGS.Get( "fp_scp_upgrades_button" ) ) or wep.SCP_SWEP != true or not wep.FPUpgrades then
             local x, y = input.GetCursorPos()
             LAST_CURSOR_POS = {
                 x = x,
@@ -292,7 +292,7 @@ function OpenUpgradeMenu()
 end
 
 hook.Add( "PlayerButtonDown", "FPUpgradesOpen", function( ply, button )
-    if CLIENT and button == CL_SETTINGS.Get( "fp_upgrade_menu" ) and IsFirstTimePredicted() then
+    if CLIENT and button == CL_SETTINGS.Get( "fp_scp_upgrades_button" ) and IsFirstTimePredicted() then
         OpenUpgradeMenu()
     end
 end )

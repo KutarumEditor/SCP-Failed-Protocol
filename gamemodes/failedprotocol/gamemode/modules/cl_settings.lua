@@ -53,8 +53,6 @@ CL_SETTINGS.Register( "fp_scp_upgrades_button", KEY_B, "bind" )
 
 CL_SETTINGS.Register( "fp_drop_weapon", KEY_G, "bind" )
 
-CL_SETTINGS.Register( "fp_upgrade_menu", KEY_B, "bind" )
-
 CL_SETTINGS.Register( "fp_language", "english", "list" )
 
 function CL_SETTINGS.Set( name, val )

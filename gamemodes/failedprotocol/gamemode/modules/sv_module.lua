@@ -98,6 +98,12 @@ function GM:PlayerDeath( ply, inf, att )
 		net.WriteString( reason )
 	net.Broadcast()
 
+	if att:IsValid() then
+		MsgC( color_white, "Player "..ply:Nick().." (", FPTeams.GetColor( ply:FPTeam() ), ply:GetFPClass(), color_white, ") was killed by "..att:Nick().." (", FPTeams.GetColor( att:FPTeam() ), att:GetFPClass(), color_white, ")\n" )
+	else
+		MsgC( color_white, "Player "..ply:Nick().." (", FPTeams.GetColor( ply:FPTeam() ), ply:GetFPClass(), color_white, ") died\n" )
+	end
+	
 	if ply:FPTeam() == TEAM_SCP then return end
 
 	if inf:IsValid() and inf:GetClass() == "fp_melee_034" then

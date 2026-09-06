@@ -6,7 +6,7 @@ SWEP.ShouldDrawVM = true
 SWEP.WorldModel = "models/kutarum/scpfp/w_keycard.mdl"
 SWEP.ShouldDrawWM = false
 
-SWEP.AutoSwitchTo = true
+SWEP.AutoSwitchTo = false
 SWEP.Weight = 1
 
 SWEP.HoldType = "slam"

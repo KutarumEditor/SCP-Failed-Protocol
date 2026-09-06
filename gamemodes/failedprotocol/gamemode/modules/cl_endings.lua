@@ -19,7 +19,7 @@ hook.Add( "FPHUD", "DrawEnding", function()
     local info = GetEndingInfo( endType )
 
     if info != {} and ct < endTime then
-        draw.SimpleText( info.lang, "HUDNormal", ScrW()/2, ScrH()/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+        draw.SimpleText( LANG.Get( "ENDINGS", info.lang ), "HUDNormal", ScrW()/2, ScrH()/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
     end
 end )
 

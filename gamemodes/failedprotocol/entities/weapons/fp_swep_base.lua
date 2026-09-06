@@ -61,6 +61,10 @@ function SWEP:InitLang()
 	self.PrintDesc = wepLang.desc
 end
 
+function SWEP:CustomInit()
+	--
+end
+
 function SWEP:Initialize()
 	self:InitLang()
 
@@ -91,6 +95,8 @@ function SWEP:Initialize()
 			end
 		end
 	end
+
+	self:CustomInit()
 end
 
 function SWEP:PrimaryAttack()

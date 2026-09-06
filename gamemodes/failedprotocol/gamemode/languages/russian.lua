@@ -19,6 +19,31 @@ MISC.cuffed = "Вы связаны"
 MISC.escaping = "Вы сбежите через"
 MISC.inventory = "Инвентарь"
 
+local INV = {}
+lang.INV = INV
+
+INV.inventory = "Инвентарь"
+INV.helmet = "Шлем"
+INV.active = "Активно"
+INV.armor = "Броня"
+INV.suit = "Костюм"
+INV.ready = "Готово"
+INV.equipped = "Экипировано"
+INV.condition = "Состояние"
+INV.unverified_contact = "Непроверенный контакт"
+INV.loot_contact = "Контакт с добычей"
+INV.quantity = "Количество"
+INV.lmb_hold_identify = "ЛКМ  •  Опознать"
+INV.lmb_take = "ЛКМ  •  Взять"
+INV.controls_equip_drop = "ЛКМ Экипировать  •  ПКМ Бросить"
+INV.empty = "Пусто"
+INV.unverified = "Не проверено"
+INV.scanning = "Сканирование"
+INV.unknown = "Неизвестно"
+INV.blocked = "Заблокировано"
+INV.take = "Взять"
+INV.loot = "Добыча"
+
 local MENU = {}
 lang.MENU = MENU
 
@@ -196,20 +221,14 @@ BODY.reason = "Причина смерти"
 BODY.time = "Время смерти"
 BODY.items = "Предметы"
 
-local ROUNDENDINFO = {}
-lang.ROUNDENDINFO = ROUNDENDINFO
+local ENDINGS = {}
+lang.ENDINGS = ENDINGS
 
-ROUNDENDINFO.result = "Результат раунда:"
-
-ROUNDENDINFO.mvps = "Лучшие игроки:"
-ROUNDENDINFO.frags = "очков"
-
-ROUNDENDINFO.audit = "Аудит:"
-
-ROUNDENDINFO.foundation = "Фонд восстановил контроль"
-ROUNDENDINFO.scp = "Аномалии высвободились"
-ROUNDENDINFO.captured = "Комплекс захвачен"
-ROUNDENDINFO.warheads = "Боеголовки взорваны"
+ENDINGS.facility_destroyed = "Комплекс был уничтожен"
+ENDINGS.power_seized = "Комплекс был захвачен"
+ENDINGS.break_out = "Аномалии захватили комплекс"
+ENDINGS.control_regained = "Контроль восстановлен"
+ENDINGS.unknown_fate = "Судьба комплекса неизвестна"
 
 local WEP = {}
 lang.WEP = WEP

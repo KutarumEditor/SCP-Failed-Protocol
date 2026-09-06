@@ -585,6 +585,7 @@ CLASSES = {
 		spawngroup = "sh",
 		team = TEAM_SH,
 		model = "models/kutarum/scpfp/playermodels/sh_com.mdl",
+		max = 1,
 		weps = { "tfa_fp_sg552" },
 		ammo = { ["556x45"] = 120 },
 		vest = "sh_vest",

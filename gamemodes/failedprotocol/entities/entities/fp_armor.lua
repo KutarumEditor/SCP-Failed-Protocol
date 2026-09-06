@@ -47,7 +47,7 @@ function ENT:Use( activator, caller )
     activator:TimedTask( "armor_equip", 5, Color( 200, 155, 0 ),
     function()
         return IsValid( self ) and IsValid( activator ) and activator.FPArmor[self.ArmorType].name == nil and
-            activator:EyePos():Distance( activator:GetEyeTrace().HitPos ) < 100 and activator:GetEyeTrace().Entity == self
+            activator:EyePos():Distance( self:GetPos() ) < 100
     end, function()
         activator:SetFPArmor( self.ArmorType, self:GetType(), self:GetDurability() )
 

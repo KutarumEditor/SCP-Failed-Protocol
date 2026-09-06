@@ -19,6 +19,31 @@ MISC.cuffed = "You are detained"
 MISC.escaping = "You are escaping through"
 MISC.inventory = "Inventory"
 
+local INV = {}
+lang.INV = INV
+
+INV.inventory = "Inventory"
+INV.helmet = "Helmet"
+INV.active = "Active"
+INV.armor = "Armor"
+INV.suit = "Suit"
+INV.ready = "Ready"
+INV.equipped = "Equipped"
+INV.condition = "Condition"
+INV.unverified_contact = "Unverified contact"
+INV.loot_contact = "Loot contact"
+INV.quantity = "Quantity"
+INV.lmb_hold_identify = "LMB  •  Identify"
+INV.lmb_take = "LMB  •  Take"
+INV.controls_equip_drop = "LMB Equip  •  RMB Drop"
+INV.empty = "Empty"
+INV.unverified = "Uverified"
+INV.scanning = "Scanning"
+INV.unknown = "Unknown"
+INV.blocked = "Blocked"
+INV.take = "Take"
+INV.loot = "Loot"
+
 local MENU = {}
 lang.MENU = MENU
 
@@ -197,20 +222,14 @@ BODY.reason = "Death reason"
 BODY.time = "Death time"
 BODY.items = "Items"
 
-local ROUNDENDINFO = {}
-lang.ROUNDENDINFO = ROUNDENDINFO
+local ENDINGS = {}
+lang.ENDINGS = ENDINGS
 
-ROUNDENDINFO.result = "Round result:"
-
-ROUNDENDINFO.mvps = "Best players:"
-ROUNDENDINFO.frags = "points"
-
-ROUNDENDINFO.audit = "Audit:"
-
-ROUNDENDINFO.foundation = "Foundation regained control"
-ROUNDENDINFO.scp = "Anomalies outbroke"
-ROUNDENDINFO.captured = "Facility was captured"
-ROUNDENDINFO.warheads = "Warheads detonated"
+ENDINGS.facility_destroyed = "Facility was destroyed"
+ENDINGS.power_seized = "Facility was captured"
+ENDINGS.break_out = "Anomalies massacred facility"
+ENDINGS.control_regained = "Facility was secured"
+ENDINGS.unknown_fate = "Fate of facility is unknown"
 
 local WEP = {}
 lang.WEP = WEP
