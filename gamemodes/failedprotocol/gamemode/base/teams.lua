@@ -27,19 +27,20 @@ function FPTeams.AddTeamInfo( name )
 	return info
 end
 
-function FPTeams.Register( name, info, clr, reward, can_escape )
+function FPTeams.Register( tab )
 	local n = table.insert( FPTeams.REG, {
-		info = info or 0,
-		color = clr, name = name,
-		reward = math.floor( reward ),
-		can_escape = can_escape,
+		info = tab.info or 0,
+		color = tab.clr or Color(),
+		name = tab.name,
+		reward = math.floor( tab.reward or 0 ),
+		can_escape = tab.can_escape or false,
 		relations = {},
 		escort = {},
 		escorted_by = {},
 	} )
 	FPTeams.REG[n].relations[n] = true
 
-	_G["TEAM_"..name] = n
+	_G["TEAM_"..tab.name] = n
 	table.insert( FPTeams.ALL, n )
 end
 
@@ -52,6 +53,20 @@ function FPTeams.AddInfo( team, info )
 	if t then
 		t.info = bit.bor( t.info, info )
 	end
+end
+
+function FPTeams.RemoveInfo( team, info )
+	local t = FPTeams.REG[team]
+	if !t then return end
+
+	t.info = bit.band( t.info, bit.bnot( info ) )
+end
+
+function FPTeams.HasInfo( team, info )
+	local t = FPTeams.REG[team]
+	if !t then return false end
+
+	return bit.band( t.info, info ) == info
 end
 
 function FPTeams.SetupAllies( tab, ally )
@@ -378,20 +393,100 @@ FPTeams.AddTeamInfo( "ALIVE" )
 FPTeams.AddTeamInfo( "HUMAN" )
 FPTeams.AddTeamInfo( "SCP" )
 FPTeams.AddTeamInfo( "STAFF" )
+FPTeams.AddTeamInfo( "LONER" )
 
-FPTeams.Register( "SPEC", 0, Color( 150, 150, 150 ), 0 )
-FPTeams.Register( "CLASSD", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 242, 106, 25 ), 1, true )
-FPTeams.Register( "SCI", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ), Color( 0, 155, 255 ), 2, true )
-FPTeams.Register( "SD", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ), Color( 0, 90, 222 ), 3, true )
-FPTeams.Register( "MTF", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ), Color( 0, 0, 255 ), 4, false )
-FPTeams.Register( "GOC", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 97, 132, 149 ), 4, false )
-FPTeams.Register( "SPEAR", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 0, 25, 48 ), 4, false )
-FPTeams.Register( "GRU", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 158, 145, 99 ), 4, false )
-FPTeams.Register( "CI", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 13, 59, 20 ), 4, false )
-FPTeams.Register( "CBG", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 80, 52, 52 ), 4, false )
-FPTeams.Register( "MCD", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 59, 45, 105 ), 4, false )
-FPTeams.Register( "SH", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ), Color( 0, 133, 77 ), 4, false )
-FPTeams.Register( "SCP", bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_SCP ), Color( 52, 7, 7 ), 10, true )
+FPTeams.Register( {
+	name = "SPEC",
+	clr = Color( 150, 150, 150 ),
+} )
+
+FPTeams.Register( {
+	name = "CLASSD",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_LONER ),
+	clr = Color( 242, 106, 25 ),
+	reward = 1,
+	can_escape = true
+} )
+
+FPTeams.Register( {
+	name = "SCI",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF, FPTeams.INFO_LONER ),
+	clr = Color( 0, 155, 255 ),
+	reward = 2,
+	can_escape = true
+} )
+
+FPTeams.Register( {
+	name = "SD",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ),
+	clr = Color( 0, 90, 222 ),
+	reward = 3,
+	can_escape = true
+} )
+
+FPTeams.Register( {
+	name = "MTF",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ),
+	clr = Color( 0, 0, 255 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "GOC",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 97, 132, 149 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "SPEAR",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 0, 25, 48 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "GRU",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 158, 145, 99 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "CI",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 13, 59, 20 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "CBG",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 80, 52, 52 ),
+	reward = 3
+} )
+
+FPTeams.Register( {
+	name = "MCD",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 59, 45, 105 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "SH",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
+	clr = Color( 0, 133, 77 ),
+	reward = 4
+} )
+
+FPTeams.Register( {
+	name = "SCP",
+	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_SCP, FPTeams.INFO_LONER ),
+	clr = Color( 52, 7, 7 ),
+	reward = 10,
+	can_escape = true
+} )
 
 FPTeams.SetupNeutral( TEAM_GRU, true )
 FPTeams.SetupNeutral( TEAM_SPEAR, true )

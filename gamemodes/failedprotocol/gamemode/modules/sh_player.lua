@@ -268,11 +268,11 @@ function PLAYER:IsAlly( ply )
 end
 
 function PLAYER:IsNeutral( ply )
-	return self == ply and false or FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() )
+	return self == ply and false or ( FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() ) and NEUTRALITY.IsBroken( ply1, ply2 ) )
 end
 
 function PLAYER:IsEnemy( ply )
-	return self == ply and false or FPTeams.IsEnemy( self:FPTeam(), ply:FPTeam() )
+	return self == ply and false or FPTeams.IsEnemy( self:FPTeam(), ply:FPTeam() ) or ( FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() ) and NEUTRALITY.IsBroken( ply1, ply2 ) )
 end
 
 function PLAYER:IsSCP()

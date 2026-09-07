@@ -86,9 +86,41 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 end
 
 function GM:PlayerDeath( ply, inf, att )
+	local rivalryOutcome = {
+		[TEAM_CI] = function()
+			if att:FPTeam() == TEAM_SH then
+				RIVALRY.AddPoints( TEAM_SH, 2 )
+			end
+		end,
+		[TEAM_SH] = function()
+			if att:FPTeam() == TEAM_CI then
+				RIVALRY.AddPoints( TEAM_CI, 2 )
+			end
+		end,
+		[TEAM_MTF] = function()
+			if ply:FPTeam() == TEAM_GOC then
+				ROUNDPROP.Set( "MTF_GOC_standoff", true )
+
+				--TODO: Karma decrease
+			end
+		end,
+		[TEAM_GOC] = function()
+			if FPTeams.HasInfo( ply:FPTeam(), FPTeams.INFO_STAFF ) then
+				ROUNDPROP.Set( "MTF_GOC_standoff", true )
+
+				--TODO: Karma decrease
+			end
+		end,
+	}
+
 	local reason = "suicide"
 	if att != nil and att != ply then
 		reason = "default"
+		NEUTRALITY.Break( att, ply )
+
+		if rivalryOutcome[att] != nil then
+			rivalryOutcome[att]()
+		end
 	end
 
 	net.Start( "FPKillfeed" )
