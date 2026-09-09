@@ -130,7 +130,7 @@ function PLAYER:HasEffect( name )
 	return istable( eff_tbl[name] )
 end
 
-function PLAYER:ApplyEffect( name )
+function PLAYER:ApplyEffect( name, time )
 	if not SERVER then return end
 
 	local eff_data = REGISTERED_EFFECTS[name]
@@ -141,7 +141,7 @@ function PLAYER:ApplyEffect( name )
 	local eff_tbl = self:GetProperty( "Effects", {} )
 
 	eff_tbl[name] = eff_tbl[name] or {}
-	eff_tbl[name].time = isnumber( eff_tbl[name].time ) and REGISTERED_EFFECTS[name].stacks == true and math.min( CurTime() + ( REGISTERED_EFFECTS[name].max_time or math.huge ), eff_tbl[name].time + REGISTERED_EFFECTS[name].time ) or CurTime() + REGISTERED_EFFECTS[name].time
+	eff_tbl[name].time = time or isnumber( eff_tbl[name].time ) and REGISTERED_EFFECTS[name].stacks == true and math.min( CurTime() + ( REGISTERED_EFFECTS[name].max_time or math.huge ), eff_tbl[name].time + REGISTERED_EFFECTS[name].time ) or CurTime() + REGISTERED_EFFECTS[name].time
 	eff_tbl[name].nextThink = eff_tbl[name].nextThink or isnumber( REGISTERED_EFFECTS[name].think_freq ) and CurTime() + REGISTERED_EFFECTS[name].think_freq or 0
 
 	self:SetProperty( "Effects", eff_tbl, true )
