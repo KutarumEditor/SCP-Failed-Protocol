@@ -371,7 +371,7 @@ end
 
 function DrawFPEffects()
 	local outline_size = 1
-	local eff_size, eff_gap, eff_outline = ScreenScale( 12 ), ScreenScale( 4 ), ScreenScale( 2 )
+	local eff_size, eff_gap, eff_outline = ScreenScale( 16 ), ScreenScale( 4 ), ScreenScale( 2 )
 	local effs = lply:GetProperty( "Effects", {} )
 	local total_space = #effs * eff_size + ( #effs - 1 ) * eff_gap
 	local start_pos = ( ScrH() - total_space )/2
@@ -399,6 +399,9 @@ function DrawFPEffects()
 			surface.SetDrawColor( effclr )
 			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
 			surface.DrawTexturedRect( eff_gap + eff_outline, start_pos + eff_outline, eff_size - eff_outline * 2, eff_size - eff_outline * 2 )
+
+			local time = REGISTERED_EFFECTS[k].time == -1 and "" or math.ceil( v.time - CurTime() )
+			draw.SimpleTextOutlined( time, "HUDSmall", eff_gap + eff_size/2, start_pos + eff_size - ScreenScale( 2 ), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
         KMASKS.Source()
             draw.RoundedBox( 0, eff_gap, start_pos, eff_size, eff_size, color_white )
         KMASKS.End()
@@ -502,7 +505,6 @@ end
 
 CL_VIEW = {}
 CL_VIEW.timeScale = GetConVar( "host_timescale" )
-CL_VIEW.narcosis = false
 CL_VIEW.narcosis_mult = 0
 CL_VIEW.moveroll_mult = 0
 
@@ -620,7 +622,7 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
         view.origin, view.angles = ApplyProceduralBob( ply, view.origin, view.angles, ft )
     end
 
-	CL_VIEW.narcosis_mult = math.Clamp( CL_VIEW.narcosis_mult + ( CL_VIEW.narcosis and .001 or -.001 ), 0, 1 )
+	CL_VIEW.narcosis_mult = math.Clamp( CL_VIEW.narcosis_mult + ( lply:HasEffect("narcosis") and .001 or -.001 ), 0, 1 )
 
 	if ply:KeyDown( IN_MOVERIGHT ) then
 		CL_VIEW.moveroll_mult = math.min( 1, CL_VIEW.moveroll_mult + .05 )
@@ -722,6 +724,7 @@ end
 
 ExplosionFadeOut = 0
 
+local narcosisLerp = 0
 local lostsignal_mat = Material( "failedprotocol/signal_lost" )
 local explosionFadeRatio = 0
 function GM:RenderScreenspaceEffects()
@@ -763,6 +766,18 @@ function GM:RenderScreenspaceEffects()
 
 	if dmg_blur > 0 then
 		DrawBokehDOF( dmg_blur, 1, 12 )
+	end
+
+	local hasNarcosis = lply:HasEffect( "narcosis" )
+
+	if hasNarcosis then
+		narcosisLerp = math.min( 1, narcosisLerp + FrameTime()/1.5 )
+	else
+		narcosisLerp = math.max( 0, narcosisLerp - FrameTime()/1.5 )
+	end
+	
+	if narcosisLerp > 0 then
+		DrawBokehDOF( ( math.sin( CurTime() ) / 2 + .5 ) * narcosisLerp * 2, 1, 2 )
 	end
 
 	DisplayPhrases()
@@ -820,4 +835,23 @@ concommand.Add( "remove_clientside_models", function()
 			v:Remove()
 		end
 	end
+end )
+
+local painlerp = 0
+local painclr = { Color( 87, 23, 23 ), Color( 112, 13, 13) }
+hook.Add( "FPHUD", "PainHUD", function()
+	if lply:HasEffect( "pain" ) then
+		painlerp = math.min( painlerp + FrameTime()/2, 1 )
+	else
+		painlerp = math.max( painlerp - FrameTime()/3, 0 )
+	end
+
+	if painlerp == 0 then return end
+	
+	local painsin = math.sin( CurTime() ) / 2 + .5
+	local clr = LerpColor( painsin, Color( 87, 23, 23 ), Color( 31, 10, 10) )
+	clr.a = 255 * painlerp
+	surface.SetDrawColor( clr )
+	surface.SetMaterial( vignette_mat )
+	surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
 end )

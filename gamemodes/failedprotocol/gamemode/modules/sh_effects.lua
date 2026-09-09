@@ -13,27 +13,112 @@ REGISTERED_EFFECTS = {
 		end_func = function( ply ) end -- Do something after effect wears off
 	},*/
 	["bleeding"] = {
-		icon = Material( "crimeville/icons/bleeding.png", "noclamp" ),
+		icon = Material( "failedprotocol/icons/bleeding.png", "noclamp" ),
 		color = Color( 225, 0, 0 ),
-		time = 999,
+		time = 10,
 		max_time = 20,
 		stacks = true,
 		think_freq = 2,
 		think_func = function( ply )
-			ply:SetDeathReason( "bleed", true )
+			ply:SetDeathReason( "bleed" )
 
 			local dmg = DamageInfo()
-			dmg:SetDamage( FPRandom( 3, 5 ) )
+			dmg:SetDamage( 3 )
 			dmg:SetAttacker( ply )
 			dmg:SetInflictor( ply )
-			--ply:TakeDamageInfo( dmg )
+			ply:TakeDamageInfo( dmg )
+		end
+	},
+	["pain"] = {
+		icon = Material( "failedprotocol/icons/pain.png", "noclamp" ),
+		color = Color( 134, 58, 58),
+		time = 30,
+		max_time = 30,
+		stacks = true,
+		think_freq = 2,
+		think_func = function( ply )
+			ply:EmitSound( "scpfp/humans/pain/pain_"..FPRandom( 8 )..".mp3", 90 )
+		end,
+		start_func = function( ply )
+			ply:SetFPWeaponBonus( "recoil", "pain", 1.75 )
+			ply:SetFPWeaponBonus( "ergonomics", "pain", .75 )
 		end,
 		end_check = function( ply )
-			return !ply:Alive()
+			return !ply:IsHuman() or ply:HasEffect( "painblock" )
 		end,
 		end_func = function( ply )
+			ply:RemoveFPWeaponBonus( "recoil", "pain" )
+			ply:RemoveFPWeaponBonus( "ergonomics", "pain" )
+		end,
+	},
+	["painblock"] = {
+		icon = Material( "failedprotocol/icons/painblock.png", "noclamp" ),
+		color = Color( 39, 177, 231),
+		time = 60,
+		max_time = 60,
+		stacks = true,
+		end_check = function( ply )
+			return !ply:IsHuman()
+		end,
+	},
+	["narcosis"] = {
+		icon = Material( "failedprotocol/icons/bleeding.png", "noclamp" ),
+		color = Color( 85, 84, 107),
+		time = 60,
+		max_time = 120,
+		stacks = true,
+		end_check = function( ply )
+			return !ply:IsHuman()
+		end,
+	},
+	["overdose"] = {
+		icon = Material( "failedprotocol/icons/overdose.png", "noclamp" ),
+		color = Color( 49, 32, 32),
+		time = 30,
+		max_time = 30,
+		stacks = false,
+		think_freq = 1,
+		think_func = function( ply )
+			ply:SetDeathReason( "overdose" )
 
-		end
+			local dmg = DamageInfo()
+			dmg:SetDamage( 10 )
+			dmg:SetAttacker( ply )
+			dmg:SetInflictor( ply )
+			ply:TakeDamageInfo( dmg )
+		end,
+		end_check = function( ply )
+			return !ply:IsHuman()
+		end,
+	},
+	["scp207"] = {
+		icon = Material( "failedprotocol/icons/overdose.png", "noclamp" ),
+		color = Color( 202, 204, 56),
+		time = -1,
+		max_time = -1,
+		stacks = false,
+		think_freq = 5,
+		think_func = function( ply )
+			ply:SetDeathReason( "internalbleeding" )
+
+			local dmg = DamageInfo()
+			dmg:SetDamage( 1 )
+			dmg:SetDamageType( DMG_DIRECT )
+			dmg:SetAttacker( ply )
+			dmg:SetInflictor( ply )
+			ply:TakeDamageInfo( dmg )
+		end,
+		start_func = function( ply )
+			ply:SetFPWeaponBonus( "recoil", "scp207", .75 )
+			ply:SetFPWeaponBonus( "ergonomics", "scp207", 1.5 )
+		end,
+		end_check = function( ply )
+			return !ply:IsHuman()
+		end,
+		end_func = function( ply )
+			ply:RemoveFPWeaponBonus( "recoil", "scp207" )
+			ply:RemoveFPWeaponBonus( "ergonomics", "scp207" )
+		end,
 	},
 }
 
@@ -47,6 +132,11 @@ end
 
 function PLAYER:ApplyEffect( name )
 	if not SERVER then return end
+
+	local eff_data = REGISTERED_EFFECTS[name]
+	if eff_data == nil then
+		print( "Effect '"..name.."' doesn't exist" )	
+	return end
 
 	local eff_tbl = self:GetProperty( "Effects", {} )
 
@@ -75,6 +165,12 @@ function PLAYER:RemoveEffect( name )
 	self:SetProperty( "Effects", eff_tbl, true )
 end
 
+function PLAYER:CleanEffects( name )
+	if not SERVER then return end
+
+	self:SetProperty( "Effects", {}, true )
+end
+
 if SERVER then
 
 hook.Add( "Tick", "FPEffectsCalc", function()
@@ -84,9 +180,10 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 		ply.FPProperties.Effects = ply.FPProperties.Effects or {}
 
 		for k, v in pairs( ply.FPProperties.Effects ) do
-			if REGISTERED_EFFECTS[k].end_check( ply ) == true then
-				if isfunction( REGISTERED_EFFECTS[k].end_func ) then
-					REGISTERED_EFFECTS[k].end_func( ply )
+			local eff_data = REGISTERED_EFFECTS[k]
+			if eff_data.end_check != nil and eff_data.end_check( ply ) == true or not ply:Alive() then
+				if isfunction( eff_data.end_func ) then
+					eff_data.end_func( ply )
 				end
 
 				ply.FPProperties.Effects[k] = nil
@@ -95,16 +192,16 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 			end
 
 			if CurTime() > v.nextThink then
-				if isfunction( REGISTERED_EFFECTS[k].think_func ) then
-					REGISTERED_EFFECTS[k].think_func( ply )
+				if isfunction( eff_data.think_func ) then
+					eff_data.think_func( ply )
 				end
 
-				v.nextThink = CurTime() + ( REGISTERED_EFFECTS[k].think_freq or FrameTime() )
+				v.nextThink = CurTime() + ( eff_data.think_freq or FrameTime() )
 			end
 
-			if CurTime() > v.time then
-				if isfunction( REGISTERED_EFFECTS[k].end_func ) then
-					REGISTERED_EFFECTS[k].end_func( ply )
+			if eff_data.time != -1 and CurTime() > v.time then
+				if isfunction( eff_data.end_func ) then
+					eff_data.end_func( ply )
 				end
 
 				ply.FPProperties.Effects[k] = nil
@@ -113,10 +210,6 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 			end
 		end
 	end
-end )
-
-concommand.Add( "fp_random_effect", function( ply )
-	ply:ApplyEffect( table.Random( table.GetKeys( REGISTERED_EFFECTS ) ) )
 end )
 
 end

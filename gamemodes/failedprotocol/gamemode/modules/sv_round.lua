@@ -49,7 +49,6 @@ REGISTERED_ROUND_TYPES = {
 
 			net.Ping( "ClearCSData", "" )
 
-			ClearPersonas()
 			SetupPlayers( "default" )
 		end,
 		endcheck = function()
@@ -82,6 +81,9 @@ function RoundStart( type )
 		TIMERS.DestroyAll()
 		PA.Reset()
 		PHRASES.Clear( true )
+		RIVALRY.Reset()
+		NEUTRALITY.Reset()
+		ClearPersonas()
 
 		AnnulScore()
 
@@ -109,7 +111,6 @@ end
 
 function RestartRound()
 	-- Make random round system here
-
 
 	RoundStart( "default" )
 end

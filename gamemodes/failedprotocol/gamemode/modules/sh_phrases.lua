@@ -14,6 +14,7 @@ PHRASES = PHRASES or {
 }
 
 local sndDurTbl = {
+	--Announcer
 	["scpfp/gocsniper/warning1.wav"] = 1.6,
 	["scpfp/gocsniper/warning2.wav"] = 1.95,
 	["scpfp/gocsniper/fire1.wav"] = 1.45,
@@ -29,6 +30,11 @@ local sndDurTbl = {
 	["scpfp/public_announcements/warheads.wav"] = 9.45,
 	["scpfp/warheads/phrase1.wav"] = 4.55,
 	["scpfp/warheads/phrase2.wav"] = 2.75,
+
+	--SCP457
+	["scpfp/scp/457/ignite1.wav"] = 5.5,
+	["scpfp/scp/457/ignite2.wav"] = 1.8,
+	["scpfp/scp/457/ignite3.wav"] = 2.3,
 }
 
 local senderColor = {
@@ -36,6 +42,7 @@ local senderColor = {
 	gocsniper = Color( 97, 132, 149 ),
 	gruspy = Color( 158, 145, 99 ),
 	unkoper = Color( 34, 36, 197),
+	SCP457 = Color( 52, 7, 7 ),
 }
 
 local function castPhraseInternal( sound, sender, text )

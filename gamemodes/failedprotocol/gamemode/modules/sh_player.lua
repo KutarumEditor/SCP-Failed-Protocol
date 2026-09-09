@@ -252,6 +252,10 @@ function PLAYER:CanPickup( ent )
 	return #tbl < self:GetInvSlots() and not self:HasWeapon( ent:GetClass() )
 end
 
+function PLAYER:GetDeathReason()
+	return self:GetProperty( "DeathReason", { "" } )[1]
+end
+
 function PLAYER:IsReady()
 	local ready = self:GetReady()
 
@@ -268,11 +272,11 @@ function PLAYER:IsAlly( ply )
 end
 
 function PLAYER:IsNeutral( ply )
-	return self == ply and false or ( FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() ) and NEUTRALITY.IsBroken( ply1, ply2 ) )
+	return self == ply and false or ( FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() ) and not NEUTRALITY.IsBroken( self, ply ) )
 end
 
 function PLAYER:IsEnemy( ply )
-	return self == ply and false or FPTeams.IsEnemy( self:FPTeam(), ply:FPTeam() ) or ( FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() ) and NEUTRALITY.IsBroken( ply1, ply2 ) )
+	return self == ply and false or FPTeams.IsEnemy( self:FPTeam(), ply:FPTeam() ) or ( FPTeams.IsNeutral( self:FPTeam(), ply:FPTeam() ) and NEUTRALITY.IsBroken( self, ply ) )
 end
 
 function PLAYER:IsSCP()

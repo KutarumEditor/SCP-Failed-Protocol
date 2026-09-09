@@ -43,7 +43,7 @@ SPAWNGROUPS = {
 				if scps > 0 and scps < 4 then
 					PA.Play( "scpfp/public_announcements/"..scps.."_scp.wav", "scp"..scps )
 				else
-					PA.Play( "scpfp/public_announcements/intercom_end.wav" )
+					PA.Play( "scpfp/public_announcements/intercom_end.wav", "" )
 				end
 			end )
 		end

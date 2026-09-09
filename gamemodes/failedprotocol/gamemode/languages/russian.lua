@@ -269,6 +269,8 @@ lang.KILLFEED = KILLFEED
 
 KILLFEED.suicide = "%v умер."
 KILLFEED.default = "%a убил %v с помощью %i."
+KILLFEED.bleed = "%v истёк кровью."
+KILLFEED.overdose = "%v умер от передозировки."
 
 local DEATHQUOTES = {}
 lang.DEATHQUOTES = DEATHQUOTES
@@ -373,6 +375,13 @@ PHRASES.pa = {
 	scp1 = "Ожидается восстановление условий содержания 1 SCP объекта.",
 	scp2 = "Ожидается восстановление условий содержания 2 SCP объектов.",
 	scp3 = "Ожидается восстановление условий содержания 3 SCP объектов.",
+}
+
+PHRASES.SCP457_name = "SCP-457"
+PHRASES.SCP457 = {
+	burn1 = "Расти... Нужно... Должен расти...",
+	burn2 = "Гори...",
+	burn3 = "Оно горит..."
 }
 
 LANG.Register( "russian", lang )

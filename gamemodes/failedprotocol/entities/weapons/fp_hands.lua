@@ -48,7 +48,9 @@ function SWEP:SetupDataTables()
 end
 
 function SWEP:CustomInit()
-	self:InitLang()
+	if SERVER then return end
+	
+	self.PrintName = LANG.Get( "WEP", self:GetClass(), "name" )
 end
 
 function SWEP:PrimaryAttack()

@@ -34,22 +34,35 @@ end
 
 --[[ NEUTRALITY SYSTEM ]]--
 
-NEUTRALITY = {
+NEUTRALITY = NEUTRALITY or {
     TEAMS = {},
     PLAYERS = {}
 }
 
 function NEUTRALITY.Reset()
-    NEUTRALITY = {
+    NEUTRALITY.TEAMS = {}
+    NEUTRALITY.PLAYERS = {}
+end
+
+local function _breakPlayerNeutrality( ply1, ply2 )
+    local t1, t2 = ply1:FPTeam(), ply2:FPTeam()
+
+    NEUTRALITY.TEAMS[t1] = NEUTRALITY.TEAMS[t1] or {
         TEAMS = {},
         PLAYERS = {}
     }
-end
-
-function NEUTRALITY.Break( ply1, ply2 )
-    local t1, t2 = ply1:FPTeam(), ply2:FPTeam()
-
-    if not ply1:IsNeutral( ply2 ) then return end
+    NEUTRALITY.PLAYERS[ply1] = NEUTRALITY.PLAYERS[ply1] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+    NEUTRALITY.TEAMS[t2] = NEUTRALITY.TEAMS[t2] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+    NEUTRALITY.PLAYERS[ply2] = NEUTRALITY.PLAYERS[ply2] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
 
     if FPTeams.HasInfo( t1, FPTeams.INFO_LONER ) then
         if FPTeams.HasInfo( t2, FPTeams.INFO_LONER ) then
@@ -68,13 +81,93 @@ function NEUTRALITY.Break( ply1, ply2 )
             NEUTRALITY.TEAMS[t2].TEAMS[t1] = true
         end
     end
+end
+
+local function _breakTeamNeutrality( t1, ply2 )
+    local t2 = ply2:FPTeam()
+
+    NEUTRALITY.TEAMS[t1] = NEUTRALITY.TEAMS[t1] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+    NEUTRALITY.TEAMS[t2] = NEUTRALITY.TEAMS[t2] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+    NEUTRALITY.PLAYERS[ply2] = NEUTRALITY.PLAYERS[ply2] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+
+    if !FPTeams.HasInfo( t1, FPTeams.INFO_LONER ) then
+        if FPTeams.HasInfo( t2, FPTeams.INFO_LONER ) then
+            NEUTRALITY.TEAMS[t1].PLAYERS[ply2] = true
+            NEUTRALITY.PLAYERS[ply2].TEAMS[t1] = true
+        else
+            NEUTRALITY.TEAMS[t1].TEAMS[t2] = true
+            NEUTRALITY.TEAMS[t2].TEAMS[t1] = true
+        end
+    end
+end
+
+function NEUTRALITY.Break( ply1, ply2 )
+    for k, v in pairs( FPTeams.GetByGroup( FPTeams.GetGroup( ply1:FPTeam() ) ) ) do
+        if not FPTeams.HasInfo( k, FPTeams.INFO_LONER ) then
+            _breakTeamNeutrality( k, ply2 )
+        end
+    end
+
+    for k, v in pairs( FPTeams.GetByGroup( FPTeams.GetGroup( ply2:FPTeam() ) ) ) do
+        if not FPTeams.HasInfo( k, FPTeams.INFO_LONER ) then
+            _breakTeamNeutrality( k, ply1 )
+        end
+    end
+
+    if not ply1:IsNeutral( ply2 ) then return end
+
+    _breakPlayerNeutrality( ply1, ply2 )
 
     --TODO: Reduce karma
 end
 
 function NEUTRALITY.IsBroken( ply1, ply2 )
-    local state = NEUTRALITY.TEAMS[ply1:FPTeam()].TEAMS[ply2:FPTeam()]
-        or NEUTRALITY.PLAYERS[ply1].TEAMS[ply2:FPTeam()]
+    local t1, t2 = ply1:FPTeam(), ply2:FPTeam()
+    NEUTRALITY.TEAMS[t1] = NEUTRALITY.TEAMS[t1] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+    NEUTRALITY.PLAYERS[ply1] = NEUTRALITY.PLAYERS[ply1] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
 
-    return state or false
+    return NEUTRALITY.TEAMS[t1].TEAMS[t2]
+        or NEUTRALITY.PLAYERS[ply1].TEAMS[t2]
+        or NEUTRALITY.TEAMS[t1].PLAYERS[ply2]
+        or NEUTRALITY.PLAYERS[ply1].PLAYERS[ply2]
+        or false
+end
+
+function NEUTRALITY.IsBrokenByTeam( team1, ply2 )
+    local team2 = ply2:FPTeam()
+    NEUTRALITY.TEAMS[team1] = NEUTRALITY.TEAMS[team1] or {
+        TEAMS = {},
+        PLAYERS = {}
+    }
+
+    return NEUTRALITY.TEAMS[team1].TEAMS[team2]
+        or NEUTRALITY.TEAMS[team1].PLAYERS[ply2]
+        or false
+end
+
+local PLAYER = FindMetaTable( "Player" )
+
+function PLAYER:ResetNeutrality()
+    for _, ply in player.Iterator() do
+        NEUTRALITY.PLAYERS[ply].PLAYERS[self] = nil
+    end
+
+    for k, v in ipairs( NEUTRALITY.TEAMS ) do
+        v.PLAYERS[self] = nil
+    end
 end

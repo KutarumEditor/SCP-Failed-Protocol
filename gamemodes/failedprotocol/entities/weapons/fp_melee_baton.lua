@@ -13,7 +13,7 @@ SWEP.Damage = { 20, 40 }
 SWEP.DamageType = DMG_CLUB
 SWEP.Cooldown = .25
 
-SWEP.HoldType = "melee"
+SWEP.HoldType = "knife"
 
 SWEP.Sounds = {
 	Draw = "expbat_draw",
@@ -27,3 +27,17 @@ SWEP.AnimSpeed = {
 	Idle = .5,
 	Attack = 1
 }
+
+function SWEP:Initialize()
+	self:SetHoldType( self.HoldType )
+end
+
+hook.Add( "FPMeleeOnHit", "GuardBaton", function( attacker, victim, dmg )
+	if victim:IsPlayer() and victim:Alive() and ( attacker:GetFPClass() == "guard_pacificator" or attacker:GetFPClass() == "cispy" ) then
+		victim:DropWep( victim:GetActiveWeapon() )
+	end
+end )
+
+SWEP.TPIKForce = true
+SWEP.TPIKPos = Vector( 0, 0, 0 )
+SWEP.TPIK_DisableLeftHand = true

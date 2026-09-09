@@ -1,3 +1,7 @@
+local function checkFoundationRivalry( ply )
+	return NEUTRALITY.IsBrokenByTeam( TEAM_SD, ply ) or NEUTRALITY.IsBrokenByTeam( TEAM_MTF, ply ) or FPTeams.IsEnemy( ply:FPTeam(), TEAM_MTF ) or FPTeams.IsEnemy( ply:FPTeam(), TEAM_SD )
+end
+
 ENDINGS = {
 	["default"] = {
 		[1] = {
@@ -15,7 +19,7 @@ ENDINGS = {
 				if #plys == 0 then return false end
 
 				for i, ply in ipairs( plys ) do
-					if !FPTeams.IsEnemy( ply:FPTeam(), TEAM_MTF ) then return false end
+					if !checkFoundationRivalry( ply ) then return false end
 					
 					if ply:FPTeam() == TEAM_SCP then return false end
 				end
@@ -49,7 +53,7 @@ ENDINGS = {
 				if #plys == 0 then return false end
 
 				for i, ply in ipairs( plys ) do
-					if FPTeams.IsEnemy( ply:FPTeam(), TEAM_MTF ) then return false end
+					if checkFoundationRivalry( ply ) then return false end
 				end
 
 				return true

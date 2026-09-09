@@ -34,6 +34,7 @@ ABILITIES = {
 				} )
 
 				local ent = tr.Entity
+				net.Ping( "GRULocateTry", tostring( ent:UserID() ), ply )
 				if ent.amnesicrussian then
 					ABILITIES.Remove( ply, "gruspycheck" )
 					ABILITIES.Remove( ply, "gruspylocate" )
@@ -227,6 +228,8 @@ function ABILITIES.Spend( ply, name, num )
 			ABILITIES.Remove( ply, name )
 		end
 	end
+
+	ABILITIES.Sync( ply )
 end
 
 function ABILITIES.Use( ply, name )

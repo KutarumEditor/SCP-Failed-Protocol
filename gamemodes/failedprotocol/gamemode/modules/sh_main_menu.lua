@@ -201,7 +201,7 @@ local function OpenCustomMenu()
         end
     )
 
-    CreateMenuButton(
+    --[[CreateMenuButton(
         MenuPanel,
         "ВЫЙТИ ИЗ ИГРЫ",
         280,
@@ -219,7 +219,7 @@ local function OpenCustomMenu()
 
         end,
         true
-    )
+    )]]
 
     local Info = vgui.Create("DLabel", MainMenu)
 

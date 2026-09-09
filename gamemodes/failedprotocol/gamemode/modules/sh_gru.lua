@@ -78,6 +78,16 @@ end )
 net.ReceivePing( "FoundRussian", function( data )
 	local ply = Player( tonumber( data ) )
 	ply.known = true
+	time = 0
+end )
+
+net.ReceivePing( "GRULocateTry", function( data )
+	local ply = Player( tonumber( data ) )
+	for i, v in ipairs( UncheckedD ) do
+		if v == ply then
+			table.remove( UncheckedD, i )
+		break end
+	end
 end )
 
 net.ReceivePing( "RemoveForGRULocator", function( data )

@@ -10,7 +10,7 @@ function BreachAction()
 		timer.Create( "BreachSirenRepeat", 1.4, 6, function()
 			DrawSprite( {
 	            mat = vignette_mat,
-	            clr = color_white,
+	            clr = color_black,
 	            time = .75,
 	            fade = .5,
 	            x = -1,

@@ -113,6 +113,8 @@ function SWEP:CalcHit()
 			if flesh_mats[tr.MatType] then
 				sound = self.Sounds.HitFlesh
 			end
+
+			hook.Run( "FPMeleeOnHit", ply, victim, dmg )
 		end
 	else
 		sound = nil

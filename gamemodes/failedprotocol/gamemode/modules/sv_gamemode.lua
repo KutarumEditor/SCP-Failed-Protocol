@@ -82,10 +82,17 @@ function GM:EntityTakeDamage( ent, dmginfo )
 
 	dmginfo:SetDamageForce( Vector( 0, 0, 0 ) )
 
+	local dmg = dmginfo:GetDamage()
+	if ( dmg > 20 or dmgType == DMG_BURN ) and ent:IsHuman() then
+		ent:ApplyEffect( "pain" )
+	end
+
+	if dmgType == DMG_DIRECT then return end
+
 	ent:ViewPunch( Angle( 0, 0, FPRandom() > .5 and 2.5 or -2.5 ) )
 
 	net.Start( "DamageBlur" )
-		net.WriteFloat( dmginfo:GetDamage() )
+		net.WriteFloat( dmg )
 	net.Send( ent )
 end
 

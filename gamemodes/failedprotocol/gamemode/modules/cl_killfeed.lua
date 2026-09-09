@@ -102,7 +102,9 @@ local function KillfeedAdd( attacker, victim, inflictor, reason )
 	end
 
     local reas = reason
-    if !attacker:IsValid() then
+    if victim:GetDeathReason() != "" then
+        reas = victim:GetDeathReason()
+    elseif !attacker:IsValid() then
         reas = "suicide"
     end
 

@@ -3,6 +3,7 @@
 FPTeams = {
 	ALL = {},
 	REG = {},
+	GROUPS = {},
 	SCORE = {}
 }
 
@@ -32,6 +33,7 @@ function FPTeams.Register( tab )
 		info = tab.info or 0,
 		color = tab.clr or Color(),
 		name = tab.name,
+		group = tab.group,
 		reward = math.floor( tab.reward or 0 ),
 		can_escape = tab.can_escape or false,
 		relations = {},
@@ -40,12 +42,33 @@ function FPTeams.Register( tab )
 	} )
 	FPTeams.REG[n].relations[n] = true
 
+	FPTeams.GROUPS[tab.group] = FPTeams.GROUPS[tab.group] or {}
+	FPTeams.GROUPS[tab.group][n] = true
+
 	_G["TEAM_"..tab.name] = n
 	table.insert( FPTeams.ALL, n )
 end
 
 function FPTeams.GetAll()
 	return FPTeams.ALL
+end
+
+function FPTeams.GetByGroup( group )
+	local tbl = {}
+
+	for i, v in ipairs( FPTeams.REG ) do
+		if v.group != group then continue end
+
+		tbl[i] = v
+	end
+
+	return tbl
+end
+
+function FPTeams.GetData( team )
+	if !FPTeams.REG[team] then return end
+
+	return FPTeams.REG[team]
 end
 
 function FPTeams.AddInfo( team, info )
@@ -297,6 +320,12 @@ function FPTeams.GetName( team )
 	return FPTeams.REG[team].name
 end
 
+function FPTeams.GetGroup( team )
+	if !FPTeams.REG[team] then return end
+
+	return FPTeams.REG[team].group
+end
+
 function FPTeams.GetColor( team )
 	if !FPTeams.REG[team] then return end
 
@@ -397,11 +426,13 @@ FPTeams.AddTeamInfo( "LONER" )
 
 FPTeams.Register( {
 	name = "SPEC",
+	group = "specs",
 	clr = Color( 150, 150, 150 ),
 } )
 
 FPTeams.Register( {
 	name = "CLASSD",
+	group = "classd",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_LONER ),
 	clr = Color( 242, 106, 25 ),
 	reward = 1,
@@ -410,6 +441,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "SCI",
+	group = "staff",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF, FPTeams.INFO_LONER ),
 	clr = Color( 0, 155, 255 ),
 	reward = 2,
@@ -418,6 +450,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "SD",
+	group = "staff",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ),
 	clr = Color( 0, 90, 222 ),
 	reward = 3,
@@ -426,6 +459,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "MTF",
+	group = "staff",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN, FPTeams.INFO_STAFF ),
 	clr = Color( 0, 0, 255 ),
 	reward = 4
@@ -433,6 +467,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "GOC",
+	group = "goc",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 97, 132, 149 ),
 	reward = 4
@@ -440,6 +475,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "SPEAR",
+	group = "spear",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 0, 25, 48 ),
 	reward = 4
@@ -447,6 +483,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "GRU",
+	group = "gru",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 158, 145, 99 ),
 	reward = 4
@@ -454,6 +491,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "CI",
+	group = "chaos",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 13, 59, 20 ),
 	reward = 4
@@ -461,6 +499,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "CBG",
+	group = "cbg",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 80, 52, 52 ),
 	reward = 3
@@ -468,6 +507,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "MCD",
+	group = "mcd",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 59, 45, 105 ),
 	reward = 4
@@ -475,6 +515,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "SH",
+	group = "sh",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_HUMAN ),
 	clr = Color( 0, 133, 77 ),
 	reward = 4
@@ -482,6 +523,7 @@ FPTeams.Register( {
 
 FPTeams.Register( {
 	name = "SCP",
+	group = "scp",
 	info = bit.bor( FPTeams.INFO_ALIVE, FPTeams.INFO_SCP, FPTeams.INFO_LONER ),
 	clr = Color( 52, 7, 7 ),
 	reward = 10,

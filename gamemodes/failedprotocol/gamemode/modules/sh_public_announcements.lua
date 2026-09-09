@@ -30,7 +30,10 @@ hook.Add( "Think", "PAThink", function()
 	if PA.NEXT < ct and PA.QUEUE[1] != nil then
 		local q = PA.QUEUE
 		local snd = q[1].snd
-		PHRASES.Cast( game.GetWorld(), snd, "pa", q[1].subs )
+
+		if subs != "" then
+			PHRASES.Cast( game.GetWorld(), snd, "pa", q[1].subs )
+		end
 
 		PA.NEXT = CurTime() + ( sound_duration_override[snd] or SoundDuration( snd ) )
 

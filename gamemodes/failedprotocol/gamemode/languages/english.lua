@@ -270,6 +270,8 @@ lang.KILLFEED = KILLFEED
 
 KILLFEED.suicide = "%v died."
 KILLFEED.default = "%a killed %v with %i."
+KILLFEED.bleed = "%v bled out."
+KILLFEED.overdose = "%v died of an overdose."
 
 local DEATHQUOTES = {}
 lang.DEATHQUOTES = DEATHQUOTES
@@ -380,6 +382,13 @@ PHRASES.pa = {
 	scp1 = "Awaiting recontainment of 1 SCP subject.",
 	scp2 = "Awaiting recontainment of 2 SCP subjects.",
 	scp3 = "Awaiting recontainment of 3 SCP subjects.",
+}
+
+PHRASES.SCP457_name = "SCP-457"
+PHRASES.SCP457 = {
+	burn1 = "Grow... Need... Must grow...",
+	burn2 = "Burn...",
+	burn3 = "It burns..."
 }
 
 LANG.Register( "english", lang )

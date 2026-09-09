@@ -163,19 +163,12 @@ function PLAYER:CreatePlayerRagdoll()
 	return body
 end
 
-function PLAYER:SetDeathReason( reason, pro_only )
-	local tbl = self:GetProperty( "DeathReason", {
-		default = "",
-		pro = ""
-	} )
+function PLAYER:SetDeathReason( reason )
+	self:SetProperty( "DeathReason", { reason }, true )
 
-	if not pro_only then
-		tbl.default = reason
-	end
-
-	tbl.pro = reason
-
-	self:SetProperty( "DeathReasonPro", tbl, true )
+	timer.Simple( 0, function()
+		self:SetProperty( "DeathReason", { "" }, true )
+	end )
 end
 
 function PLAYER:SerpentMobilize()
@@ -342,7 +335,7 @@ function PLAYER:Cleanup()
 	self:SetFPArmor( "helmet", nil, 0 )
 	self:RemoveEffect()
 	ABILITIES.Clear( self )
-
+	
 	self.amnesicrussian = false
 end
 
@@ -373,6 +366,8 @@ function PLAYER:Setup( class, spawn_override, instant )
 
 	self:UnSpectate()
 	self:Cleanup()
+	self:CleanEffects()
+	self:ClearFPWeaponBonus()
 
 	self:Spawn()
 	self:RemoveAllDecals()
@@ -424,6 +419,10 @@ function PLAYER:Setup( class, spawn_override, instant )
 	self:SetRunSpeed( class_tab.runspeed or 225 )
 	self:SetJumpPower( class_tab.jumppower or 175 )
 
+	if class_tab.norandomskin != true then
+		self:SetSkin( FPRandom( 0, 6 ) )
+	end
+
 	if isfunction( class_tab.callback ) then
 		class_tab.callback( self )
 	end
@@ -456,6 +455,8 @@ function PLAYER:SetupSCP( class, instant )
 
 	self:UnSpectate()
 	self:Cleanup()
+	self:CleanEffects()
+	self:ClearFPWeaponBonus()
 	
 	self:Spawn()
 	self:RemoveAllDecals()

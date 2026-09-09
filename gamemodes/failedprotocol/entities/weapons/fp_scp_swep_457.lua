@@ -89,7 +89,13 @@ function SWEP:Think()
 				if self.nextPhrase < ct then
 					self.nextPhrase = ct + 10
 
-					owner:EmitSound( IgnitePhrases[FPRandom( #IgnitePhrases ) ], 60 )
+					local phrase = FPRandom( 3 )
+					owner:EmitSound( "scpfp/scp/457/ignite"..phrase..".wav", 90 )
+					for i, v in ipairs( ents.FindInSphere( owner:GetPos(), 512 ) ) do
+						if v:IsPlayer() then
+							PHRASES.Cast( v, "scpfp/scp/457/ignite"..phrase..".wav", "SCP457", "burn"..phrase )
+						end
+					end
 				end
 			end
 		end
