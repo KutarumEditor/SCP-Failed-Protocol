@@ -28,7 +28,7 @@ function SWEP:Think()
 
 	if SERVER then
 		if ct > self:GetNextScreech() then
-			owner:EmitSound( "scpfp/scp/008/screech"..FPRandom( 1, 16 )..".wav", 60 )
+			owner:EmitSound( "scpfp/scp/008/screech"..FPRandom( 1, 16 )..".wav", 60, 100, .45 )
 
 			self:SetNextScreech( ct + FPRandom( 3, 5 ) )
 		end

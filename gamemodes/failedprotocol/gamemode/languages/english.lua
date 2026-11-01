@@ -391,4 +391,38 @@ PHRASES.SCP457 = {
 	burn3 = "It burns..."
 }
 
+PHRASES.cbgpsycho_name = "Inner voice"
+PHRASES.cbgpsycho = {
+	spawn1 = "SO, THERE WILL BE SOME SHIT WITHIN THIS AREA YUP?",
+	spawn2 = "GET YOUR ASSES READY CUZ I'M GOING TO FUCK YOU UP",
+	spawn3 = "LUCKILY I HAVE SOME SHIT WITH ME",
+	usage1 = "THIS PERC AIN'T SHIT...",
+	usage2 = "LET'S SEE...",
+	usage3 = "GOIN' POSTAL",
+	pillkill1 = "NOW IT'S MY TURN",
+	pillkill2 = "SOOOO, YOU REALLY GOT SOME SHIT YUP",
+	pillkill3 = "GET YOUR HANDS AWAY FROM MY SHIT",
+	ragestart1 = "TRY TO STOP ME",
+	ragestart2 = "TRY TO STAY ON MY WAY",
+	ragestart3 = "GUNS DON'T KILL PEOPLE, I DO",
+	ragekill1 = "BLOOD IS FUEL",
+	ragekill2 = "GET THE FUCK OUTTA MY WAY",
+	ragekill3 = "DOMINATED",
+	ragekill4 = "FEELIN' GOOD...",
+	ragekill5 = "I'M CHOSEN BY MEKHANE",
+	ragekill6 = "DIE",
+	rageover = "THAT WAS GOOD...",
+	badtripstart1 = "FUCKING FUCK...",
+	badtripstart2 = "NO NO NO NO NO...",
+	badtripstart3 = "SHIT SHIT SHIIIT...",
+	badtripkill1 = "PLEASE...",
+	badtripkill2 = "I... I CAN'T...",
+	badtripkill3 = "STOP IT...",
+	badtripkill4 = "JUST LET ME REST",
+	badtripkill5 = "I'M SORRY...",
+	badtripkill6 = "PLEASE STOP ME",
+	badtripover = "NEVER AGAIN..."
+}
+
+
 LANG.Register( "english", lang )

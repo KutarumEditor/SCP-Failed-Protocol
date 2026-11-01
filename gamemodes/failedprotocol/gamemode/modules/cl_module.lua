@@ -838,8 +838,8 @@ concommand.Add( "remove_clientside_models", function()
 end )
 
 local painlerp = 0
-local painclr = { Color( 87, 23, 23 ), Color( 112, 13, 13) }
-hook.Add( "FPHUD", "PainHUD", function()
+local painclr = { Color( 87, 23, 23, 55 ), Color( 112, 13, 13, 255 ) }
+hook.Add( "PreFPHUD", "PainHUD", function()
 	if lply:HasEffect( "pain" ) then
 		painlerp = math.min( painlerp + FrameTime()/2, 1 )
 	else
@@ -848,9 +848,33 @@ hook.Add( "FPHUD", "PainHUD", function()
 
 	if painlerp == 0 then return end
 	
-	local painsin = math.sin( CurTime() ) / 2 + .5
-	local clr = LerpColor( painsin, Color( 87, 23, 23 ), Color( 31, 10, 10) )
+	local painsin = math.sin( CurTime() * 3 ) / 2 + .5
+	local clr = LerpColor( painsin, painclr[1], painclr[2] )
 	clr.a = 255 * painlerp
+	surface.SetDrawColor( clr )
+	surface.SetMaterial( vignette_mat )
+	surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
+end )
+
+local overdoselerp = 0
+local overdoseclr = { Color( 105, 105, 105, 155 ), Color( 129, 0, 0, 200 ) }
+hook.Add( "PreFPHUD", "OverdoseHUD", function()
+	if lply:HasEffect( "overdose" ) then
+		overdoselerp = math.min( overdoselerp + FrameTime()/2, 1 )
+	else
+		overdoselerp = math.max( overdoselerp - FrameTime(), 0 )
+	end
+
+	if overdoselerp == 0 then return end
+
+	local blacken = color_black:Copy()
+	blacken.a = 200 * overdoselerp
+	surface.SetDrawColor( blacken )
+	surface.DrawRect( 0, 0, ScrW(), ScrH() )
+	
+	local sin = math.sin( CurTime() * 9 ) / 2 + .5
+	local clr = LerpColor( sin, overdoseclr[1], overdoseclr[2] )
+	clr.a = 255 * overdoselerp
 	surface.SetDrawColor( clr )
 	surface.SetMaterial( vignette_mat )
 	surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )

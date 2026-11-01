@@ -62,13 +62,21 @@ REGISTERED_EFFECTS = {
 		end,
 	},
 	["narcosis"] = {
-		icon = Material( "failedprotocol/icons/bleeding.png", "noclamp" ),
+		icon = Material( "failedprotocol/icons/narcosis.png", "noclamp" ),
 		color = Color( 85, 84, 107),
 		time = 60,
 		max_time = 120,
 		stacks = true,
+		start_func = function( ply )
+			ply:SetFPWeaponBonus( "recoil", "narcosis", 1.25 )
+			ply:SetFPWeaponBonus( "ergonomics", "narcosis", .9 )
+		end,
 		end_check = function( ply )
 			return !ply:IsHuman()
+		end,
+		end_func = function( ply )
+			ply:RemoveFPWeaponBonus( "recoil", "narcosis" )
+			ply:RemoveFPWeaponBonus( "ergonomics", "narcosis" )
 		end,
 	},
 	["overdose"] = {
@@ -133,6 +141,7 @@ end
 function PLAYER:ApplyEffect( name, time )
 	if not SERVER then return end
 
+	local ct = CurTime()
 	local eff_data = REGISTERED_EFFECTS[name]
 	if eff_data == nil then
 		print( "Effect '"..name.."' doesn't exist" )	
@@ -141,13 +150,13 @@ function PLAYER:ApplyEffect( name, time )
 	local eff_tbl = self:GetProperty( "Effects", {} )
 
 	eff_tbl[name] = eff_tbl[name] or {}
-	eff_tbl[name].time = time or isnumber( eff_tbl[name].time ) and REGISTERED_EFFECTS[name].stacks == true and math.min( CurTime() + ( REGISTERED_EFFECTS[name].max_time or math.huge ), eff_tbl[name].time + REGISTERED_EFFECTS[name].time ) or CurTime() + REGISTERED_EFFECTS[name].time
-	eff_tbl[name].nextThink = eff_tbl[name].nextThink or isnumber( REGISTERED_EFFECTS[name].think_freq ) and CurTime() + REGISTERED_EFFECTS[name].think_freq or 0
+	eff_tbl[name].time = time or isnumber( eff_tbl[name].time ) and eff_data.stacks == true and math.min( ct + ( eff_data.max_time or math.huge ), eff_tbl[name].time + eff_data.time ) or ct + eff_data.time
+	eff_tbl[name].nextThink = eff_tbl[name].nextThink or isnumber( eff_data.think_freq ) and ct + eff_data.think_freq or 0
 
 	self:SetProperty( "Effects", eff_tbl, true )
 
-	if isfunction( REGISTERED_EFFECTS[name].start_func ) then
-		REGISTERED_EFFECTS[name].start_func( self )
+	if isfunction( eff_data.start_func ) then
+		eff_data.start_func( self )
 	end
 end
 

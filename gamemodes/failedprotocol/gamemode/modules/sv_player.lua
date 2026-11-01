@@ -255,6 +255,178 @@ function PLAYER:Undetain()
 	end
 end
 
+--[[-------------------------------------------------------------------------
+SPEED SYSTEM
+---------------------------------------------------------------------------]]
+function PLAYER:PushSpeed( walk, run, slow, crouch, id, maxstack, force_mult )
+	if walk <= 0 and walk != -1 then
+		print( "Invalid value for walk speed!" )
+		return false
+	end
+
+	if run <= 0 and run != -1 then
+		print( "Invalid value for run speed!" )
+		return false
+	end
+
+	if slow <= 0 and slow != -1 then
+		print( "Invalid value for slowwalk speed!" )
+		return false
+	end
+
+	if crouch < 0 and crouch != -1 then
+		crouch = 0
+	elseif crouch > 1 then
+		crouch = 1
+	end
+
+	if self.SpeedStack then
+		if type( id ) == "string" then
+			for i, v in ipairs( self.SpeedStack ) do
+				if v.id == id then
+					if !maxstack or maxstack == -1 or !isnumber( maxstack ) or v.stacks < maxstack then
+						v.stacks = v.stacks + 1
+					end
+
+					return true
+				end
+			end
+		else
+			id = nil
+		end
+	end
+
+	local swalk = self:GetWalkSpeed()
+	local srun = self:GetRunSpeed()
+	local sslow = self:GetSlowWalkSpeed()
+	local scrouch = self:GetCrouchedWalkSpeed()
+
+	if !self.SpeedStack then
+		self.SpeedStack = { {
+			id = 0,
+			spid = 0,
+			walk = swalk,
+			run = srun,
+			slow = sslow,
+			crouch = scrouch,
+		} }
+	end
+
+	if force_mult or walk > 0 and walk <= 2 then
+		self:SetWalkSpeed( swalk * walk )
+	elseif walk != -1 then
+		self:SetWalkSpeed( walk )
+	end
+
+	if force_mult or run > 0 and run <= 2 then
+		self:SetRunSpeed( srun * run )
+	elseif run != -1 then
+		self:SetRunSpeed( run )
+	end
+
+	if force_mult or slow > 0 and slow <= 2 then
+		self:SetSlowWalkSpeed( sslow * slow )
+	elseif slow != -1 then
+		self:SetSlowWalkSpeed( slow )
+	end
+
+	if crouch != -1 then
+		self:SetCrouchedWalkSpeed( crouch )
+	end
+
+	local spid = self.SpeedStack[#self.SpeedStack].spid + 1
+	if !id then
+		id = spid
+	end
+
+	table.insert( self.SpeedStack, { id = id, spid = spid, walk = walk, run = run, slow = slow, crouch = crouch, stacks = 1 } )
+
+	return id
+end
+
+local function getCrouchValue( p )
+	for i, v in rpairs( p.SpeedStack ) do
+		local value = v.crouch
+
+		if value != -1 then
+			return value
+		end
+	end
+end
+
+local function getSpeedValue( p, id )
+	local mul = 1
+
+	for i, v in rpairs( p.SpeedStack ) do
+		local value = v[id]
+
+		if value > 0 and value <= 2 then
+			mul = mul * value
+		elseif value >= 3 then
+			return value * mul
+		end
+	end
+end
+
+function PLAYER:PopSpeed( id, all )
+	if !self.SpeedStack then return end
+	if id == 0 then return end
+
+	for i, v in ipairs( self.SpeedStack ) do
+		if v.id == id then
+			v.stacks = v.stacks - 1
+
+			if all or v.stacks <= 0 then
+				table.remove( self.SpeedStack, i )
+
+				self:SetWalkSpeed( getSpeedValue( self, "walk" ) )
+				self:SetRunSpeed( getSpeedValue( self, "run" )  )
+				self:SetSlowWalkSpeed( getSpeedValue( self, "slow" ) )
+				self:SetCrouchedWalkSpeed( getCrouchValue( self ) )
+
+				return true
+			end
+
+			return false
+		end
+	end
+end
+
+function PLAYER:SetBaseSpeed( walk, run, slow, crouch )
+	if !self.SpeedStack then
+		self.SpeedStack = {}
+	end
+
+	self.SpeedStack[1] = {
+		id = 0,
+		spid = 0,
+		walk = walk,
+		run = run,
+		slow = slow,
+		crouch = crouch
+	}
+
+	if #self.SpeedStack == 1 then
+		self:SetWalkSpeed( walk )
+		self:SetRunSpeed( run )
+		self:SetSlowWalkSpeed( slow )
+		self:SetCrouchedWalkSpeed( crouch )
+	end
+end
+
+function PLAYER:ClearSpeedStack()
+	if !self.SpeedStack then return end
+
+	self:SetWalkSpeed( self.SpeedStack[1].walk )
+	self:SetRunSpeed( self.SpeedStack[1].run )
+	self:SetSlowWalkSpeed( self.SpeedStack[1].slow )
+	self:SetCrouchedWalkSpeed( self.SpeedStack[1].crouch )
+
+	self.SpeedStack = { self.SpeedStack[1] }
+end
+
+----------------------------------------------------------------
+
 function PLAYER:PopupInfo( time, data )
 	if not IsValid( self ) or not self:IsPlayer() then return end
 
@@ -413,10 +585,7 @@ function PLAYER:Setup( class, spawn_override, instant )
 	self:SetMaxStamina( class_tab.maxstamina or 100 )
 	self:SetStamina( class_tab.stamina or 100 )
 
-	self:SetWalkSpeed( class_tab.walkspeed or 125 )
-	self:SetCrouchedWalkSpeed( class_tab.crouchspeed or .5 )
-	self:SetSlowWalkSpeed( class_tab.slowwalkspeed or 85 )
-	self:SetRunSpeed( class_tab.runspeed or 225 )
+	self:SetBaseSpeed( class_tab.walkspeed or 125, class_tab.runspeed or 225, class_tab.slowwalkspeed or 85, class_tab.crouchspeed or .5 )
 	self:SetJumpPower( class_tab.jumppower or 175 )
 
 	if class_tab.norandomskin != true then
@@ -485,10 +654,7 @@ function PLAYER:SetupSCP( class, instant )
 	self:SetMaxStamina( class_tab.maxstamina or 100 )
 	self:SetStamina( class_tab.stamina or 100 )
 
-	self:SetWalkSpeed( class_tab.walkspeed or 175 )
-	self:SetCrouchedWalkSpeed( class_tab.crouchspeed or .5 )
-	self:SetSlowWalkSpeed( class_tab.slowwalkspeed or class_tab.walkspeed or 85 )
-	self:SetRunSpeed( class_tab.runspeed or class_tab.walkspeed or 175 )
+	self:SetBaseSpeed( class_tab.walkspeed or 175, class_tab.runspeed or class_tab.walkspeed or 175, class_tab.slowwalkspeed or class_tab.walkspeed or 85, class_tab.crouchspeed or .5 )
 	self:SetJumpPower( class_tab.jumppower or 175 )
 
 	if isfunction( class_tab.callback ) then

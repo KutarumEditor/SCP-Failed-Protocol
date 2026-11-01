@@ -85,43 +85,47 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	net.Ping( "ClientDeath", nil, ply )
 end
 
+local rivalryOutcome = {
+	[TEAM_CI] = function( att, ply )
+		if att:FPTeam() == TEAM_SH then
+			RIVALRY.AddPoints( TEAM_SH, 2 )
+		end
+	end,
+	[TEAM_SH] = function( att, ply )
+		if att:FPTeam() == TEAM_CI then
+			RIVALRY.AddPoints( TEAM_CI, 2 )
+		end
+	end,
+	[TEAM_MTF] = function( att, ply )
+		if att:FPTeam() == TEAM_GOC then
+			ROUNDPROP.Set( "MTF_GOC_standoff", true )
+		end
+	end,
+	[TEAM_SD] = function( att, ply )
+		if att:FPTeam() == TEAM_GOC then
+			ROUNDPROP.Set( "MTF_GOC_standoff", true )
+		end
+	end,
+	[TEAM_SCI] = function( att, ply )
+		if att:FPTeam() == TEAM_GOC then
+			ROUNDPROP.Set( "MTF_GOC_standoff", true )
+		end
+	end,
+	[TEAM_GOC] = function( att, ply )
+		if FPTeams.HasInfo( att:FPTeam(), FPTeams.INFO_STAFF ) then
+			ROUNDPROP.Set( "MTF_GOC_standoff", true )
+		end
+	end,
+}
+
 function GM:PlayerDeath( ply, inf, att )
-	local rivalryOutcome = {
-		[TEAM_CI] = function()
-			print( 1 )
-			if att:FPTeam() == TEAM_SH then
-				RIVALRY.AddPoints( TEAM_SH, 2 )
-			end
-		end,
-		[TEAM_SH] = function()
-			print( 2 )
-			if att:FPTeam() == TEAM_CI then
-				RIVALRY.AddPoints( TEAM_CI, 2 )
-			end
-		end,
-		[TEAM_MTF] = function()
-			if att:FPTeam() == TEAM_GOC then
-				ROUNDPROP.Set( "MTF_GOC_standoff", true )
-
-				--TODO: Karma decrease
-			end
-		end,
-		[TEAM_GOC] = function()
-			if FPTeams.HasInfo( att:FPTeam(), FPTeams.INFO_STAFF ) then
-				ROUNDPROP.Set( "MTF_GOC_standoff", true )
-
-				--TODO: Karma decrease
-			end
-		end,
-	}
-
 	local reason = "suicide"
 	if att:IsValid() and att != ply then
 		reason = "default"
 		NEUTRALITY.Break( att, ply )
 
 		if rivalryOutcome[ply:FPTeam()] != nil then
-			rivalryOutcome[ply:FPTeam()]()
+			rivalryOutcome[ply:FPTeam()]( att, ply )
 		end
 	end
 

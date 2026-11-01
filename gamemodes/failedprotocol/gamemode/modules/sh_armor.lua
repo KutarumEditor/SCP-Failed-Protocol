@@ -33,7 +33,7 @@ REGISTERED_ARMOR = {
 		model = "models/kutarum/scpfp/helmets/ntf_helmet.mdl",
 		durability = 65,
 		resistance = {
-			[HITGROUP_HEAD] = .3,
+			[HITGROUP_HEAD] = .4,
 		},
 		class = 3,
 	},
@@ -43,7 +43,7 @@ REGISTERED_ARMOR = {
 		model = "models/kutarum/scpfp/helmets/ci_helmet.mdl",
 		durability = 75,
 		resistance = {
-			[HITGROUP_HEAD] = .35,
+			[HITGROUP_HEAD] = .45,
 		},
 		class = 3,
 	},
@@ -53,7 +53,7 @@ REGISTERED_ARMOR = {
 		model = "models/kutarum/scpfp/helmets/goc_helmet.mdl",
 		durability = 85,
 		resistance = {
-			[HITGROUP_HEAD] = .35,
+			[HITGROUP_HEAD] = .45,
 		},
 		class = 3,
 	},
@@ -63,9 +63,9 @@ REGISTERED_ARMOR = {
 		model = "models/kutarum/scpfp/helmets/cbg_mask.mdl",
 		durability = 50,
 		resistance = {
-			[HITGROUP_HEAD] = .25,
+			[HITGROUP_HEAD] = .3,
 		},
-		class = 2,
+		class = 3,
 	},
 	["gru_helmet"] = {
 		type = "helmet",
@@ -75,7 +75,7 @@ REGISTERED_ARMOR = {
 		resistance = {
 			[HITGROUP_HEAD] = .5,
 		},
-		class = 3,
+		class = 4,
 	},
 	["spear_helmet"] = {
 		type = "helmet",
@@ -85,7 +85,7 @@ REGISTERED_ARMOR = {
 		resistance = {
 			[HITGROUP_HEAD] = .4,
 		},
-		class = 3,
+		class = 4,
 	},
 	["security_light_vest"] = {
 		type = "vest",
@@ -97,7 +97,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_STOMACH] = .3,
 			[HITGROUP_GENERIC] = 1,
 		},
-		class = 2,
+		class = 3,
 	},
 	["security_medium_vest"] = {
 		type = "vest",
@@ -111,7 +111,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_LEFTARM] = .5,
 			[HITGROUP_GENERIC] = 1,
 		},
-		class = 2,
+		class = 3,
 	},
 	["security_heavy_vest"] = {
 		type = "vest",
@@ -127,7 +127,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_LEFTLEG] = .5,
 			[HITGROUP_GENERIC] = 1,
 		},
-		class = 3,
+		class = 4,
 	},
 	["ntf_vest"] = {
 		type = "vest",
@@ -157,7 +157,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_LEFTARM] = .55,
 			[HITGROUP_GENERIC] = 1,
 		},
-		class = 3,
+		class = 4,
 	},
 	["sh_vest"] = {
 		type = "vest",
@@ -168,7 +168,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_CHEST] = .25,
 			[HITGROUP_STOMACH] = .35,
 		},
-		class = 2,
+		class = 3,
 	},
 	["goc_vest"] = {
 		type = "vest",
@@ -206,7 +206,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_LEFTARM] = .55,
 			[HITGROUP_GENERIC] = 1,
 		},
-		class = 4,
+		class = 5,
 	},
 	["cbg_plate_holder"] = {
 		type = "vest",
@@ -217,7 +217,7 @@ REGISTERED_ARMOR = {
 			[HITGROUP_CHEST] = .4,
 			[HITGROUP_GENERIC] = 1,
 		},
-		class = 2,
+		class = 3,
 	},
 }
 

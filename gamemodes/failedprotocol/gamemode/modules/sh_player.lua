@@ -256,6 +256,10 @@ function PLAYER:GetDeathReason()
 	return self:GetProperty( "DeathReason", { "" } )[1]
 end
 
+function PLAYER:AddKarma( amount )
+	self:SetPlayerKarma( self:PlayerKarma() + amount )
+end
+
 function PLAYER:IsReady()
 	local ready = self:GetReady()
 
@@ -333,6 +337,5 @@ end
 
 FPAccessor( "PlayerLevel", { db_key = "level", getter = "PlayerLevel" } )
 FPAccessor( "PlayerXP", { db_key = "xp", getter = "PlayerXP" } )
-FPAccessor( "ClassPoints", { db_key = "class_points", getter = "ClassPoints" } )
+FPAccessor( "PlayerKarma", { db_key = "karma", getter = "PlayerKarma" } )
 FPAccessor( "SCPPenalty", { db_key = "scp_penalty" } )
-FPAccessor( "PlayerKarma", { db_key = "scp_karma" } )

@@ -127,7 +127,11 @@ function NEUTRALITY.Break( ply1, ply2 )
 
     _breakPlayerNeutrality( ply1, ply2 )
 
-    --TODO: Reduce karma
+    if FPTeams.HasInfo( ply2:FPTeam(), FPTeams.INFO_LONER ) then
+        ply1:AddKarma( -5 )
+    else
+        ply1:AddKarma( -25 )
+    end
 end
 
 function NEUTRALITY.IsBroken( ply1, ply2 )
