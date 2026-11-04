@@ -122,6 +122,7 @@ CLASSES.shsoldier = "Солдат ДЗ"
 CLASSES.shcom = "Командир ДЗ"
 
 CLASSES.cbgsoldier = "Солдат ЦРБ"
+CLASSES.cbgpsycho = "Псих ЦРБ"
 
 CLASSES.SCP008 = "SCP-008-2"
 CLASSES.SCP035 = "SCP-035-2"
@@ -162,6 +163,7 @@ DESC.shsoldier = "Описание йоу"
 DESC.shcom = "Описание йоу"
 
 DESC.cbgsoldier = "Описание йоу"
+DESC.cbgpsycho = "Описание йоу"
 
 DESC.SCP008 = "Описание йоу"
 DESC.SCP035 = "Описание йоу"
@@ -244,6 +246,9 @@ WEP.fp_knife = {
 }
 WEP.fp_bandage = {
 	name = "Бинт"
+}
+WEP.fp_vicodin = {
+	name = "Викодин"
 }
 
 local ENT = {}
@@ -395,8 +400,8 @@ PHRASES.cbgpsycho = {
 	pillkill1 = "ТЕПЕРЬ МОЯ ОЧЕРЕДЬ",
 	pillkill2 = "ЧТОООЖ, ТАК У ТЕБЯ РЕАЛЬНО ЕСТЬ ЭТА ХЕРНЯ",
 	pillkill3 = "РУКИ ПРОЧЬ ОТ МОЕЙ ХЕРНИ",
-	ragestart1 = "ПОПРОБУЙ ОСТАНОВИ",
-	ragestart2 = "ПОПРОБУЙ ПОСТОЙ НА ПУТИ",
+	ragestart1 = "ПОПРОБУЙ ОСТАНОВИ МЕНЯ",
+	ragestart2 = "ПОПРОБУЙ ВСТАТЬ У МЕНЯ НА ПУТИ",
 	ragestart3 = "НЕ ОРУЖИЕ УБИВАЕТ ЛЮДЕЙ, ЛЮДЕЙ УБИВАЮ Я",
 	ragekill1 = "КРОВЬ ЭТО ТОПЛИВО",
 	ragekill2 = "СЪЕБИ С ПУТИ",

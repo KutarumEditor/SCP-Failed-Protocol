@@ -629,6 +629,28 @@ CLASSES = {
 			ply:GiveKeycard( "mtf" )
 		end,
 	},
+	["cbgpsycho"] = {
+		spawngroup = "cbg",
+		team = TEAM_CBG,
+		model = "models/kutarum/scpfp/playermodels/cbg.mdl",
+		weps = { "tfa_fp_ump", "fp_vicodin" },
+		ammo = { ["45acp"] = 120 },
+		helmet = "cbg_mask",
+		vest = "cbg_plate_holder",
+		maxhp = 120,
+		hp = 120,
+		maxstamina = 130,
+		stamina = 130,
+		walkspeed = 125,
+		crouchspeed = 0.5,
+		slowwalkspeed = 85,
+		runspeed = 230,
+		jumppower = 175,
+		callback = function( ply )
+			ply:GiveKeycard( "mtf" )
+			ply:ApplyEffect( "calm", 150 )
+		end,
+	},
 }
 
 function GetAllClasses()

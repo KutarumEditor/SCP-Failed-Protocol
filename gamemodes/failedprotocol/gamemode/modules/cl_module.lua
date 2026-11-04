@@ -40,6 +40,14 @@ local hide = {
 	--[""] = true,
 }
 
+BAR_COLORS = {
+	health = Color( 65, 175, 105 ),
+	stamina = Color( 155, 155, 155 ),
+	buff_stamina = Color( 228, 167, 0),
+	armor = Color( 65, 105, 175 ),
+	disguise = Color( 81, 60, 143 )
+}
+
 hook.Add( "HUDShouldDraw", "FPHideHUD", function( name )
 	if ( hide[ name ] ) then
 		return false
@@ -143,7 +151,6 @@ local hud_shake = 0
 local alpha_death_mult = 1
 
 local total_alpha_mult = 1 * alpha_death_mult * hud_hide_alpha
-
 hook.Add( "FPHUD", "MainHUD", function()
 	local disg = lply:GetProperty( "FPDisguise", {
 		0,
@@ -153,28 +160,32 @@ hook.Add( "FPHUD", "MainHUD", function()
 	local bars = {
 		[2] = {	--Health
 			icon = hp_mat,
-			clr = Color( 65, 175, 105 ),
+			clr = BAR_COLORS.health,
 			curvalue = math.max( lply:Health(), 0 ),
 			maxvalue = lply:GetMaxHealth(),
 			show = function() return lply:FPTeam() != TEAM_SPEC end,
 		},
 		[1] = {	--Stamina
 			icon = stam_mat,
-			clr = Color( 155, 155, 155 ),
+			clr = function()
+				local infStam = lply:GetInfStamina()
+				return infStam and LerpColor( math.sin( CurTime() * 9 ), BAR_COLORS.stamina, BAR_COLORS.buff_stamina ) or BAR_COLORS.stamina
+			end,
 			curvalue = math.max( lply:GetStamina(), 0 ),
 			maxvalue = lply:GetMaxStamina(),
+			textoverride = function( cur, max ) return lply:GetInfStamina() and "∞" or tostring( math.ceil( cur ) ).."/"..max end,
 			show = function() return lply:FPTeam() != TEAM_SPEC and ( lply:FPTeam() != TEAM_SCP or SCPS[lply:GetFPClass()].has_stamina == true ) end,
 		},
 		[3] = {	--Armor
 			icon = armor_mat,
-			clr = Color( 65, 105, 175 ),
+			clr = BAR_COLORS.armor,
 			curvalue = lply:Armor(),
 			maxvalue = lply:GetMaxArmor(),
 			show = function() return lply:Armor() > 0 and lply:FPTeam() != TEAM_SPEC end,
 		},
 		[4] = {	--Disguise
 			icon = disg_mat,
-			clr = Color( 81, 60, 143 ),
+			clr = BAR_COLORS.disguise,
 			curvalue = disg[1] - CurTime(),
 			maxvalue = disg[2],
 			textoverride = function( cur, max ) return disg[1] == -1 and "∞" or tostring( math.ceil( cur ) ) end,
@@ -208,7 +219,8 @@ hook.Add( "FPHUD", "MainHUD", function()
 		if bar.show() == false then continue end
 
 		randShake = math.Rand( -hud_shake, hud_shake )
-		local clr = LerpColor( .95, Color( bar.clr.r, bar.clr.g, bar.clr.b ), Color( 0, 0, 0 ) )
+		local bar_col = isfunction( bar.clr ) and bar.clr() or bar.clr
+		local clr = LerpColor( .95, Color( bar_col.r, bar_col.g, bar_col.b ), Color( 0, 0, 0 ) )
 		clr.a = 225 * total_alpha_mult
 		local text = tostring( math.ceil( bar.curvalue ) )
 		local hCoef = 1
@@ -226,7 +238,7 @@ hook.Add( "FPHUD", "MainHUD", function()
 		surface.SetDrawColor( clr )
 	    surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, bar_h, bar_h )
 
-		surface.SetDrawColor( bar.clr )
+		surface.SetDrawColor( bar_col )
 		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, outline_size, bar_h )
 		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, ScreenScale( 2 ), outline_size )
 		surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
@@ -235,18 +247,18 @@ hook.Add( "FPHUD", "MainHUD", function()
 		surface.DrawRect( 8 + randShake + ind + bar_h - ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
 
 	    KMASKS.Start()
-			draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2, ( w - ind*2 ) * hCoef, bar_height, bar.clr )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h, startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2, ( w - ind*2 ) * hCoef, bar_height, bar_col )
 			KMASKS.Source()
 			surface.DrawRect( 8 + randShake + ind, startY - ( 8 + randShake ) + ind, bar_h, bar_h )
 		KMASKS.End()
 
-		surface.SetDrawColor( bar.clr.r, bar.clr.g, bar.clr.b, 255 * total_alpha_mult )
+		surface.SetDrawColor( bar_col.r, bar_col.g, bar_col.b, 255 * total_alpha_mult )
 		surface.SetMaterial( bar.icon )
 		surface.DrawTexturedRect( 8 + randShake + ind + outline + gap, startY - ( 8 + randShake ) + ind + outline + gap, bar_h - ( outline + gap )*2, bar_h - ( outline + gap )*2 )
 		-- Main bar
 		draw.RoundedBox( rad - ind, bar_x, bar_y, bar_w, bar_h, clr )
 
-		surface.SetDrawColor( bar.clr )
+		surface.SetDrawColor( bar_col )
 		surface.DrawRect( bar_x, startY - ( 8 + randShake ) + ind, outline_size, bar_h )
 		surface.DrawRect( bar_x, startY - ( 8 + randShake ) + ind, ScreenScale( 2 ), outline_size )
 		surface.DrawRect( bar_x, startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
@@ -256,11 +268,11 @@ hook.Add( "FPHUD", "MainHUD", function()
 		surface.DrawRect( bar_x + bar_w - ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + bar_h - outline_size, ScreenScale( 2 ), outline_size )
 
 		KMASKS.Start()
-			surface.SetDrawColor( Color( bar.clr.r, bar.clr.g, bar.clr.b, 25 ) )
+			surface.SetDrawColor( Color( bar_col.r, bar_col.g, bar_col.b, 25 ) )
 
 			draw.HAnimatedLines( _.."bar", ScreenScale( 4 ), 10 )
 
-			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2, ( w - ind*2  - ScreenScale( 4 ) ) * hCoef, bar_height, bar.clr )
+			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2, ( w - ind*2  - ScreenScale( 4 ) ) * hCoef, bar_height, bar_col )
 			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2 - outline_size, outline_size, bar_height + ScreenScale( 1 ), color_white )
 			draw.RoundedBox( rad - ind, 8 + randShake + ind + h + ScreenScale( 2 ) + ( w - ind*2  - ScreenScale( 4 ) ), startY - ( 8 + randShake ) + ind + ( bar_h )/2 - bar_height/2 - outline_size, outline_size, bar_height + ScreenScale( 1 ), color_white )
 	    KMASKS.Source()
@@ -400,7 +412,7 @@ function DrawFPEffects()
 			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
 			surface.DrawTexturedRect( eff_gap + eff_outline, start_pos + eff_outline, eff_size - eff_outline * 2, eff_size - eff_outline * 2 )
 
-			local time = REGISTERED_EFFECTS[k].time == -1 and "" or math.ceil( v.time - CurTime() )
+			local time = v.time < 0 and "" or math.ceil( v.time - CurTime() )
 			draw.SimpleTextOutlined( time, "HUDSmall", eff_gap + eff_size/2, start_pos + eff_size - ScreenScale( 2 ), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
         KMASKS.Source()
             draw.RoundedBox( 0, eff_gap, start_pos, eff_size, eff_size, color_white )
@@ -879,3 +891,71 @@ hook.Add( "PreFPHUD", "OverdoseHUD", function()
 	surface.SetMaterial( vignette_mat )
 	surface.DrawTexturedRect( -1, -1, ScrW() + 2, ScrH() + 2 )
 end )
+
+local FlashBangData = {}
+local FlashBangBlack = {
+	max = 0,
+	cur = 0
+}
+
+local flash_mat = Material( "failedprotocol/flashbang.png" )
+hook.Add( "PreFPHUD", "FlashbangHUD", function()
+	local ct = CurTime()
+
+	FlashBangBlack.cur = FlashBangBlack.cur - FrameTime()
+	if FlashBangBlack.cur < 0 then
+		FlashBangBlack.max = 0
+	end
+
+	if FlashBangBlack.max > 0 then
+		print( FlashBangBlack.cur / FlashBangBlack.max )
+		surface.SetDrawColor( Color( 0, 0, 0, 255 * ( math.ease.OutCirc( ( FlashBangBlack.cur / FlashBangBlack.max ) ) + .01 ) ) )
+		surface.DrawRect( -1, -1, ScrW()+2, ScrH()+2 )
+	end
+
+	for i, v in ipairs( FlashBangData ) do
+		if v.death - ct < 0 then
+			table.remove( FlashBangData, i )
+		end
+
+		local size = Lerp( .5, 1024 / v.distance * 256, 128 )
+		local ss = ScreenScale( size )
+		surface.SetMaterial( flash_mat )
+		surface.SetDrawColor( Color( 255, 255, 255, 255 * ( v.death - ct ) / ( v.death - v.start ) ) )
+		surface.DrawTexturedRect( v.screendata.x - ss/2, v.screendata.y - ss/2, ss, ss )
+	end
+end )
+
+net.Receive( "FPFlashbang", function()
+	local ct, pos = CurTime(), net.ReadVector()
+	local dist = EyePos():Distance( pos )
+	local power = 1024 / dist
+	FlashBangData[#FlashBangData+1] = {
+		distance = dist,
+		screendata = ToScreen( pos ),
+		start = ct,
+		death = ct + power * 32
+	}
+
+	FlashBangBlack = {
+		max = power * 16,
+		cur = power * 16
+	}
+end )
+
+function testFlashBang()
+	local ct = CurTime()
+	local dist = 512
+	local power = 1024 / dist
+	FlashBangData[#FlashBangData+1] = {
+		distance = dist,
+		screendata = { x = ScrW()/3*2, y = ScrH()/3*2, visible = true },
+		start = ct,
+		death = ct + power * 32
+	}
+
+	FlashBangBlack = {
+		max = power * 16,
+		cur = power * 16
+	}
+end

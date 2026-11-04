@@ -44,6 +44,9 @@ function ENT:Use( activator, caller )
         end
     end
 
+    
+    self:EmitSound( "scpfp/armor/armor_equip.wav" )
+
     activator:TimedTask( "armor_equip", 5, Color( 200, 155, 0 ),
     function()
         return IsValid( self ) and IsValid( activator ) and activator.FPArmor[self.ArmorType].name == nil and
@@ -54,6 +57,8 @@ function ENT:Use( activator, caller )
         activator:EmitSound( "scpfp/armor/armor_pickup.wav" )
 
         SafeRemoveEntity( self )
+    end, function()
+        self:StopSound( "scpfp/armor/armor_equip.wav" )
     end )
 end
 

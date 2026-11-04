@@ -473,6 +473,7 @@ function PLAYER:Cleanup()
 	self:SetParent( NULL )
 	self:SetMoveType( MOVETYPE_WALK )
 	self:SetExhausted( false )
+	self:SetInfStamina( false )
 	self:SetStamina( 100 )
 	self:SetMaxStamina( 100 )
 
@@ -507,6 +508,16 @@ function PLAYER:Cleanup()
 	self:SetFPArmor( "helmet", nil, 0 )
 	self:RemoveEffect()
 	ABILITIES.Clear( self )
+
+	self.FPTrip = {
+        trip_type = nil,
+        start_time = 0,
+        action_time = 0,
+        crash_time = 0,
+        end_time = 0,
+    }
+
+	self:SyncTrip()
 	
 	self.amnesicrussian = false
 end

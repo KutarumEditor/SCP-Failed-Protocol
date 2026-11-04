@@ -41,6 +41,7 @@ local senderColor = {
 	pa = Color( 93, 122, 184 ),
 	gocsniper = Color( 97, 132, 149 ),
 	gruspy = Color( 158, 145, 99 ),
+	cbgpsycho = Color( 110, 9, 9),
 	unkoper = Color( 34, 36, 197),
 	SCP457 = Color( 52, 7, 7 ),
 }

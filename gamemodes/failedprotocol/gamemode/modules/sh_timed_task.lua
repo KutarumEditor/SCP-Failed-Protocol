@@ -4,7 +4,11 @@ if SERVER then
 
 FPTASKS = FPTASKS or {}
 
-function PLAYER:TimedTask( name, duration, color, check, callback )
+local function _mbappeSpecial()
+	--
+end
+
+function PLAYER:TimedTask( name, duration, color, check, callback, fail_callback )
 	if not IsValid( self ) or self.DoingTask then return end
 
 	self.DoingTask = true
@@ -27,6 +31,7 @@ function PLAYER:TimedTask( name, duration, color, check, callback )
 		endtime = CurTime() + duration,
 		check = check,
 		callback = callback,
+		fail_callback = fail_callback or _mbappeSpecial,
 	}
 end
 
@@ -37,6 +42,7 @@ hook.Add( "Think", "FPTaskChecker", function()
 		elseif not v.check() or not v.player:Alive() then
 			FPTASKS[k] = nil
 			v.player.DoingTask = false
+			v.fail_callback()
 			net.Start( "FPTask" )
 				net.WriteColor( Color( 0, 0, 0, 0 ) )
 				net.WriteFloat( 1 )

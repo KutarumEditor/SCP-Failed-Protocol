@@ -122,6 +122,7 @@ CLASSES.shsoldier = "SH Soldier"
 CLASSES.shcom = "SH Commander"
 
 CLASSES.cbgsoldier = "CBG Soldier"
+CLASSES.cbgpsycho = "CBG Psycho"
 
 CLASSES.SCP008 = "SCP-008-2"
 CLASSES.SCP035 = "SCP-035-2"
@@ -162,6 +163,7 @@ DESC.shsoldier = "Deez nuts"
 DESC.shcom = "Deez nuts"
 
 DESC.cbgsoldier = "Deez nuts"
+DESC.cbgpsycho = "Deez nuts"
 
 DESC.SCP008 = "Deez nuts"
 DESC.SCP035 = "Deez nuts"
@@ -245,6 +247,9 @@ WEP.fp_knife = {
 }
 WEP.fp_bandage = {
 	name = "Bandage"
+}
+WEP.fp_vicodin = {
+	name = "Vicodin"
 }
 
 local ENT = {}

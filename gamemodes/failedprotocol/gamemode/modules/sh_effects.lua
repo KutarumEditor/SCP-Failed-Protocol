@@ -99,6 +99,48 @@ REGISTERED_EFFECTS = {
 			return !ply:IsHuman()
 		end,
 	},
+	["withdrawal"] = {
+		icon = Material( "failedprotocol/icons/withdrawal.png", "noclamp" ),
+		color = Color( 68, 68, 68),
+		time = -1,
+		max_time = -1,
+		stacks = false,
+		think_freq = 2,
+		think_func = function( ply )
+			ply:EmitSound( "scpfp/humans/pain/pain_"..FPRandom( 8 )..".mp3", 90 )
+		end,
+		end_check = function( ply )
+			return ply:GetFPClass() != "cbgpsycho"
+		end,
+	},
+	["calm"] = {
+		icon = Material( "failedprotocol/icons/calm.png", "noclamp" ),
+		color = Color( 146, 146, 146),
+		time = 60,
+		max_time = 999,
+		stacks = false,
+		think_freq = 1,
+		end_check = function( ply )
+			return ply:GetFPClass() != "cbgpsycho"
+		end,
+		end_func = function( ply )
+			ply:ApplyEffect( "withdrawal", -1 )
+		end,
+	},
+	["psycho_rage"] = {
+		icon = Material( "failedprotocol/icons/psycho_rage.png", "noclamp" ),
+		color = Color( 54, 8, 8),
+		time = 999,
+		max_time = 999,
+		stacks = false,
+		think_freq = 1,
+		end_check = function( ply )
+			return ply:GetFPClass() != "cbgpsycho"
+		end,
+		end_func = function( ply )
+			ply:ApplyEffect( "calm", 150 )
+		end,
+	},
 	["scp207"] = {
 		icon = Material( "failedprotocol/icons/overdose.png", "noclamp" ),
 		color = Color( 202, 204, 56),
@@ -150,7 +192,15 @@ function PLAYER:ApplyEffect( name, time )
 	local eff_tbl = self:GetProperty( "Effects", {} )
 
 	eff_tbl[name] = eff_tbl[name] or {}
-	eff_tbl[name].time = time or isnumber( eff_tbl[name].time ) and eff_data.stacks == true and math.min( ct + ( eff_data.max_time or math.huge ), eff_tbl[name].time + eff_data.time ) or ct + eff_data.time
+
+	local realTime = isnumber( eff_tbl[name].time )	and eff_data.stacks == true and math.min( ct + ( eff_data.max_time or math.huge ), eff_tbl[name].time + eff_data.time ) or ct + eff_data.time
+	if time == -1 then
+		realTime = -1
+	elseif time != nil then
+		realTime = ct + time
+	end
+
+	eff_tbl[name].time = realTime
 	eff_tbl[name].nextThink = eff_tbl[name].nextThink or isnumber( eff_data.think_freq ) and ct + eff_data.think_freq or 0
 
 	self:SetProperty( "Effects", eff_tbl, true )
@@ -183,7 +233,7 @@ end
 if SERVER then
 
 hook.Add( "Tick", "FPEffectsCalc", function()
-	// for _, ply in ipairs( player.GetAll() ) do
+	local ct = CurTime()
 	for _, ply in player.Iterator() do
 		ply.FPProperties = ply.FPProperties or {}
 		ply.FPProperties.Effects = ply.FPProperties.Effects or {}
@@ -200,15 +250,15 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 				ply:SetProperty( "Effects", ply.FPProperties.Effects, true )
 			end
 
-			if CurTime() > v.nextThink then
+			if ct > v.nextThink then
 				if isfunction( eff_data.think_func ) then
 					eff_data.think_func( ply )
 				end
 
-				v.nextThink = CurTime() + ( eff_data.think_freq or FrameTime() )
+				v.nextThink = ct + ( eff_data.think_freq or FrameTime() )
 			end
 
-			if eff_data.time != -1 and CurTime() > v.time then
+			if eff_data.time != -1 and v.time != -1 and ct > v.time then
 				if isfunction( eff_data.end_func ) then
 					eff_data.end_func( ply )
 				end

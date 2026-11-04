@@ -9,13 +9,15 @@ hook.Add( "StartCommand", "FPSprint", function( ply, cmd )
 		cmd:RemoveKey( IN_SPEED )
 	elseif cmd:KeyDown( IN_JUMP ) and IsFirstTimePredicted() then
 		if !ply.WasJumpDown and ply:OnGround() and !ply:InVehicle() then
-			local stamina = ply:GetStamina()
+			if not ply:GetInfStamina() then
+				local stamina = ply:GetStamina()
 
-			ply.StaminaRegen = CurTime() + 1.5
+				ply.StaminaRegen = CurTime() + 1.5
 
-			stamina = math.max( stamina - 10, 0 )
-			
-			ply:SetStamina( stamina )
+				stamina = math.max( stamina - 10, 0 )
+				
+				ply:SetStamina( stamina )
+			end
 		else
 			cmd:RemoveKey( IN_JUMP )
 		end
@@ -56,7 +58,7 @@ local function CalcStamina( ply )
 	local stamina = ply:GetStamina()
 	local max_stamina = ply:GetMaxStamina()
 
-	if ply:IsSprinting() and ply:OnGround() and ( ply:KeyDown( IN_FORWARD ) or ply:KeyDown( IN_BACK ) or ply:KeyDown( IN_MOVELEFT ) or ply:KeyDown( IN_MOVERIGHT ) ) then
+	if ply:IsSprinting() and ply:OnGround() and ( ply:KeyDown( IN_FORWARD ) or ply:KeyDown( IN_BACK ) or ply:KeyDown( IN_MOVELEFT ) or ply:KeyDown( IN_MOVERIGHT ) ) and not ply:GetInfStamina() then
 		ply.StaminaRegen = CurTime() + .3
 		stamina = math.Clamp( stamina - .125, 0, max_stamina )
 	elseif ply.StaminaRegen < CurTime() then

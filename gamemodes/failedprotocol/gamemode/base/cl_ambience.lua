@@ -56,17 +56,18 @@ end
 local checkTime = 0
 local ambThinkDelay = 1
 hook.Add( "Think", "FPAmbience", function()
-	if checkTime <= CurTime() then
+	local ct = CurTime()
+	if checkTime <= ct then
 		if AMBIENT.CHANNEL == nil or not AMBIENT.CHANNEL:IsValid() or AMBIENT.CHANNEL:GetState() == 0 then
 			if AMBIENT.CHANNEL != nil and AMBIENT.CHANNEL:IsValid() and math.floor( AMBIENT.CHANNEL:GetLength() ) <= math.ceil( AMBIENT.TIME ) then
 				AMBIENT.SOUND = nil
 			end
 
-			if CurTime() > AMBIENT.BAN then
+			if ct > AMBIENT.BAN then
 				AMBIENT.Restart()
 			end
 
-			checkTime = CurTime() + ambThinkDelay
+			checkTime = ct + ambThinkDelay
 		elseif AMBIENT.CHANNEL:IsValid() and AMBIENT.CHANNEL:GetState() != 0 then
 			AMBIENT.CHANNEL:SetVolume( AMBIENT.VOLUME )
 			AMBIENT.TIME = AMBIENT.CHANNEL:GetTime()

@@ -26,6 +26,7 @@ function CLASS:SetupDataTables()
 
 	ply:NetworkVar( "Bool", 0, "Exhausted" )
 	ply:NetworkVar( "Bool", 1, "Ready" )
+	ply:NetworkVar( "Bool", 2, "InfStamina" )
 
 	if SERVER then
 		ply:Set_FPTeam( 0 )
@@ -36,6 +37,7 @@ function CLASS:SetupDataTables()
 		
 		ply:SetExhausted( false )
 		ply:SetReady( ply:IsBot() and true or false )
+		ply:SetInfStamina( false )
 		ply:SetCanZoom( false )
 
 		ply:Set_FPClass( "spectator" )
