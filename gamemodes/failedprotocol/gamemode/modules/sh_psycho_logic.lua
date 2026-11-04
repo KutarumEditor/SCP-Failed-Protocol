@@ -131,6 +131,13 @@ hook.Add( "PostPlayerDeath", "RemoveTripOnDeath", function( ply )
 	ply:SyncTrip()
 end )
 
+hook.Add( "PlayerSpawn", "TripTimersKill", function( ply )
+    local id64 = ply:SteamID64()
+	TIMERS.Destroy( id64.."_TripAction" )
+    TIMERS.Destroy( id64.."_TripCrash" )
+    TIMERS.Destroy( id64.."_TripEnd" )
+end )
+
 else
 
 TRIPMUSIC = TRIPMUSIC or {
@@ -236,8 +243,6 @@ hook.Add( "Think", "FPTripMusic", function()
     end
 end )
 
-local effectEnabled = true 
-
 local tab = {
     [ "$pp_colour_addr" ] = 0,
     [ "$pp_colour_addg" ] = 0,
@@ -338,6 +343,13 @@ net.Receive( "FPPsychoTrip", function()
         cfg.crash_cb_cl( lply )
     end end, false )
     TIMERS.Create( id64.."_TripEnd_CL", cfg.duration, function() if lply:IsValid() and lply:Alive() then cfg.end_cb_cl( lply ) end end, false )
+end )
+
+hook.Add( "OnSpawn", "TripTimersKillCL", function()
+    local id64 = LocalPlayer():SteamID64()
+	TIMERS.Destroy( id64.."_TripAction_CL" )
+    TIMERS.Destroy( id64.."_TripCrash_CL" )
+    TIMERS.Destroy( id64.."_TripEnd_CL" )
 end )
 
 end

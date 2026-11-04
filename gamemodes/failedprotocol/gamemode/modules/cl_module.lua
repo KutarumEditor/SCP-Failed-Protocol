@@ -412,7 +412,7 @@ function DrawFPEffects()
 			surface.SetMaterial( REGISTERED_EFFECTS[k].icon )
 			surface.DrawTexturedRect( eff_gap + eff_outline, start_pos + eff_outline, eff_size - eff_outline * 2, eff_size - eff_outline * 2 )
 
-			local time = v.time < 0 and "" or math.ceil( v.time - CurTime() )
+			local time = v.time < CurTime() and "" or math.ceil( v.time - CurTime() )
 			draw.SimpleTextOutlined( time, "HUDSmall", eff_gap + eff_size/2, start_pos + eff_size - ScreenScale( 2 ), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black )
         KMASKS.Source()
             draw.RoundedBox( 0, eff_gap, start_pos, eff_size, eff_size, color_white )

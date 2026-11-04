@@ -150,17 +150,12 @@ REGISTERED_EFFECTS = {
 		think_freq = 5,
 		think_func = function( ply )
 			ply:SetDeathReason( "internalbleeding" )
-
-			local dmg = DamageInfo()
-			dmg:SetDamage( 1 )
-			dmg:SetDamageType( DMG_DIRECT )
-			dmg:SetAttacker( ply )
-			dmg:SetInflictor( ply )
-			ply:TakeDamageInfo( dmg )
+			ply:SetHealth( ply:Health() - 1 )
 		end,
 		start_func = function( ply )
 			ply:SetFPWeaponBonus( "recoil", "scp207", .75 )
 			ply:SetFPWeaponBonus( "ergonomics", "scp207", 1.5 )
+			ply:PushSpeed( 1.1, 1.2, 1, 1, "ColaSpeed", 1 )
 		end,
 		end_check = function( ply )
 			return !ply:IsHuman()
@@ -168,6 +163,7 @@ REGISTERED_EFFECTS = {
 		end_func = function( ply )
 			ply:RemoveFPWeaponBonus( "recoil", "scp207" )
 			ply:RemoveFPWeaponBonus( "ergonomics", "scp207" )
+			ply:PopSpeed( "ColaSpeed" )
 		end,
 	},
 }

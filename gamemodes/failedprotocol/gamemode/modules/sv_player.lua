@@ -507,6 +507,7 @@ function PLAYER:Cleanup()
 	self:SetFPArmor( "vest", nil, 0 )
 	self:SetFPArmor( "helmet", nil, 0 )
 	self:RemoveEffect()
+	self:ClearSpeedStack()
 	ABILITIES.Clear( self )
 
 	self.FPTrip = {
