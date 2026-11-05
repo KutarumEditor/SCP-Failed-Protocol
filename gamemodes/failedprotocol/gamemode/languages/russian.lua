@@ -96,7 +96,6 @@ lang.CLASSES = CLASSES
 CLASSES.spectator = "Наблюдатель"
 
 CLASSES.classd = "Класс-Д"
-CLASSES.gruagent = "Агент ГРУ"
 
 CLASSES.researcher = "Исследователь"
 CLASSES.researcher_head = "Глава Научного Отдела"
@@ -113,10 +112,12 @@ CLASSES.ntfsoldier = "Солдат Эпсилон-11"
 CLASSES.gocsoldier = "Солдат ГОК"
 
 CLASSES.grusoldier = "Солдат ГРУ"
+CLASSES.gruagent = "Агент ГРУ"
 
 CLASSES.spearsoldier = "Солдат SPEAR"
 
 CLASSES.cisoldier = "Солдат ПХ"
+CLASSES.cicom = "Командир ПХ"
 
 CLASSES.shsoldier = "Солдат ДЗ"
 CLASSES.shcom = "Командир ДЗ"
@@ -137,7 +138,6 @@ DESC.youre = "Вы"
 DESC.spectator = "Вы можете наблюдать за игрой. Просто откиньтесь на спинку кресла и расслабьтесь."
 
 DESC.classd = "Описание йоу"
-DESC.gruamnesiac = "Описание йоу"
 
 DESC.researcher = "Описание йоу"
 DESC.researcher_head = "Описание йоу"
@@ -154,10 +154,12 @@ DESC.ntfsoldier = "Описание йоу"
 DESC.gocsoldier = "Описание йоу"
 
 DESC.grusoldier = "Описание йоу"
+DESC.gruagent = "Описание йоу"
 
 DESC.spearsoldier = "Описание йоу"
 
 DESC.cisoldier = "Описание йоу"
+DESC.cicom = "Описание йоу"
 
 DESC.shsoldier = "Описание йоу"
 DESC.shcom = "Описание йоу"

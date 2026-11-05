@@ -96,7 +96,6 @@ lang.CLASSES = CLASSES
 CLASSES.spectator = "Spectator"
 
 CLASSES.classd = "Class-D"
-CLASSES.gruagent = "GRU Agent"
 
 CLASSES.researcher = "Researcher"
 CLASSES.researcher_head = "Head of Research Department"
@@ -113,10 +112,12 @@ CLASSES.ntfsoldier = "Epsilon-11 Soldier"
 CLASSES.gocsoldier = "GOC Soldier"
 
 CLASSES.grusoldier = "GRU Soldier"
+CLASSES.gruagent = "GRU Agent"
 
 CLASSES.spearsoldier = "SPEAR Soldier"
 
 CLASSES.cisoldier = "CI Soldier"
+CLASSES.cicom = "CI Commander"
 
 CLASSES.shsoldier = "SH Soldier"
 CLASSES.shcom = "SH Commander"
@@ -137,7 +138,6 @@ DESC.youre = "You are"
 DESC.spectator = "You can spectate the game. Just sit back and relax."
 
 DESC.classd = "Deez nuts"
-DESC.gruamnesiac = "Deez nuts"
 
 DESC.researcher = "Deez nuts"
 DESC.researcher_head = "Deez nuts"
@@ -154,10 +154,12 @@ DESC.ntfsoldier = "Deez nuts"
 DESC.gocsoldier = "Deez nuts"
 
 DESC.grusoldier = "Deez nuts"
+DESC.gruagent = "Deez nuts"
 
 DESC.spearsoldier = "Deez nuts"
 
 DESC.cisoldier = "Deez nuts"
+DESC.cicom = "Deez nuts"
 
 DESC.shsoldier = "Deez nuts"
 DESC.shcom = "Deez nuts"
