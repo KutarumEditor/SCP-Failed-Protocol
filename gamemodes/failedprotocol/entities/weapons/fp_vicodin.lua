@@ -61,7 +61,7 @@ function SWEP:PrimaryAttack()
 
 		self:EmitSound( "scpfp/pills/usage.wav" )
 
-		if CLIENT then
+		if CLIENT and LocalPlayer():GetFPClass() == "cbgpsycho" then
 			PHRASES.PopUp( "cbgpsycho", table.Random( {
 				"usage1",
 				"usage2",
