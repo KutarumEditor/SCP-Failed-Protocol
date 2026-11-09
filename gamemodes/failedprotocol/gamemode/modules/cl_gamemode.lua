@@ -118,6 +118,57 @@ function MTFCutscene()
 	end )
 end
 
+local goc_mat = Material( "failedprotocol/emblems/goc.png" )
+function GOCCutscene()
+	local ply = LocalPlayer()
+
+	RunConsoleCommand( "stopsound" )
+	AMBIENT.Ban( 1 )
+
+	timer.Simple( .01, function()
+		AMBIENT.Restart( "sound/scpfp/support_themes/goc.mp3" )
+		ClearInfoPopup()
+	end )
+
+	HideHUD( true, true )
+
+	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 15.8 )
+
+	TIMERS.Create( "GOCLogo", 3.23, function()
+		DrawSprite( {
+            mat = goc_mat,
+            clr = color_white,
+            time = 11,
+            fade = 5,
+            x = ( ScrW() - logo_scale ) / 2,
+            y = ( ScrH() - logo_scale ) / 2,
+            w = logo_scale,
+            h = logo_scale
+        } )
+
+		TIMERS.Create( "GetMyHUDBack", 12.7, function()
+			PopupInfo( 15, {
+				{
+					text = { LANG.Get( "CLASSES", ply:GetFPClass() ) },
+					font = "RoundStartInfoBig",
+					color = FPTeams.GetColor( ply:FPTeam() ),
+					ugap = -8,
+					lgap = 4
+				},
+				{
+					text = { LANG.Get( "DESC", ply:GetFPClass() ) },
+					font = "RoundStartInfoExtraSmall",
+					color = color_white,
+					ugap = -8,
+					lgap = 4
+				},
+			} )
+
+			HideHUD( false )
+		end )
+	end )
+end
+
 local gru_mat = Material( "failedprotocol/emblems/gru.png" )
 function GRUCutscene()
 	local ply = LocalPlayer()
@@ -172,6 +223,10 @@ end
 
 net.ReceivePing( "MTFSpawn", function()
 	MTFCutscene()
+end )
+
+net.ReceivePing( "GOCSpawn", function()
+	GOCCutscene()
 end )
 
 net.ReceivePing( "GRUSpawn", function()

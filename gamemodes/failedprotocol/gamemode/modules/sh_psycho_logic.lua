@@ -31,12 +31,14 @@ TRIP_CFG = {
         end,
         act_cb = function( ply )
             ply:PushSpeed( 1.1, 1.25, 1, 1, "PsychoTrip", 1 )
+            ply:SetInfStamina( true )
         end,
         act_cb_cl = function( ply )
             --
         end,
         crash_cb = function( ply )
             ply:PopSpeed( "PsychoTrip" )
+            ply:SetInfStamina( false )
         end,
         crash_cb_cl = function( ply )
         end,
@@ -69,6 +71,17 @@ TRIP_CFG = {
         start_cb = function( ply )
         end,
         start_cb_cl = function( ply )
+            timer.Simple( 1.15, function() -- 1 beat
+                ply:ScreenFade( SCREENFADE.IN, Color( 125, 0, 0, 125 ), .5, 0 )
+            end )
+
+            timer.Simple( 2.54, function() -- 2 beat
+                ply:ScreenFade( SCREENFADE.IN, Color( 175, 0, 0, 175 ), .33, 0 )
+            end )
+
+            timer.Simple( 3.26, function() -- 3 beat
+                ply:ScreenFade( SCREENFADE.IN, Color( 225, 0, 0, 225 ), .33, 0 )
+            end )
         end,
         act_cb = function( ply )
             ply:PushSpeed( 1.1, 1.25, 1, 1, "PsychoTrip", 1 )
@@ -230,7 +243,7 @@ hook.Add( "Think", "FPTripMusic", function()
             if TRIPMUSIC.CHANNEL:GetState() != GMOD_CHANNEL_PLAYING then
                 TRIPMUSIC.CHANNEL:Play()
             end
-            TRIPMUSIC.CHANNEL:SetVolume( 1 )
+            TRIPMUSIC.CHANNEL:SetVolume( .5 )
             TRIPMUSIC.TIME = TRIPMUSIC.CHANNEL:GetTime()
         elseif TRIPMUSIC.SOUND and not TRIPMUSIC.LoadingSound then
             TRIPMUSIC.Play( TRIPMUSIC.SOUND )
@@ -319,7 +332,7 @@ hook.Add( "RenderScreenspaceEffects", "PsychedelicRageEffect", DrawPsychedelicRa
 
 net.Receive( "FPPsychoTrip", function()
     local lply = LocalPlayer()
-    if lply == nil then return end
+    if lply == nil or lply.SteamID64 == nil then return end
     local id64 = lply:SteamID64()
     lply.FPTrip = net.ReadTable()
 
@@ -333,7 +346,7 @@ net.Receive( "FPPsychoTrip", function()
 
     TRIPMUSIC.Play( cfg.music )
 
-    cfg.start_cb_cl()
+    cfg.start_cb_cl( lply )
     TIMERS.Create( id64.."_TripAction_CL", cfg.act_time, function() if lply:IsValid() and lply:Alive() then
         PHRASES.PopUp( "cbgpsycho", table.Random( cfg.phrases.start ), 1.5 )
         cfg.act_cb_cl( lply )

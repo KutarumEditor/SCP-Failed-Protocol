@@ -360,11 +360,11 @@ lang.PHRASES = PHRASES
 
 PHRASES.gocsniper_name = "GOC Sniper"
 PHRASES.gocsniper = {
-	scp = "Anomaly spotted...",
-	fire1 = "We are free to open fire...",
-	fire2 = "You are ordered to be terminated...",
-	warning1 = "Stay away or you'll be shot!",
-	warning2 = "This is your last chance!",
+	scp = "Anomaly spotted.",
+	fire1 = "You are ordered to be terminated.",
+	fire2 = "Target is designated for termination.",
+	warning1 = "Stay away or you'll be shot.",
+	warning2 = "Stay back, this is your last chance.",
 }
 
 PHRASES.gruspy_name = "You"

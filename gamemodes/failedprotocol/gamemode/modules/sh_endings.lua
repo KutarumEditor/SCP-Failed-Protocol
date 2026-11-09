@@ -2,6 +2,23 @@ local function checkFoundationRivalry( ply )
 	return NEUTRALITY.IsBrokenByTeam( TEAM_SD, ply ) or NEUTRALITY.IsBrokenByTeam( TEAM_MTF, ply ) or FPTeams.IsEnemy( ply:FPTeam(), TEAM_MTF ) or FPTeams.IsEnemy( ply:FPTeam(), TEAM_SD )
 end
 
+local function testCurrentFactionsRivalry()
+	local curFactions = {}
+
+	for _, ply in player.Iterator() do
+		curFactions[ply:FPTeam()] = true
+	end
+
+	for _, fac in pairs( curFactions ) do
+		for _, fac2 in pairs( curFactions ) do
+			if FPTeams.IsEnemy( fac, fac2 ) then return false end
+		end
+	end
+
+
+	return true
+end
+
 ENDINGS = {
 	["default"] = {
 		[1] = {
@@ -24,7 +41,7 @@ ENDINGS = {
 					if ply:FPTeam() == TEAM_SCP then return false end
 				end
 
-				return true
+				return testCurrentFactionsRivalry()
 			end,
 			callback = function()
 				print( "Power over facility was seized by the groups of interest!" )
@@ -56,7 +73,7 @@ ENDINGS = {
 					if checkFoundationRivalry( ply ) then return false end
 				end
 
-				return true
+				return testCurrentFactionsRivalry()
 			end,
 			callback = function()
 				print( "Foundation regained control over the facility!" )
@@ -65,7 +82,7 @@ ENDINGS = {
 		[5] = {
 			lang = "unknown_fate",
 			check = function( plys )
-				return true
+				return ( testCurrentFactionsRivalry() and ROUNDPROP.Get( "support_count" ) > 1 ) or #player.GetAlive() == 0
 			end,
 			callback = function()
 				print( "Fate of the facility is unknown..." )

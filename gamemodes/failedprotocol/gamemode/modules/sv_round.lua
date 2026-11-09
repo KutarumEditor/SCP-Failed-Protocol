@@ -88,6 +88,7 @@ function RoundStart( type )
 		AnnulScore()
 
 		ROUNDPROP.Clear()
+		ROUNDPROP.Set( "support_count", 0 )
 
 		FreezeRound()
 

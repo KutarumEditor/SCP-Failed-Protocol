@@ -49,11 +49,6 @@ function ENT:Shoot( target )
 	end
 end
 
-local phraseTbl = {
-	{ "scpfp/gocsniper/warning1.wav" },
-
-}
-
 function ENT:SpeakPhrase( snd, speaker, phrase )
 	for i, v in ipairs( ents.FindInSphere( self:GetPos(), self.Radius * 3/2 ) ) do
 		if v:IsPlayer() then
@@ -73,7 +68,7 @@ function ENT:Think()
 		if IsValid( newtar ) then
 			nextThink = 5
 			local n = FPRandom( 1, 2 )
-			self:SpeakPhrase( "scpfp/gocsniper/warning"..n..".wav", "gocsniper", "warning"..n )
+			self:SpeakPhrase( "scpfp/gocsniper/new/warning"..n..".wav", "gocsniper", "warning"..n )
 			self:SetTriggered( true )
 			self:SetTarget( newtar )
 		end
@@ -88,7 +83,7 @@ function ENT:Think()
 				self:Shoot( target )
 			else
 				local n = FPRandom( 1, 2 )
-				self:SpeakPhrase( "scpfp/gocsniper/fire"..n..".wav", "gocsniper", "fire"..n )
+				self:SpeakPhrase( "scpfp/gocsniper/new/fire"..n..".wav", "gocsniper", "fire"..n )
 				self:Shoot( target )
 				self:SetAggressive( true )
 			end

@@ -28,6 +28,22 @@ hook.Add( "StartCommand", "FPSprint", function( ply, cmd )
 	end
 end )
 
+hook.Add( "StartCommand", "FPCrouchBan", function( ply, cmd )
+	if ply:GetMoveType() != MOVETYPE_WALK then return end
+
+	if ply:OnGround() then
+		ply.AirCrouched = false
+	else
+		if ply.AirCrouched then
+			cmd:AddKey( IN_DUCK )
+		else
+			if cmd:KeyDown( IN_DUCK ) then
+				ply.AirCrouched = true
+			end
+		end
+	end
+end )
+
 hook.Add( "OnPlayerHitGround", "FPBHop", function( ply, water, floater, speed )
 	ply.JumpPenalty = CurTime() + 0.3
 end )

@@ -33,12 +33,8 @@ REGISTERED_EFFECTS = {
 		icon = Material( "failedprotocol/icons/pain.png", "noclamp" ),
 		color = Color( 134, 58, 58),
 		time = 30,
-		max_time = 30,
+		max_time = 60,
 		stacks = true,
-		think_freq = 2,
-		think_func = function( ply )
-			ply:EmitSound( "scpfp/humans/pain/pain_"..FPRandom( 8 )..".mp3", 90 )
-		end,
 		start_func = function( ply )
 			ply:SetFPWeaponBonus( "recoil", "pain", 1.75 )
 			ply:SetFPWeaponBonus( "ergonomics", "pain", .75 )
@@ -105,10 +101,6 @@ REGISTERED_EFFECTS = {
 		time = -1,
 		max_time = -1,
 		stacks = false,
-		think_freq = 2,
-		think_func = function( ply )
-			ply:EmitSound( "scpfp/humans/pain/pain_"..FPRandom( 8 )..".mp3", 90 )
-		end,
 		end_check = function( ply )
 			return ply:GetFPClass() != "cbgpsycho"
 		end,
@@ -264,6 +256,28 @@ hook.Add( "Tick", "FPEffectsCalc", function()
 				ply:SetProperty( "Effects", ply.FPProperties.Effects, true )
 			end
 		end
+	end
+end )
+
+local shouldGroan = {
+	"pain",
+	"withdrawal"
+}
+hook.Add( "PlayerPostThink", "FPGroan", function( ply )
+	local ct = CurTime()
+	if ply.nextGroan != nil and ply.nextGroan > ct then return end
+
+	local groan = false
+	for i, v in ipairs( shouldGroan ) do
+		if ply.FPProperties.Effects[v] != nil then
+			groan = true
+			break
+		end
+	end
+
+	if groan then
+		ply:EmitSound( "scpfp/humans/pain/pain_"..FPRandom( 8 )..".mp3", 90 )
+		ply.nextGroan = ct + 2
 	end
 end )
 
