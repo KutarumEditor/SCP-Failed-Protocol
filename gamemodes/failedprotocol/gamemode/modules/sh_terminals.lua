@@ -104,3 +104,8 @@ net.ReceivePing( "SyncTerminalUser", function( data )
         gui.EnableScreenClicker( true )
     end
 end )
+
+net.Receive( "FPSyncTerminalData", function( len, ply )
+    local data, ent = net.ReadTable(), net.ReadEntity()
+    ent.Data = data
+end )

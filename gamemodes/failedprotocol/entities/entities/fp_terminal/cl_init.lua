@@ -1,30 +1,26 @@
 include( "shared.lua" )
 
 ENT.Data = {
-    {
-        title = "СОСТАВ ПЕРСОНАЛА",
-        sender = "gandon",
-        text = [[Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?]],
-    },
-    {
-        title = "СОСАЛ ПЕРСОНАЛА",
-        sender = "админ",
-        text = [[qwkdpfoq[fvinw[epvoinw[ovnw[onvwlknvq[oinv[oiqwnrvbqlknocd[lq][c;cs,mvds
-bheripovqwedSosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?
-Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?Sosal?]],
-    },
+    -- {
+    --     title = "Test message",
+    --     sender = "Sender",
+    --     text = [[Test text.Test text.Test text.Test text.]],
+    -- }
 }
 
 local TEX_WIDTH, TEX_HEIGHT = 1140, 640
 
 local Colors = {
-    back = Color( 16, 16, 16 ),
-    main = Color( 215, 215, 215 ),
-    highlight = Color( 255, 255, 255),
-    pressed = Color( 140, 140, 140 ),
+    back = Color( 12, 14, 18, 245 ),
+    panelBack = Color( 20, 24, 32, 200 ),
+    main = Color( 70, 130, 180 ),
+    highlight = Color( 100, 180, 220 ),
+    pressed = Color( 40, 90, 130 ),
+    text = Color( 200, 220, 240 ),
+    textDim = Color( 100, 120, 140 ),
+    error = Color( 220, 60, 60 ),
+    success = Color( 60, 220, 100 ),
+    border = Color( 50, 80, 110 )
 }
 
 local TerminalUI = {
@@ -67,7 +63,27 @@ function TerminalUI.UpdateInput( ent, pos, ang, scale )
     end
 end
 
-function TerminalUI.Button( x, y, w, h, text, color, hoverColor, pressedColor )
+function TerminalUI.DrawDecoratedBox( x, y, w, h, colBack, colBorder )
+    surface.SetDrawColor( colBack )
+    surface.DrawRect( x, y, w, h )
+    
+    surface.SetDrawColor( colBorder )
+
+    local len = 6
+    surface.DrawLine( x, y, x + len, y )
+    surface.DrawLine( x, y, x, y + len )
+
+    surface.DrawLine( x + w, y, x + w - len, y )
+    surface.DrawLine( x + w, y, x + w, y + len )
+
+    surface.DrawLine( x, y + h, x + len, y + h )
+    surface.DrawLine( x, y + h, x, y + h - len )
+
+    surface.DrawLine( x + w, y + h, x + w - len, y + h )
+    surface.DrawLine( x + w, y + h, x + w, y + h - len )
+end
+
+function TerminalUI.Button( x, y, w, h, text, isSelected )
     local mx, my = TerminalUI.MX, TerminalUI.MY
     local isHovered = false
 
@@ -75,13 +91,24 @@ function TerminalUI.Button( x, y, w, h, text, color, hoverColor, pressedColor )
         isHovered = true
     end
 
-    local clr = color
+    local clrBack = Colors.panelBack
+    local clrBorder = Colors.border
+    local clrText = Colors.text
+
     if isHovered then
-        clr = TerminalUI.Pressed and pressedColor or hoverColor
+        clrBack = Colors.pressed
+        clrBorder = Colors.highlight
+        clrText = color_white
     end
-    surface.SetDrawColor( clr )
-    surface.DrawOutlinedRect( x, y, w, h, 1 )
-    draw.SimpleText( text, "HUDNormal", x + w / 2, y + h / 2, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+
+    if isSelected then
+        clrBack = Colors.main
+        clrBorder = Colors.highlight
+        clrText = color_white
+    end
+
+    TerminalUI.DrawDecoratedBox( x, y, w, h, clrBack, clrBorder )
+    draw.SimpleText( text, "HUDNormal", x + w / 2, y + h / 2, clrText, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
     return isHovered and TerminalUI.Pressed
 end
@@ -98,28 +125,12 @@ function TerminalUI.TexturedButton( x, y, w, h, mat, color, hoverColor, pressedC
     if isHovered then
         clr = TerminalUI.Pressed and pressedColor or hoverColor
     end
+    
+    TerminalUI.DrawDecoratedBox( x, y, w, h, Colors.panelBack, clr )
+    
     surface.SetDrawColor( clr )
     surface.SetMaterial( mat )
-    surface.DrawTexturedRect( x, y, w, h )
-
-    return isHovered and TerminalUI.Pressed
-end
-
-function TerminalUI.File( x, y, w, h, text, color, hoverColor, pressedColor )
-    local mx, my = TerminalUI.MX, TerminalUI.MY
-    local isHovered = false
-
-    if mx and mx >= x and mx <= x + w and my >= y and my <= y + h then
-        isHovered = true
-    end
-
-    local clr = color
-    if isHovered then
-        clr = TerminalUI.Pressed and pressedColor or hoverColor
-    end
-    surface.SetDrawColor( clr )
-    surface.DrawOutlinedRect( x, y, w, h, 1 )
-    draw.SimpleText( text, "HUDNormal", x + w / 2, y + h / 2, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+    surface.DrawTexturedRect( x + 8, y + 8, w - 16, h - 16 )
 
     return isHovered and TerminalUI.Pressed
 end
@@ -130,58 +141,73 @@ ENT.SelectedFile = nil
 local user_mat = Material( "failedprotocol/terminal/user.png" )
 local logo_mat = Material( "failedprotocol/scp_logo.png" )
 local power_mat = Material( "failedprotocol/terminal/power.png" )
+
 function ENT:RenderScreen( w, h, pos, ang, scale )
     local lply = LocalPlayer()
     local ct = CurTime()
 
     TerminalUI.UpdateInput( self, pos, ang, scale )
 
-    draw.RoundedBox( 0, -w/2, -h/2, w, h, Colors.back )
+    surface.SetDrawColor( Colors.back )
+    surface.DrawRect( -w/2, -h/2, w, h )
+
+    TerminalUI.DrawDecoratedBox( -w/2 + 10, -h/2 + 10, w - 20, h - 20, Color( 0, 0, 0, 0 ), Colors.border )
 
     if self:GetActive() and self:GetUser() == lply then
-        if TerminalUI.TexturedButton( TEX_WIDTH/2 - 50, -TEX_HEIGHT/2 + 5, 40, 40, power_mat, Colors.main, Colors.highlight, Colors.pressed ) then
+        if TerminalUI.TexturedButton( w/2 - 60, -h/2 + 20, 40, 40, power_mat, Colors.textDim, Colors.error, Colors.pressed ) then
             surface.PlaySound( "buttons/lightswitch2.wav" )
             lply.Terminal = nil
             net.Ping( "FPStopTerminalUsage" )
         end
 
-        draw.SimpleText( "ТЕРМИНАЛ", "HUDNormal", 0, -h/2 + 25, Colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+        draw.SimpleText( "SEC-TERMINAL v2.4", "HUDNormal", -w/2 + 30, -h/2 + 40, Colors.textDim, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+        draw.SimpleText( os.date("%H:%M:%S"), "HUDNormal", w/2 - 160, -h/2 + 40, Colors.textDim, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
 
-        surface.SetDrawColor( color_white )
-        local linePos = -h/2 + 50
-        surface.DrawLine( -TEX_WIDTH/2, linePos, TEX_WIDTH/2, linePos )
+        surface.SetDrawColor( Colors.border )
+        local linePos = -h/2 + 70
+        surface.DrawLine( -w/2 + 20, linePos, w/2 - 20, linePos )
         
         if not self:GetShow() then
-            surface.SetDrawColor( color_white )
-            surface.SetMaterial( user_mat )
-            surface.DrawTexturedRect( -TEX_HEIGHT/6, -TEX_HEIGHT/3, TEX_HEIGHT/3, TEX_HEIGHT/3 )
+            TerminalUI.DrawDecoratedBox( -180, -120, 360, 260, Colors.panelBack, Colors.border )
 
-            local linePos = 125
-            surface.DrawLine( -125, linePos, 125, linePos )
+            surface.SetDrawColor( Colors.text )
+            surface.SetMaterial( user_mat )
+            surface.DrawTexturedRect( -30, -100, 60, 60 )
+
+            draw.SimpleText( "ТРЕБУЕТСЯ АВТОРИЗАЦИЯ", "HUDNormal", 0, -10, Colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+
+            local passBoxY = 25
+            local isError = self.WrongPassword > ct
+            TerminalUI.DrawDecoratedBox( -140, passBoxY, 280, 40, Color( 10, 12, 16 ), isError and Colors.error or Colors.border )
 
             local password = ENTERED_PASSWORD or ""
-            draw.SimpleText( password, "HUDNormal", 0, 125, Colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
+            local maskedPass = string.rep("*", string.len(password))
+            if (CurTime() % 1) > 0.5 then maskedPass = maskedPass .. "_" end
+            
+            draw.SimpleText( maskedPass, "HUDNormal", 0, passBoxY + 20, isError and Colors.error or Colors.highlight, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
-            local text = self.WrongPassword > ct and "НЕВЕРНЫЙ ПАРОЛЬ" or "АВТОРИЗОВАТЬСЯ"
-            if TerminalUI.Button( -150, 150, 300, 50, text, Colors.main, Colors.highlight, Colors.pressed ) then
+            local text = isError and "НЕВЕРНЫЙ КОД ДОСТУПА" or "ВОЙТИ В СИСТЕМУ"
+            if TerminalUI.Button( -140, 80, 280, 40, text, false ) then
                 surface.PlaySound( "buttons/lightswitch2.wav" )
                 net.Ping( "FPEnterTerminalPassword", password )
                 timer.Simple( .1, function()
                     if self:IsValid() then
-                        self.WrongPassword = ct + 3
+                        self.WrongPassword = ct + 2
                     end
                 end )
             end
         else
             self.WrongPassword = 0
-            --draw.SimpleText( "ДОСТУП РАЗРЕШЕН. РЕЖИМ ПРОСМОТРА.", "HUDNormal", 0, 0, Color( 0, 255, 0 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
         
-            surface.SetDrawColor( color_white )
-            local linePos = -TEX_WIDTH/4
-            surface.DrawLine( linePos, -270, linePos, 320 )
+            surface.SetDrawColor( Colors.border )
+            local splitX = -w/4 + 20
+            surface.DrawLine( splitX, -h/2 + 90, splitX, h/2 - 30 )
+
+            draw.SimpleText( "БАЗА ДАННЫХ", "HUDNormal", -w/2 + 35, -h/2 + 95, Colors.textDim, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
 
             for i = 1, #self.Data do
-                if TerminalUI.File( -TEX_WIDTH/2 + 10, -TEX_HEIGHT/2 + 58 + ( i - 1 ) * 55, 269, 50, self.Data[i].title, Colors.main, Colors.highlight, Colors.pressed ) then
+                local isSelected = (self.SelectedFile == i)
+                if TerminalUI.Button( -w/2 + 25, -h/2 + 120 + ( i - 1 ) * 55, 260, 45, self.Data[i].title, isSelected ) then
                     surface.PlaySound( "buttons/lightswitch2.wav" )
                     if self.SelectedFile != i then
                         self.SelectedFile = i
@@ -192,20 +218,71 @@ function ENT:RenderScreen( w, h, pos, ang, scale )
             end
 
             if self.SelectedFile != nil then
-                local text = self.Data[self.SelectedFile].text
-                local textTbl = string.Explode( "\n", text )
+                local fileData = self.Data[self.SelectedFile]
+                
+                draw.SimpleText( "ДОКУМЕНТ: " .. fileData.title, "HUDNormal", splitX + 25, -h/2 + 95, Colors.highlight, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER )
+                draw.SimpleText( "АВТОР: " .. fileData.sender, "HUDNormal", w/2 - 40, -h/2 + 95, Colors.textDim, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+                
+                surface.SetDrawColor( Colors.border )
+                surface.DrawLine( splitX + 20, -h/2 + 115, w/2 - 20, -h/2 + 115 )
 
-                for i, v in ipairs( textTbl ) do
-                    draw.SimpleText( v, "HUDNormal", -256, -220 + ( i - 1 ) * 50, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM )
+                local boxX = splitX + 20
+                local boxY = -h/2 + 130
+                local boxW = (w/2 - 20) - boxX
+                local boxH = math.min(h - 170, (h/2 - 20) - boxY)
+
+                TerminalUI.DrawDecoratedBox( boxX, boxY, boxW, boxH, Colors.panelBack, Colors.border )
+
+                local text = fileData.text
+                local maxLineWidth = boxW - 30
+                local lineHeight = 22
+                local maxLines = math.floor((boxH - 45) / lineHeight)
+                
+                surface.SetFont( "HUDNormal" )
+                local lines = {}
+                
+                -- Красивый и чистый перенос текста по словам (без разрыва букв)
+                for _, paragraph in ipairs(string.Explode("\n", text)) do
+                    local currentLine = ""
+                    for word in string.gmatch(paragraph, "%S+") do
+                        local testLine = currentLine == "" and word or (currentLine .. " " .. word)
+                        local tw, _ = surface.GetTextSize(testLine)
+                        
+                        if tw > maxLineWidth then
+                            if currentLine ~= "" then
+                                table.insert(lines, currentLine)
+                                currentLine = word
+                            else
+                                -- Если даже отдельное слово слишком длинное, помещаем его на новую строку целиком
+                                table.insert(lines, word)
+                                currentLine = ""
+                            end
+                        else
+                            currentLine = testLine
+                        end
+                    end
+                    if currentLine ~= "" then
+                        table.insert(lines, currentLine)
+                    end
+                end
+
+                for i = 1, math.min(#lines, maxLines) do
+                    draw.SimpleText( lines[i], "HUDNormal", boxX + 15, boxY + 15 + ( i - 1 ) * lineHeight, Colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+                end
+
+                if #lines > maxLines then
+                    draw.SimpleText( "-- ТЕКСТ СМЕЩЕН / ЕСТЬ ЕЩЕ СТРОКИ --", "HUDNormal", boxX + boxW / 2, boxY + boxH - 20, Colors.textDim, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
                 end
             else
-                draw.SimpleText( "ВЫБЕРИТЕ ФАЙЛ", "HUDBig", 150, 0, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                draw.SimpleText( "ВЫБЕРИТЕ ФАЙЛ", "HUDNormal", splitX + (w/2 - splitX)/2, 0, Colors.textDim, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
             end
         end
     else
-        surface.SetDrawColor( color_white )
+        surface.SetDrawColor( Colors.highlight )
         surface.SetMaterial( logo_mat )
-        surface.DrawTexturedRect( -TEX_HEIGHT/6, -TEX_HEIGHT/6, TEX_HEIGHT/3, TEX_HEIGHT/3 )
+        surface.DrawTexturedRect( -h/6, -h/4, h/3, h/3 )
+
+        draw.SimpleText( "ТЕРМИНАЛ ЗОНЫ // НАЖМИТЕ [E]", "HUDNormal", 0, h/6, Colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
     end
 end
 
