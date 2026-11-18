@@ -91,7 +91,7 @@ function GM:EntityTakeDamage( ent, dmginfo )
 
 	ent:ViewPunch( Angle( 0, 0, FPRandom() > .5 and 2.5 or -2.5 ) )
 
-	net.Start( "DamageBlur" )
+	net.Start( "FPDamageBlur" )
 		net.WriteFloat( dmg )
 	net.Send( ent )
 end

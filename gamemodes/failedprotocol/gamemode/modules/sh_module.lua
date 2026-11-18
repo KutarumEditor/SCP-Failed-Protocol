@@ -44,16 +44,6 @@ local function GetPartArmor( ply, hg )
 	return armorTbl
 end
 
-function DoImpactEffect( hitpos, attacker )
-	local normal = hitpos - attacker:GetPos()
-	normal:Normalize()
-
-	local effectdata = EffectData()
-	effectdata:SetOrigin( hitpos )
-	effectdata:SetNormal( normal )
-	util.Effect( "MetalSpark", effectdata )
-end
-
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 	if not SERVER then return end
 
@@ -61,6 +51,8 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 		local armortbl = GetPartArmor( ply, hitgroup )
 		local armorClass, bulletClass = 0, GetFPAmmoPiercing( game.GetAmmoName( dmginfo:GetAmmoType() ) )
 		local defendedAtLeastBySomeShit = false
+		local hasHelmet = false
+		local ricochet = false
 
 		for i, armor in ipairs( armortbl ) do
 			if armor != nil and armor.durability != 0 then
@@ -69,6 +61,21 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 				local start_dmg = dmginfo:GetDamage()
 				if bulletClass <= armorClass then
 					dmginfo:ScaleDamage( ( 1 - regTbl.resistance[hitgroup] ) * math.min( 1, bulletClass / armorClass )  )
+				end
+
+				if hitgroup == HITGROUP_HEAD and bulletClass < armorClass then
+					local ricochetChance = ( 1 - ( bulletClass / armorClass ) ) * 0.3
+					if math.Rand( 0, 1 ) < ricochetChance then
+						ricochet = true
+						--print( "rico!" )
+						dmginfo:SetDamage( 0 )
+						ply:EmitSound( "scpfp/armor/rico/rico"..FPRandom( 1, 3 )..".mp3" )
+						net.Start( "FPArmorImpactEffect" )
+							net.WriteVector( dmginfo:GetDamagePosition() )
+							net.WriteEntity( dmginfo:GetAttacker() )
+						net.Broadcast()
+						break
+					end
 				end
 
 				if armor.durability != -1 then
@@ -83,14 +90,29 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 					armor.durability = 0
 				end
 
-				DoImpactEffect( dmginfo:GetDamagePosition(), dmginfo:GetAttacker() )
+				if hitgroup == HITGROUP_HEAD and regTbl.resistance[HITGROUP_HEAD] then
+					hasHelmet = true
+				end
+
+				net.Start( "FPArmorImpactEffect" )
+					net.WriteVector( dmginfo:GetDamagePosition() )
+					net.WriteEntity( dmginfo:GetAttacker() )
+				net.Broadcast()
 			end
 		end
 
-		dmginfo:ScaleDamage( hitGroupDamage[hitgroup] or 1 )
+		if not ricochet then
+			dmginfo:ScaleDamage( hitGroupDamage[hitgroup] or 1 )
 
-		if hitgroup == HITGROUP_HEAD and ( !defendedAtLeastBySomeShit or bulletClass > armorClass ) then
-			dmginfo:ScaleDamage( 3 )
+			if hitgroup == HITGROUP_HEAD and ( !defendedAtLeastBySomeShit or bulletClass > armorClass ) then
+				dmginfo:ScaleDamage( 3 )
+			elseif hitgroup == HITGROUP_HEAD and hasHelmet then
+				ply:EmitSound( "scpfp/armor/helmet/hit"..FPRandom( 1, 3 )..".wav" )
+				net.Start( "FPArmorImpactEffect" )
+					net.WriteVector( dmginfo:GetDamagePosition() )
+					net.WriteEntity( dmginfo:GetAttacker() )
+				net.Broadcast()
+			end
 		end
 
 		dmginfo:SetDamage( math.ceil( dmginfo:GetDamage() ) )

@@ -229,7 +229,7 @@ function TransmitSound( snd, status, arg1, arg2 )
 				local dist = v:GetPos():Distance( arg1 )
 
 				if dist <= arg2 then
-					net.Start( "PlaySound" )
+					net.Start( "FPPlaySound" )
 						net.WriteBool( status )
 						net.WriteFloat( 1 - dist / arg2 )
 						net.WriteString( snd )
@@ -238,13 +238,13 @@ function TransmitSound( snd, status, arg1, arg2 )
 			end
 		end
 	elseif isentity( arg1 ) and IsValid( arg1 ) and arg1:IsPlayer() or istable( arg1 ) then
-		net.Start( "PlaySound" )
+		net.Start( "FPPlaySound" )
 			net.WriteBool( status )
 			net.WriteFloat( arg2 or 1 )
 			net.WriteString( snd )
 		net.Send( arg1 )
 	else
-		net.Start( "PlaySound" )
+		net.Start( "FPPlaySound" )
 			net.WriteBool( status or false )
 			net.WriteFloat( arg1 or 1 )
 			net.WriteString( snd )

@@ -134,7 +134,7 @@ net.ReceivePing( "SayPersona", function( data )
 	chat.AddText( Color( 0, 150, 200 ), ply:FPName().." "..ply:FPSurname()..LANG.Get( "MISC", "heard_persona" ) )
 end )
 
-net.Receive( "PersonaSync", function()
+net.Receive( "FPPersonaSync", function()
 	USED_PERSONAS = net.ReadTable()
 end )
 
@@ -209,7 +209,7 @@ local name_gen_overrides = {
 			surname = code
 		} )
 
-		net.Start( "PersonaSync" )
+		net.Start( "FPPersonaSync" )
 			net.WriteTable( USED_PERSONAS )
 		net.Broadcast()
 
@@ -235,7 +235,7 @@ function PLAYER:GeneratePersona( override )
 			surname = sn
 		} )
 
-		net.Start( "PersonaSync" )
+		net.Start( "FPPersonaSync" )
 			net.WriteTable( USED_PERSONAS )
 		net.Broadcast()
 
@@ -253,7 +253,7 @@ function PLAYER:ChangePersonaManually( name, surname )
 	self:SetFPName( name )
 	self:SetFPSurname( surname )
 
-	net.Start( "PersonaSync" )
+	net.Start( "FPPersonaSync" )
 		net.WriteTable( USED_PERSONAS )
 	net.Broadcast()
 end

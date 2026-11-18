@@ -10,7 +10,7 @@ function BulletSupress( ignorant, traceStart, traceEnd )
 	end
 
 	for i, ply in ipairs( plys ) do
-		net.Start( "SuppressionSync" )
+		net.Start( "FPSuppressionSync" )
 			net.WriteVector( traceStart )
 			net.WriteVector( traceEnd )
 		net.Send( ply )
@@ -31,7 +31,7 @@ function Suppress( num )
 	SUPPRESSION = math.Clamp( SUPPRESSION + num, 0, 1 )
 end
 
-net.Receive( "SuppressionSync", function()
+net.Receive( "FPSuppressionSync", function()
 	local sPos, ePos = net.ReadVector(), net.ReadVector()
 
 	local BulPos = ClosestPointOnLine( LocalPlayer():EyePos(), sPos, ePos )

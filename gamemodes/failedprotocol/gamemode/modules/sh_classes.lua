@@ -76,7 +76,10 @@ SPAWNGROUPS = {
 				net.Ping( "GOCSpawn", nil, ply )
 			end
 
-			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+			if next_mtf != nil then
+				ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			end
 		end
 	},
 	["gru"] = {
@@ -125,7 +128,10 @@ SPAWNGROUPS = {
 				net.Ping( "SPEARSpawn", nil, ply )
 			end
 
-			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+			if next_mtf != nil then
+				ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			end
 		end
 	},
 	["ci"] = {
@@ -149,7 +155,10 @@ SPAWNGROUPS = {
 				net.Ping( "CISpawn", nil, ply )
 			end
 
-			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+			if next_mtf != nil then
+				ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			end
 		end
 	},
 	["sh"] = {
@@ -173,7 +182,10 @@ SPAWNGROUPS = {
 				net.Ping( "SHSpawn", nil, ply )
 			end
 
-			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+			if next_mtf != nil then
+				ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			end
 		end
 	},
 	["cbg"] = {
@@ -197,7 +209,10 @@ SPAWNGROUPS = {
 				net.Ping( "CBGSpawn", nil, ply )
 			end
 
-			ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			local next_mtf = ROUNDPROP.Get( "next_mtf" )
+			if next_mtf != nil then
+				ROUNDPROP.Set( "next_mtf", ROUNDPROP.Get( "next_mtf" ) - 1 )
+			end
 		end
 	},
 }
@@ -206,6 +221,7 @@ CLASSES = {
 	/*["yournamehere"] = {
 		team = TEAM_SPEC,
 		model = "your/model/path.mdl",
+		usehead = true, --sets random head if set to 'true'; to set specific head, write down table where first key is model, and the second one is skin
 		max = 999, -- Must be a higher number than 0
 		weps = { "first_weapon", "second_weapon" },
 		ammo = { ["357"] = 10 },
@@ -232,26 +248,8 @@ CLASSES = {
 		spawngroup = "classd",
 		team = TEAM_CLASSD,
 		model = "models/kutarum/scpfp/playermodels/classd.mdl",
+		usehead = true,
 		weps = {},
-		ammo = {},
-		maxhp = 100,
-		hp = 100,
-		maxstamina = 100,
-		stamina = 100,
-		walkspeed = 125,
-		crouchspeed = 0.5,
-		slowwalkspeed = 85,
-		runspeed = 235,
-		jumppower = 175,
-		callback = function( ply )
-			ply:GeneratePersona( "classd" )
-		end,
-	},
-	["mosind"] = {
-		spawngroup = "classd",
-		team = TEAM_CLASSD,
-		model = "models/kutarum/scpfp/playermodels/classd.mdl",
-		weps = { "tfa_fp_mosin" },
 		ammo = {},
 		maxhp = 100,
 		hp = 100,
@@ -269,7 +267,8 @@ CLASSES = {
 	["guard_pacificator"] = {
 		spawngroup = "security",
 		team = TEAM_SD,
-		model = "models/kutarum/scpfp/playermodels/security.mdl",
+		model = "models/kutarum/scpfp/playermodels/guard.mdl",
+		usehead = true,
 		weps = { "fp_melee_baton" },
 		ammo = {},
 		helmet = "security_cap",
@@ -287,7 +286,8 @@ CLASSES = {
 	["cispy"] = {
 		spawngroup = "security",
 		team = TEAM_CI,
-		model = "models/kutarum/scpfp/playermodels/security.mdl",
+		model = "models/kutarum/scpfp/playermodels/guard.mdl",
+		usehead = true,
 		max = 1,
 		weps = { "fp_melee_baton" },
 		ammo = {},
@@ -306,7 +306,8 @@ CLASSES = {
 	["guard"] = {
 		spawngroup = "security",
 		team = TEAM_SD,
-		model = "models/kutarum/scpfp/playermodels/security.mdl",
+		model = "models/kutarum/scpfp/playermodels/guard.mdl",
+		usehead = true,
 		helmet = "security_light_helmet",
 		vest = "security_medium_vest",
 		maxhp = 110,
@@ -325,7 +326,9 @@ CLASSES = {
 	["guard_storm"] = {
 		spawngroup = "security",
 		team = TEAM_SD,
-		model = "models/kutarum/scpfp/playermodels/security.mdl",
+		model = "models/kutarum/scpfp/playermodels/guard.mdl",
+		usehead = true,
+		max = 1,
 		helmet = "security_heavy_helmet",
 		vest = "security_heavy_vest",
 		maxhp = 120,
@@ -344,7 +347,8 @@ CLASSES = {
 	["researcher"] = {
 		spawngroup = "personnel",
 		team = TEAM_SCI,
-		model = "models/kutarum/brichevsk/personnel_models/scientist.mdl",
+		model = "models/kutarum/scpfp/playermodels/researcher.mdl",
+		usehead = true,
 		weps = {},
 		ammo = {},
 		maxhp = 100,
@@ -363,7 +367,8 @@ CLASSES = {
 	["gruspy"] = {
 		spawngroup = "personnel",
 		team = TEAM_GRU,
-		model = "models/kutarum/brichevsk/personnel_models/scientist.mdl",
+		model = "models/kutarum/scpfp/playermodels/researcher.mdl",
+		usehead = true,
 		max = 1,
 		weight = 3,
 		weps = { "tfa_fp_pm" },
@@ -398,7 +403,8 @@ CLASSES = {
 	["medic"] = {
 		spawngroup = "personnel",
 		team = TEAM_SCI,
-		model = "models/kutarum/brichevsk/personnel_models/medic.mdl",
+		model = "models/kutarum/scpfp/playermodels/medic.mdl",
+		usehead = true,
 		weps = {},
 		ammo = {},
 		maxhp = 100,
@@ -418,6 +424,7 @@ CLASSES = {
 		spawngroup = "personnel",
 		team = TEAM_SCI,
 		model = "models/kutarum/scpfp/playermodels/head_of_res_dep.mdl",
+		usehead = true,
 		weps = {},
 		ammo = {},
 		maxhp = 100,
@@ -442,6 +449,7 @@ CLASSES = {
 		spawngroup = "ntf",
 		team = TEAM_MTF,
 		model = "models/kutarum/scpfp/playermodels/ntf.mdl",
+		usehead = true,
 		weps = { "tfa_fp_m4a1" },
 		ammo = { ["556x45"] = 120 },
 		helmet = "ntf_helmet",
@@ -467,6 +475,7 @@ CLASSES = {
 		spawngroup = "goc",
 		team = TEAM_GOC,
 		model = "models/kutarum/scpfp/playermodels/goc.mdl",
+		usehead = true,
 		weps = { "tfa_fp_mk17" },
 		ammo = { ["762x51"] = 80 },
 		helmet = "goc_helmet",
@@ -492,6 +501,7 @@ CLASSES = {
 		spawngroup = "gru",
 		team = TEAM_GRU,
 		model = "models/kutarum/scpfp/playermodels/gru.mdl",
+		usehead = true,
 		weps = { "tfa_fp_val" },
 		ammo = { ["9x39"] = 100 },
 		helmet = "gru_helmet",
@@ -516,6 +526,7 @@ CLASSES = {
 		spawngroup = "spear",
 		team = TEAM_SPEAR,
 		model = "models/kutarum/scpfp/playermodels/spear.mdl",
+		usehead = true,
 		weps = { "tfa_fp_acr" },
 		ammo = { ["556x45"] = 120 },
 		helmet = "spear_helmet",
@@ -539,6 +550,7 @@ CLASSES = {
 		spawngroup = "ci",
 		team = TEAM_CI,
 		model = "models/kutarum/scpfp/playermodels/ci.mdl",
+		usehead = true,
 		weps = { "tfa_fp_badger" },
 		ammo = { ["556x45"] = 120 },
 		helmet = "ci_helmet",
@@ -564,6 +576,7 @@ CLASSES = {
 		spawngroup = "ci",
 		team = TEAM_CI,
 		model = "models/kutarum/scpfp/playermodels/ci_com.mdl",
+		usehead = true,
 		max = 1,
 		weight = 3,
 		weps = { "tfa_fp_badger" },
@@ -591,6 +604,7 @@ CLASSES = {
 		spawngroup = "sh",
 		team = TEAM_SH,
 		model = "models/kutarum/scpfp/playermodels/sh.mdl",
+		usehead = true,
 		weps = { "tfa_fp_sg552" },
 		ammo = { ["556x45"] = 120 },
 		vest = "sh_vest",
@@ -612,6 +626,7 @@ CLASSES = {
 		spawngroup = "sh",
 		team = TEAM_SH,
 		model = "models/kutarum/scpfp/playermodels/sh_com.mdl",
+		usehead = true,
 		max = 1,
 		weps = { "tfa_fp_sg552" },
 		ammo = { ["556x45"] = 120 },
@@ -639,6 +654,7 @@ CLASSES = {
 		spawngroup = "cbg",
 		team = TEAM_CBG,
 		model = "models/kutarum/scpfp/playermodels/cbg.mdl",
+		usehead = true,
 		weps = { "tfa_fp_ump" },
 		ammo = { ["45acp"] = 120 },
 		helmet = "cbg_mask",
@@ -660,6 +676,7 @@ CLASSES = {
 		spawngroup = "cbg",
 		team = TEAM_CBG,
 		model = "models/kutarum/scpfp/playermodels/cbg.mdl",
+		usehead = true,
 		max = 1,
 		weight = 3,
 		weps = { "tfa_fp_spas", "fp_vicodin" },

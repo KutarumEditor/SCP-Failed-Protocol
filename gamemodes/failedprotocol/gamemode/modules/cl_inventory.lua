@@ -487,6 +487,7 @@ local function CreatePlayerModel( parent )
                 if IsValid( merged ) then
                     merged:SetNoDraw( true )
                     merged:AddEffects( EF_BONEMERGE )
+                    merged:SetSkin( child:GetSkin() )
                     merged:SetParent( self.Entity )
                     boneMergedModels[#boneMergedModels + 1] = merged
                 end

@@ -4,7 +4,7 @@ include( "shared.lua" )
 
 function ENT:SyncStorage()
 	local tab = table.Copy( self.Items )
-	net.Start( "StorageSync" )
+	net.Start( "FPStorageSync" )
 		net.WriteEntity( self )
 		net.WriteTable( tab )
 	net.Broadcast()

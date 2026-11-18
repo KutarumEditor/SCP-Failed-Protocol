@@ -58,7 +58,7 @@ REGISTERED_ROUND_TYPES = {
 }
 
 function RoundDataSync( ply )
-	net.Start( "RoundDataSync" )
+	net.Start( "FPRoundDataSync" )
 		net.WriteTable( ROUND )
 	if IsValid( ply ) and ply:IsPlayer() then
 		net.Send( ply )

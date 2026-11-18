@@ -427,6 +427,35 @@ end
 
 ----------------------------------------------------------------
 
+--[[-------------------------------------------------------------------------
+HEADS
+---------------------------------------------------------------------------]]
+
+function PLAYER:SetHead( model, skin )
+	local head = ents.Create( "fp_bonemerge" )
+	head:SetParent( self )
+	head:SetPos( self:GetPos() )
+	head.Model = model
+	head:SetSkin( skin )
+	head:Spawn()
+
+	self.Head = head
+end
+
+local RANDOM_HEADS = {
+	{
+		model = "models/kutarum/scpfp/playermodels/heads/1.mdl",
+		skins = 7,
+	},
+}
+
+function PLAYER:RollHead() --Heads will roll
+	local tbl = RANDOM_HEADS[FPRandom(#RANDOM_HEADS)]
+	self:SetHead( tbl.model, FPRandom( tbl.skins ) - 1 )
+end
+
+----------------------------------------------------------------
+
 function PLAYER:PopupInfo( time, data )
 	if not IsValid( self ) or not self:IsPlayer() then return end
 
@@ -600,8 +629,17 @@ function PLAYER:Setup( class, spawn_override, instant )
 	self:SetBaseSpeed( class_tab.walkspeed or 125, class_tab.runspeed or 225, class_tab.slowwalkspeed or 85, class_tab.crouchspeed or .5 )
 	self:SetJumpPower( class_tab.jumppower or 175 )
 
-	if class_tab.norandomskin != true then
-		self:SetSkin( FPRandom( 0, 6 ) )
+	if self.Head != nil then
+		if self.Head != NULL then
+			self.Head:Remove()
+		end
+		self.Head = nil
+	end
+
+	if class_tab.usehead == true then
+		self:RollHead()
+	elseif istable( class_tab.usehead ) then
+		self:SetHead( class_tab.usehead[1], class_tab.usehead[2] )
 	end
 
 	if isfunction( class_tab.callback ) then

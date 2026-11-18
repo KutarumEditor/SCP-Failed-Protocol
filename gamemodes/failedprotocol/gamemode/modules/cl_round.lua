@@ -6,7 +6,7 @@ ROUND = ROUND or {
 	finishtime = 0,
 }
 
-net.Receive( "RoundDataSync", function()
+net.Receive( "FPRoundDataSync", function()
 	ROUND = net.ReadTable()
 end )
 

@@ -43,25 +43,32 @@ function BreachAction()
 end
 
 function RoundStartCutscene()
+	AMBIENT.Remove()
+	
 	local ply = LocalPlayer()
 
-	HideHUD( true, true )
+	local func = hook.Run( "RoundStartCutsceneOverride" )
 
-	ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
-	AMBIENT.Ban( 189 )
+	if func != true then
+		HideHUD( true, true )
 
-	local track = ply:GetFPClass() == "SCP035" and "sound/scpfp/ambience/035_cutscene.wav"
-		or ply:FPTeam() == TEAM_SCP and "sound/scpfp/ambience/scp_spawn.mp3"
-		or ply:FPTeam() == TEAM_CLASSD and "sound/scpfp/ambience/blue_feather.mp3"
-		or "sound/scpfp/ambience/personnel_spawn.mp3"
+		ply:ScreenFade( SCREENFADE.IN, color_black, 5, 3 )
+		AMBIENT.Ban( 189 )
 
-	AMBIENT.Restart( track )
+		local track =  ply:GetFPClass() == "SCP035" and "sound/scpfp/ambience/035_cutscene.wav"
+			or ply:FPTeam() == TEAM_SCP and "sound/scpfp/ambience/scp_spawn.mp3"
+			or ply:FPTeam() == TEAM_CLASSD and "sound/scpfp/ambience/blue_feather.mp3"
+			or "sound/scpfp/ambience/personnel_spawn.mp3"
+
+		AMBIENT.Restart( track )
+
+		timer.Simple( 3, function()
+			HideHUD( false )
+		end )
+	end
+
 	TIMERS.Create( "ClientBreachStart", 46, function()
 		BreachAction()
-	end )
-
-	timer.Simple( 3, function()
-		HideHUD( false )
 	end )
 end
 

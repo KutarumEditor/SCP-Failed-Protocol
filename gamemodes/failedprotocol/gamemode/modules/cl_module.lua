@@ -722,7 +722,7 @@ local tab = {
 
 local dmg_blur = 0
 
-net.Receive( "DamageBlur", function()
+net.Receive( "FPDamageBlur", function()
 	dmg = net.ReadFloat()
 
 	hud_shake = math.Clamp( hud_shake + dmg, 0, 2.5 )
@@ -959,3 +959,20 @@ function testFlashBang()
 		cur = power * 16
 	}
 end
+
+function DoImpactEffect( hitpos, attacker )
+	if not IsValid( attacker ) then return end
+	local normal = hitpos - attacker:GetPos()
+	normal:Normalize()
+
+	local effectdata = EffectData()
+	effectdata:SetOrigin( hitpos )
+	effectdata:SetNormal( normal )
+	util.Effect( "MetalSpark", effectdata )
+end
+
+net.Receive( "FPArmorImpactEffect", function()
+	local hitpos = net.ReadVector()
+	local attacker = net.ReadEntity()
+	DoImpactEffect( hitpos, attacker )
+end )

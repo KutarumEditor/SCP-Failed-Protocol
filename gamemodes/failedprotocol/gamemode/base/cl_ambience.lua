@@ -54,7 +54,7 @@ function AMBIENT.SetVolume( volume )
 end
 
 local checkTime = 0
-local ambThinkDelay = 1
+local ambThinkDelay = 3
 hook.Add( "Think", "FPAmbience", function()
 	local ct = CurTime()
 	if checkTime <= ct then

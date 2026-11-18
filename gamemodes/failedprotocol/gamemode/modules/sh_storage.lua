@@ -128,7 +128,7 @@ function OpenContainerUI( ent )
    	end
 end
 
-net.Receive( "StorageSync", function( len, ply )
+net.Receive( "FPStorageSync", function( len, ply )
 	local ent = net.ReadEntity()
 	local tbl = net.ReadTable()
 

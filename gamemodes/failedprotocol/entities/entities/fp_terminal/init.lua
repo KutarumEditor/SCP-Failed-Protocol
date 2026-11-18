@@ -43,7 +43,7 @@ function ENT:SyncData()
     local user = self:GetUser()
     if user == nil then return end
     
-    net.Start( "SyncTerminalData" )
+    net.Start( "FPSyncTerminalData" )
         net.WriteTable( self.Data )
         net.WriteEntity( self )
     net.Send( user )

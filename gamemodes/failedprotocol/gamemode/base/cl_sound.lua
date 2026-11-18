@@ -32,7 +32,7 @@ function ClientsideSound( file, ent )
 	end
 end
 
-net.Receive( "PlaySound", function( len )
+net.Receive( "FPPlaySound", function( len )
 	local com = net.ReadBool()
 	local vol = net.ReadFloat()
 	local f = net.ReadString()
